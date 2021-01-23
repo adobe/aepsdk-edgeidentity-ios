@@ -2,7 +2,7 @@
 
 ## About this project
 
-The AEP Idenity Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and requires the `AEPCore` extension.
+The AEP Identity Edge Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and requires the `AEPCore` extension.
 
 ## Requirements
 - Xcode 11.0 (or newer)
@@ -33,15 +33,15 @@ $ pod install
 
 ### [Swift Package Manager](https://github.com/apple/swift-package-manager)
 
-To add the AEPEdge Package to your application, from the Xcode menu select:
+To add the AEPIdentityEdge Package to your application, from the Xcode menu select:
 
 `File > Swift Packages > Add Package Dependency...`
 
-Enter the URL for the AEPEdge package repository: `https://github.com/adobe/aepsdk-edge-ios.git`.
+Enter the URL for the AEPIdentityEdge package repository: `https://github.com/adobe/aepsdk-edge-ios.git`.
 
 When prompted, make sure you change the branch to `main`. (Once the repo is public, we will reference specific tags/versions instead of a branch)
 
-Alternatively, if your project has a `Package.swift` file, you can add AEPEdge directly to your dependencies:
+Alternatively, if your project has a `Package.swift` file, you can add AEPIdentityEdge directly to your dependencies:
 
 ```
 dependencies: [
