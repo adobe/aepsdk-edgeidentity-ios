@@ -1,0 +1,24 @@
+PODS:
+  - AEPCore (3.0.0):
+    - AEPRulesEngine (= 1.0.0)
+    - AEPServices (= 3.0.0)
+  - AEPRulesEngine (1.0.0)
+  - AEPServices (3.0.0)
+
+DEPENDENCIES:
+  - AEPCore
+
+SPEC REPOS:
+  trunk:
+    - AEPCore
+    - AEPRulesEngine
+    - AEPServices
+
+SPEC CHECKSUMS:
+  AEPCore: 9ced1f1fddcbfd61517461e548e36aee740bf7c8
+  AEPRulesEngine: 8bbc694fce6900cd33b2496c7d4b33ee2eeffc46
+  AEPServices: 21ea64149483fdfbd5f88f546b9f5ad7d4987400
+
+PODFILE CHECKSUM: 33dfa8574c67203c1eae2184df01685364d170b6
+
+COCOAPODS: 1.10.1
