@@ -17,6 +17,10 @@
 		D43BAB3B25BBA8C700B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
 		D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB6925BBAF6000B08CC0 /* Identity.swift */; };
 		D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */; };
+		D43BABAA25BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */; };
+		D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */; };
+		D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */; };
+		D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +60,12 @@
 		D43BAB3A25BBA8C700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB6925BBAF6000B08CC0 /* Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity.swift; sourceTree = "<group>"; };
 		D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeConstants.swift; sourceTree = "<group>"; };
+		D43BABA725BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AEPIdentityEdgeSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEPIdentityEdgeSampleAppApp.swift; sourceTree = "<group>"; };
+		D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D43BABB225BBC4BB00B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC8D595E8B8F0E9A6976C2C2 /* Pods_AEPIdentityEdge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPIdentityEdge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -83,6 +93,13 @@
 			files = (
 				D43BAB3B25BBA8C700B08CC0 /* AEPIdentityEdge.framework in Frameworks */,
 				43E2977FF5B6CE67BFA18068 /* Pods_FunctionalTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D43BABA425BBC4BA00B08CC0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +135,7 @@
 				D43BAB1225BBA4F700B08CC0 /* Sources */,
 				D43BAB2625BBA8A900B08CC0 /* UnitTests */,
 				D43BAB3725BBA8C700B08CC0 /* FunctionalTests */,
+				D43BABA825BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */,
 				D43BAB1125BBA4F700B08CC0 /* Products */,
 				D00D9C7ED5DCBE11F5BE521D /* Pods */,
 				0B5B2ACABDDBE64CBBCE2D00 /* Frameworks */,
@@ -130,6 +148,7 @@
 				D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */,
 				D43BAB2525BBA8A800B08CC0 /* UnitTests.xctest */,
 				D43BAB3625BBA8C700B08CC0 /* FunctionalTests.xctest */,
+				D43BABA725BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,6 +182,27 @@
 			);
 			name = FunctionalTests;
 			path = Tests/FunctionalTests;
+			sourceTree = "<group>";
+		};
+		D43BABA825BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */ = {
+			isa = PBXGroup;
+			children = (
+				D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */,
+				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
+				D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */,
+				D43BABB225BBC4BB00B08CC0 /* Info.plist */,
+				D43BABAF25BBC4BB00B08CC0 /* Preview Content */,
+			);
+			name = AEPIdentityEdgeSampleApp;
+			path = SampleApps/AEPIdentityEdgeSampleApp;
+			sourceTree = "<group>";
+		};
+		D43BABAF25BBC4BB00B08CC0 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,6 +278,23 @@
 			productReference = D43BAB3625BBA8C700B08CC0 /* FunctionalTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		D43BABA625BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D43BABB525BBC4BB00B08CC0 /* Build configuration list for PBXNativeTarget "AEPIdentityEdgeSampleApp" */;
+			buildPhases = (
+				D43BABA325BBC4BA00B08CC0 /* Sources */,
+				D43BABA425BBC4BA00B08CC0 /* Frameworks */,
+				D43BABA525BBC4BA00B08CC0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AEPIdentityEdgeSampleApp;
+			productName = AEPIdentityEdgeSampleApp;
+			productReference = D43BABA725BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -255,6 +312,9 @@
 						CreatedOnToolsVersion = 12.3;
 					};
 					D43BAB3525BBA8C700B08CC0 = {
+						CreatedOnToolsVersion = 12.3;
+					};
+					D43BABA625BBC4BA00B08CC0 = {
 						CreatedOnToolsVersion = 12.3;
 					};
 				};
@@ -275,6 +335,7 @@
 				D43BAB0F25BBA4F700B08CC0 /* AEPIdentityEdge */,
 				D43BAB2425BBA8A800B08CC0 /* UnitTests */,
 				D43BAB3525BBA8C700B08CC0 /* FunctionalTests */,
+				D43BABA625BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */,
 			);
 		};
 /* End PBXProject section */
@@ -298,6 +359,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D43BABA525BBC4BA00B08CC0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */,
+				D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +499,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D43BABA325BBC4BA00B08CC0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */,
+				D43BABAA25BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,6 +778,50 @@
 			};
 			name = Release;
 		};
+		D43BABB325BBC4BB00B08CC0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SampleApps/AEPIdentityEdgeSampleApp/Preview Content\"";
+				DEVELOPMENT_TEAM = FKGEE875K4;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = SampleApps/AEPIdentityEdgeSampleApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.AEPIdentityEdgeSampleApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D43BABB425BBC4BB00B08CC0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SampleApps/AEPIdentityEdgeSampleApp/Preview Content\"";
+				DEVELOPMENT_TEAM = FKGEE875K4;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = SampleApps/AEPIdentityEdgeSampleApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.AEPIdentityEdgeSampleApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -734,6 +857,15 @@
 			buildConfigurations = (
 				D43BAB3F25BBA8C700B08CC0 /* Debug */,
 				D43BAB4025BBA8C700B08CC0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D43BABB525BBC4BB00B08CC0 /* Build configuration list for PBXNativeTarget "AEPIdentityEdgeSampleApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D43BABB325BBC4BB00B08CC0 /* Debug */,
+				D43BABB425BBC4BB00B08CC0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
