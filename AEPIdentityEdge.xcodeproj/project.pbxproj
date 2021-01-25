@@ -228,6 +228,7 @@
 				D43BAB0C25BBA4F700B08CC0 /* Sources */,
 				D43BAB0D25BBA4F700B08CC0 /* Frameworks */,
 				D43BAB0E25BBA4F700B08CC0 /* Resources */,
+				D43BAC2025BF4A0C00B08CC0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -247,6 +248,7 @@
 				D43BAB2225BBA8A800B08CC0 /* Frameworks */,
 				D43BAB2325BBA8A800B08CC0 /* Resources */,
 				040C2E600C1E8401E3A245DF /* [CP] Embed Pods Frameworks */,
+				D43BAC2125BF4A3A00B08CC0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -267,6 +269,7 @@
 				D43BAB3325BBA8C700B08CC0 /* Frameworks */,
 				D43BAB3425BBA8C700B08CC0 /* Resources */,
 				B256A447209E5CFC8F247606 /* [CP] Embed Pods Frameworks */,
+				D43BAC2225BF4A5C00B08CC0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -285,6 +288,7 @@
 				D43BABA325BBC4BA00B08CC0 /* Sources */,
 				D43BABA425BBC4BA00B08CC0 /* Frameworks */,
 				D43BABA525BBC4BA00B08CC0 /* Resources */,
+				D43BAC2325BF4A7F00B08CC0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -473,6 +477,74 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		D43BAC2025BF4A0C00B08CC0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ../.swiftlint.yml Sources\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		D43BAC2125BF4A3A00B08CC0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ../../.swiftlint.yml --lenient Tests/UnitTests\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		D43BAC2225BF4A5C00B08CC0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ../../.swiftlint.yml --lenient Tests/FunctionalTests\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		D43BAC2325BF4A7F00B08CC0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ../../.swiftlint.yml SampleApps/AEPIdentityEdgeSampleApp\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
