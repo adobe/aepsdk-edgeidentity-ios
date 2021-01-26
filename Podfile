@@ -17,3 +17,7 @@ end
 target 'FunctionalTests' do
   pod 'AEPCore'
 end
+
+target 'AEPIdentityEdgeSampleApp' do
+  pod 'AEPCore'
+end

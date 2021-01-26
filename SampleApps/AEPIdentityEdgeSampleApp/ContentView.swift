@@ -9,17 +9,55 @@
  governing permissions and limitations under the License.
  */
 
+import AEPCore
+import AEPIdentityEdge
 import SwiftUI
 
 struct ContentView: View {
+    @State var ecidText: String
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        HStack {
+            Text("Privacy: ")
+            Button(action: {
+                MobileCore.setPrivacyStatus(PrivacyStatus.optedIn)
+            }) {
+                Text("in")
+            }
+            Button(action: {
+                MobileCore.setPrivacyStatus(PrivacyStatus.optedOut)
+            }) {
+                Text("out")
+            }
+            Button(action: {
+                MobileCore.setPrivacyStatus(PrivacyStatus.unknown)
+            }) {
+                Text("unknown")
+            }
+        }.padding()
+
+        VStack {
+            Button(action: {
+                self.ecidText = ""
+                Identity.getExperienceCloudId { ecid, _ in
+                    if let ecid = ecid {
+                        self.ecidText = ecid
+                    } else {
+                        self.ecidText = "ecid is null"
+                    }
+                }
+            }) {
+                Text("Get ECID")
+            }.padding()
+
+            Text(ecidText)
+        }
+
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(ecidText: "")
     }
 }

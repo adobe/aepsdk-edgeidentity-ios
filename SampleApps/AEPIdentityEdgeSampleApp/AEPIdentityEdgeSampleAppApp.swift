@@ -13,9 +13,12 @@ import SwiftUI
 
 @main
 struct AEPIdentityEdgeSampleAppApp: App {
+    // swiftlint:disable weak_delegate
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(ecidText: "")
         }
     }
 }
