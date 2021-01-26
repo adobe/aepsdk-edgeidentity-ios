@@ -63,13 +63,15 @@ class IdentityState {
 
         if newPrivacyStatus == .optedOut {
             identityProperties.ecid = nil
+            identityProperties.saveToPersistence()
+            createSharedState(identityProperties.toEventData(), event)
         } else if identityProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
             identityProperties.ecid = ECID()
+            identityProperties.saveToPersistence()
+            createSharedState(identityProperties.toEventData(), event)
         }
 
-        identityProperties.saveToPersistence()
-        createSharedState(identityProperties.toEventData(), event)
     }
 
 }
