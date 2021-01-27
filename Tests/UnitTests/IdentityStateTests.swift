@@ -109,6 +109,8 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             XCTFail("Shared state should not be updated")
+        }, createXDMSharedState: { _, _ in
+            XCTFail("XDM Shared state should not be updated")
         })
 
         // verify
@@ -129,6 +131,8 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             XCTFail("Shared state should not be updated")
+        }, createXDMSharedState: { _, _ in
+            XCTFail("XDM Shared state should not be updated")
         })
 
         // verify
@@ -140,6 +144,7 @@ class IdentityStateTests: XCTestCase {
     func testProcessPrivacyChangeToOptOut() {
         // setup
         let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .unknown
         props.ecid = ECID()
@@ -150,10 +155,12 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             sharedStateExpectation.fulfill()
+        }, createXDMSharedState: { _, _ in
+            xdmSharedStateExpectation.fulfill()
         })
 
         // verify
-        wait(for: [sharedStateExpectation], timeout: 1)
+        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.optedOut, state.identityProperties.privacyStatus) // privacy status should change to opt out
         XCTAssertNil(state.identityProperties.ecid) // ecid is cleared
@@ -163,6 +170,7 @@ class IdentityStateTests: XCTestCase {
     func testProcessPrivacyChangeFromOptOutToOptIn() {
         // setup
         let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .optedOut
 
@@ -172,10 +180,12 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             sharedStateExpectation.fulfill()
+        }, createXDMSharedState: { _, _ in
+            xdmSharedStateExpectation.fulfill()
         })
 
         // verify
-        wait(for: [sharedStateExpectation], timeout: 1)
+        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.optedIn, state.identityProperties.privacyStatus) // privacy status should change to opt in
         XCTAssertNotNil(state.identityProperties.ecid) // ecid is set
@@ -184,7 +194,8 @@ class IdentityStateTests: XCTestCase {
     /// When we go from opt-out to unknown
     func testProcessPrivacyChangeFromOptOutToUnknown() {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "A force sync event should be dispatched")
+        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .optedOut
 
@@ -194,10 +205,12 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             sharedStateExpectation.fulfill()
+        }, createXDMSharedState: { _, _ in
+            xdmSharedStateExpectation.fulfill()
         })
 
         // verify
-        wait(for: [sharedStateExpectation], timeout: 1)
+        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.unknown, state.identityProperties.privacyStatus) // privacy status should change to opt in
         XCTAssertNotNil(state.identityProperties.ecid) // ecid is set
@@ -216,6 +229,8 @@ class IdentityStateTests: XCTestCase {
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
             XCTFail("Shared state should not be updated")
+        }, createXDMSharedState: { _, _ in
+            XCTFail("XDM Shared state should not be updated")
         })
 
         // verify

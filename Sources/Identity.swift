@@ -53,6 +53,7 @@ import Foundation
         // attempt to bootup
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
             createSharedState(data: state.identityProperties.toEventData(), event: nil)
+            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
         }
 
         return false // cannot handle any events until we have booted
@@ -81,7 +82,7 @@ import Foundation
     private func handleConfigurationResponse(event: Event) {
         if event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
             // if config contains new global privacy status, process the request
-            state?.processPrivacyChange(event: event, createSharedState: createSharedState(data:event:))
+            state?.processPrivacyChange(event: event, createSharedState: createSharedState(data:event:), createXDMSharedState: createXDMSharedState(data:event:))
         }
     }
 }

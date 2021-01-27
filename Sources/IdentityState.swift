@@ -51,7 +51,7 @@ class IdentityState {
     /// - Parameters:
     ///   - event: the event triggering the privacy change
     ///   - createSharedState: a function which can create Identity shared state
-    func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void) {
+    func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void, createXDMSharedState: ([String: Any], Event) -> Void) {
         let privacyStatusStr = event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
 
@@ -65,11 +65,13 @@ class IdentityState {
             identityProperties.ecid = nil
             identityProperties.saveToPersistence()
             createSharedState(identityProperties.toEventData(), event)
+            createXDMSharedState(identityProperties.toXdmData(), event)
         } else if identityProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
             identityProperties.ecid = ECID()
             identityProperties.saveToPersistence()
             createSharedState(identityProperties.toEventData(), event)
+            createXDMSharedState(identityProperties.toXdmData(), event)
         }
 
     }
