@@ -107,11 +107,9 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            XCTFail("Shared state should not be updated")
-        }, createXDMSharedState: { _, _ in
-            XCTFail("XDM Shared state should not be updated")
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have not been saved to persistence
@@ -129,11 +127,9 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            XCTFail("Shared state should not be updated")
-        }, createXDMSharedState: { _, _ in
-            XCTFail("XDM Shared state should not be updated")
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have not been saved to persistence
@@ -153,11 +149,9 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            sharedStateExpectation.fulfill()
-        }, createXDMSharedState: { _, _ in
-            xdmSharedStateExpectation.fulfill()
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
@@ -181,11 +175,9 @@ class IdentityStateTests: XCTestCase {
                           data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            sharedStateExpectation.fulfill()
-        }, createXDMSharedState: { _, _ in
-            xdmSharedStateExpectation.fulfill()
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
@@ -209,11 +201,9 @@ class IdentityStateTests: XCTestCase {
                           data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            sharedStateExpectation.fulfill()
-        }, createXDMSharedState: { _, _ in
-            xdmSharedStateExpectation.fulfill()
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
@@ -236,11 +226,9 @@ class IdentityStateTests: XCTestCase {
                           data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
-        state.processPrivacyChange(event: event, createSharedState: { _, _ in
-            XCTFail("Shared state should not be updated")
-        }, createXDMSharedState: { _, _ in
-            XCTFail("XDM Shared state should not be updated")
-        })
+        state.processPrivacyChange(event: event,
+                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
