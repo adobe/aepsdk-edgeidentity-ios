@@ -14,7 +14,7 @@
 import AEPServices
 import XCTest
 
-class IdentityEdgePropertiesTests: XCTestCase {
+class IdentityPropertiesTests: XCTestCase {
 
     var mockDataStore: MockDataStore {
         return ServiceProvider.shared.namedKeyValueService as! MockDataStore
@@ -48,6 +48,50 @@ class IdentityEdgePropertiesTests: XCTestCase {
         // verify
         XCTAssertEqual(1, eventData.count)
         XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+    }
+
+    /// When all properties all nil, the xdm data should be empty
+    func testToXdmDataEmpty() {
+        // setup
+        let properties = IdentityProperties()
+
+        // test
+        let xdmData = properties.toXdmData()
+
+        // verify
+        XCTAssertTrue(xdmData.isEmpty)
+    }
+
+    /// Test that xdm data is populated correctly when all properties are non-nil
+    func testToXdmDataFull() {
+        // setup
+        var properties = IdentityProperties()
+        properties.ecid = ECID()
+
+        // test
+        let xdmData = properties.toXdmData()
+
+        // verify
+        XCTAssertEqual(1, xdmData.count)
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: xdmData) else {
+            XCTFail("Failed to serialize dictionary to JSON data")
+            return
+        }
+
+        let decoder = JSONDecoder()
+
+        guard let identityMap = try? decoder.decode(IdentityMap.self, from: jsonData) else {
+            XCTFail("Failed to decode JSON data to IdentityMap")
+            return
+        }
+
+        let ecidItem = identityMap.getItemsFor(namespace: IdentityEdgeConstants.Namespaces.ECID)
+        XCTAssertNotNil(ecidItem)
+        XCTAssertEqual(1, ecidItem?.count)
+        XCTAssertEqual(properties.ecid?.ecidString, ecidItem?[0].id)
+        XCTAssertNil(ecidItem?[0].authenticationState)
+        XCTAssertNil(ecidItem?[0].primary)
     }
 
     func testSaveToPersistenceLoadFromPersistence() {

@@ -20,9 +20,11 @@
 		BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */; };
 		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
 		BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */; };
-		BFF6499B25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */; };
+		BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */; };
 		BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */; };
 		BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */; };
+		BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */; };
+		BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */; };
 		D076CE38E08EF904D1B9F82E /* Pods_AEPIdentityEdgeSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */; };
 		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */; };
@@ -73,9 +75,11 @@
 		BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockExtension.swift; sourceTree = "<group>"; };
 		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
 		BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStore.swift; sourceTree = "<group>"; };
-		BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgePropertiesTests.swift; sourceTree = "<group>"; };
+		BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPropertiesTests.swift; sourceTree = "<group>"; };
 		BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityStateTests.swift; sourceTree = "<group>"; };
 		BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableExtensionRuntime.swift; sourceTree = "<group>"; };
+		BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMap.swift; sourceTree = "<group>"; };
+		BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMapTests.swift; sourceTree = "<group>"; };
 		CB754BCCDBA7D33B9940E6ED /* Pods-UnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.debug.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; sourceTree = "<group>"; };
 		D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AEPIdentityEdge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,6 +210,7 @@
 				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
 				BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */,
 				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
+				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -218,8 +223,9 @@
 				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
 				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
 				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
-				BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */,
+				BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
+				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
 			);
 			name = UnitTests;
 			path = Tests/UnitTests;
@@ -652,6 +658,7 @@
 				BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */,
 				BFF6492125BFD1CB0012A4C5 /* IdentityProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */,
+				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -662,11 +669,12 @@
 				BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */,
 				BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */,
 				BFF6497A25C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift in Sources */,
-				BFF6499B25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift in Sources */,
+				BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */,
 				BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */,
 				BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */,
 				BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */,
+				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

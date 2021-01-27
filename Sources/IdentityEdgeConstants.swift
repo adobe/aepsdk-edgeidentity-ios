@@ -37,4 +37,8 @@ enum IdentityEdgeConstants {
     enum DataStoreKeys {
         static let IDENTITY_PROPERTIES = "identity.properties"
     }
+
+    enum Namespaces {
+        static let ECID = "ECID"
+    }
 }
