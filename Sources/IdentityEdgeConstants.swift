@@ -41,4 +41,8 @@ enum IdentityEdgeConstants {
     enum Namespaces {
         static let ECID = "ECID"
     }
+
+    enum XDMKeys {
+        static let IDENTITY_MAP = "identityMap"
+    }
 }

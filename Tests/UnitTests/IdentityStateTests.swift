@@ -175,7 +175,10 @@ class IdentityStateTests: XCTestCase {
         props.privacyStatus = .optedOut
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
@@ -200,7 +203,10 @@ class IdentityStateTests: XCTestCase {
         props.privacyStatus = .optedOut
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
 
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in
@@ -224,7 +230,10 @@ class IdentityStateTests: XCTestCase {
         props.ecid = ECID()
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event, createSharedState: { _, _ in

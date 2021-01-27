@@ -33,13 +33,19 @@ struct IdentityProperties: Codable {
     /// Converts `IdentityProperties` into an event data representation in XDM format
     /// - Returns: A dictionary representing this `IdentityProperties` in XDM format
     func toXdmData() -> [String: Any] {
+        var map: [String: Any] = [:]
+
         var identityMap = IdentityMap()
         if let ecid = ecid {
             identityMap.addItem(namespace: IdentityEdgeConstants.Namespaces.ECID,
                                 id: ecid.ecidString)
         }
 
-        return identityMap.asDictionary() ?? [:]
+        if let dict = identityMap.asDictionary() {
+            map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
+        }
+
+        return map
     }
 
     /// Populates the fields with values stored in the Identity data store

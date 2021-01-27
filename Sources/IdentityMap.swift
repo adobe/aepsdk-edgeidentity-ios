@@ -96,6 +96,10 @@ extension IdentityMap {
         if let jsonXdm = toJSONData() {
             xdm = try? JSONSerialization.jsonObject(with: jsonXdm, options: []) as? [String: Any]
         }
-        return xdm
+        guard let resultXdm = xdm, !resultXdm.isEmpty else {
+            return nil
+        }
+
+        return resultXdm
     }
 }

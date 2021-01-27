@@ -72,9 +72,12 @@ class IdentityPropertiesTests: XCTestCase {
         let xdmData = properties.toXdmData()
 
         // verify
-        XCTAssertEqual(1, xdmData.count)
+        guard let xdmIdentityMap = xdmData[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] else {
+            XCTFail("Identity Properties did not contain key 'identityMap'.")
+            return
+        }
 
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: xdmData) else {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: xdmIdentityMap) else {
             XCTFail("Failed to serialize dictionary to JSON data")
             return
         }
