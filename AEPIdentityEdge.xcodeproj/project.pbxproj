@@ -202,15 +202,15 @@
 		D43BAB1225BBA4F700B08CC0 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
 				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
-				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
-				D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */,
 				BFF6491A25BFD1990012A4C5 /* ECID.swift */,
-				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
+				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
 				BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */,
-				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
+				D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */,
 				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
+				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
+				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
+				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -219,13 +219,13 @@
 			isa = PBXGroup;
 			children = (
 				BFF6497F25C0A2A80012A4C5 /* Mocks */,
-				D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */,
-				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
-				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
 				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
+				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
+				D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */,
+				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
 				BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
-				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
+				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
 			);
 			name = UnitTests;
 			path = Tests/UnitTests;
@@ -246,8 +246,8 @@
 			children = (
 				BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */,
 				BFF6493D25C097560012A4C5 /* AppDelegate.swift */,
-				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
 				D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */,
+				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
 				D43BABB225BBC4BB00B08CC0 /* Info.plist */,
 				D43BABAF25BBC4BB00B08CC0 /* Preview Content */,
 			);
