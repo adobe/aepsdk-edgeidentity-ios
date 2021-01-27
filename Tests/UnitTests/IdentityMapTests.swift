@@ -83,57 +83,56 @@ class IdentityMapTests: XCTestCase {
 
     // MARK: encoder tests
 
-    //    func testEncode_oneItem() {
-    //        var identityMap = IdentityMap()
-    //        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
-    //
-    //        let encoder = JSONEncoder()
-    //        encoder.outputFormatting = [.prettyPrinted]
-    //
-    //        let data = try? encoder.encode(identityMap)
-    //        let actualResult = asFlattenDictionary(data: data)
-    //        let expectedResult: [String: Any] =
-    //            [ "space[0].id": "id",
-    //              "space[0].authenticationState": "ambiguous",
-    //              "space[0].primary": false]
-    //        assertEqual(expectedResult, actualResult)
-    //    }
+    func testEncode_oneItem() {
+        var identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
 
-    //    func testEncode_twoItems() {
-    //        var identityMap = IdentityMap()
-    //        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
-    //        identityMap.addItem(namespace: "A", id: "123")
-    //
-    //        let encoder = JSONEncoder()
-    //        encoder.outputFormatting = [.prettyPrinted]
-    //
-    //        let data = try? encoder.encode(identityMap)
-    //        let actualResult = asFlattenDictionary(data: data)
-    //        let expectedResult: [String: Any] =
-    //            [ "A[0].id": "123",
-    //              "space[0].id": "id",
-    //              "space[0].authenticationState": "ambiguous",
-    //              "space[0].primary": false]
-    //        assertEqual(expectedResult, actualResult)
-    //    }
+        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
+            XCTFail("IdentityMap.asDictionary returned nil!")
+            return
+        }
+        let expectedResult: [String: Any] =
+            ["space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]]
 
-    //    func testEncode_twoItemsSameNamespace() {
-    //        var identityMap = IdentityMap()
-    //        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
-    //        identityMap.addItem(namespace: "space", id: "123")
-    //
-    //        let encoder = JSONEncoder()
-    //        encoder.outputFormatting = [.prettyPrinted]
-    //
-    //        let data = try? encoder.encode(identityMap)
-    //        let actualResult = asFlattenDictionary(data: data)
-    //        let expectedResult: [String: Any] =
-    //            [ "space[0].id": "id",
-    //              "space[0].authenticationState": "ambiguous",
-    //              "space[0].primary": false,
-    //              "space[1].id": "123"]
-    //        assertEqual(expectedResult, actualResult)
-    //    }
+        XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
+    }
+
+    func testEncode_twoItems() {
+        var identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
+        identityMap.addItem(namespace: "A", id: "123")
+
+        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
+            XCTFail("IdentityMap.asDictionary returned nil!")
+            return
+        }
+        let expectedResult: [String: Any] =
+            [
+                "A": [ ["id": "123"] ],
+                "space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]
+            ]
+
+        XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
+    }
+
+    func testEncode_twoItemsSameNamespace() {
+        var identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", id: "id", authenticationState: AuthenticationState.ambiguous, primary: false)
+        identityMap.addItem(namespace: "space", id: "123")
+
+        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
+            XCTFail("IdentityMap.asDictionary returned nil!")
+            return
+        }
+        let expectedResult: [String: Any] =
+            [
+                "space": [
+                    ["id": "id", "authenticationState": "ambiguous", "primary": false],
+                    ["id": "123"]
+                ]
+            ]
+        XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
+    }
 
     // MARK: decoder tests
 
