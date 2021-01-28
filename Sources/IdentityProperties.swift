@@ -20,7 +20,11 @@ struct IdentityProperties: Codable {
     var ecid: ECID?
 
     /// The IDFA from retrieved Apple APIs
-    var advertisingIdentifier: String?
+    var advertisingIdentifier: String? {
+        didSet {
+            saveToPersistence()
+        }
+    }
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
@@ -29,10 +33,8 @@ struct IdentityProperties: Codable {
     /// - Returns: A dictionary representing this `IdentityProperties`
     func toEventData() -> [String: Any] {
         var eventData = [String: Any]()
-        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
-        if let adId = advertisingIdentifier, !adId.isEmpty {
-            eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
-        }
+        eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
+        eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
         return eventData
     }
 
@@ -47,8 +49,8 @@ struct IdentityProperties: Codable {
                                 id: ecid.ecidString)
         }
 
-        if let adId = advertisingIdentifier, !adId.isEmpty {
-            identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
+        if let adId = advertisingIdentifier {
+            identityMap.addItem(namespace: IdentityEdgeConstants.Namespaces.IDFA,
                                 id: adId)
         }
 
