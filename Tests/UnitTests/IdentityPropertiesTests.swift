@@ -41,13 +41,15 @@ class IdentityPropertiesTests: XCTestCase {
         // setup
         var properties = IdentityProperties()
         properties.ecid = ECID()
+        properties.advertisingIdentifier = "test-ad-id"
 
         // test
         let eventData = properties.toEventData()
 
         // verify
-        XCTAssertEqual(1, eventData.count)
+        XCTAssertEqual(2, eventData.count)
         XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
     }
 
     /// When all properties all nil, the xdm data should be empty
@@ -67,34 +69,25 @@ class IdentityPropertiesTests: XCTestCase {
         // setup
         var properties = IdentityProperties()
         properties.ecid = ECID()
+        properties.advertisingIdentifier = "test-ad-id"
 
         // test
         let xdmData = properties.toXdmData()
 
+        guard let ecidString = properties.ecid?.ecidString else {
+            XCTFail("properties.ecid is nil, which is unexpected.")
+            return
+        }
+
         // verify
-        guard let xdmIdentityMap = xdmData[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] else {
-            XCTFail("Identity Properties did not contain key 'identityMap'.")
-            return
-        }
+        let expectedResult: [String: Any] =
+            [ "identityMap": [
+                "ECID": [ ["id": "\(ecidString)"] ],
+                "IDFA": [ ["id": "test-ad-id"] ]
+            ]
+            ]
 
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: xdmIdentityMap) else {
-            XCTFail("Failed to serialize dictionary to JSON data")
-            return
-        }
-
-        let decoder = JSONDecoder()
-
-        guard let identityMap = try? decoder.decode(IdentityMap.self, from: jsonData) else {
-            XCTFail("Failed to decode JSON data to IdentityMap")
-            return
-        }
-
-        let ecidItem = identityMap.getItemsFor(namespace: IdentityEdgeConstants.Namespaces.ECID)
-        XCTAssertNotNil(ecidItem)
-        XCTAssertEqual(1, ecidItem?.count)
-        XCTAssertEqual(properties.ecid?.ecidString, ecidItem?[0].id)
-        XCTAssertNil(ecidItem?[0].authenticationState)
-        XCTAssertNil(ecidItem?[0].primary)
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }
 
     func testSaveToPersistenceLoadFromPersistence() {
