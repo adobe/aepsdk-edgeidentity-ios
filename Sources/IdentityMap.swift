@@ -28,7 +28,7 @@ struct IdentityMap {
     /// - Parameters:
     ///   - namespace: The namespace for this identity
     ///   - id: Identity of the consumer in the related namespace.
-    ///   - authenticationState: The state this identity is authenticated as for this observed ExperienceEvent.
+    ///   - authenticationState: The authentication state this identity as for an observed ExperienceEvent.
     ///   - primary: Indicates if this identity is the preferred identity. It is used as a hint to help systems better organize how identities are queried.
     mutating func addItem(namespace: String,
                           id: String,
@@ -87,10 +87,12 @@ extension IdentityItem: Equatable {
 }
 
 extension IdentityMap {
-    func toJSONData() -> Data? {
+    /// Encode this IdentityMap to JSON data
+    private func toJSONData() -> Data? {
         try? JSONEncoder().encode(self)
     }
 
+    /// Encode this IdentityMap to JSON data and return as dictionary.
     func asDictionary() -> [String: Any]? {
         var xdm: [String: Any]?
         if let jsonXdm = toJSONData() {
