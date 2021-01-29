@@ -41,7 +41,8 @@ class IdentityState {
         identityProperties.loadFromPersistence()
 
         // Load privacy status
-        identityProperties.privacyStatus = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? PrivacyStatus ?? PrivacyStatus.unknown
+        let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Defaults.PRIVACY_STATUS
 
         hasBooted = true
         Log.debug(label: LOG_TAG, "Identity has successfully booted up")
