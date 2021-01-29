@@ -253,22 +253,30 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithValidId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "adId", expectedAdId: "adId")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updated from nil to empty on first call, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithEmptyId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "", expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "", expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updated from nil to empty on first call when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithZeros() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updated from empty to valid value and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesEmptyWithValidId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "", newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "", newAdId: "adId", expectedAdId: "adId")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID call is ignored when old and new values are empty
@@ -278,7 +286,7 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID call is ignored when old and new values are empty; passing all zeros is converted to empty string
     func testSyncAdvertisingIdentifierDoesNotUpdatesEmptyWithEZeros() {
-        assertSyncAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        assertSyncAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
     }
 
     /// Test ad ID is updated from old value to new value, and no consent event is dispatched
@@ -293,27 +301,37 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updated from valid value to empty string and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesValidWithEmptyId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: "", expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: "", expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updaed from valid value to empty string when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesValidWithZeros() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updaed from all zeros to valid value and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithValidId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithEmptyId() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updaed from all zeros to empty string and consent false is dispatched; passing all zeros is converted to empty string
     func testSyncAdvertisingIdentifierUpdatesZerosWithZeros() {
-        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID call is ignored if passing nil
@@ -332,17 +350,17 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: "adId")
 
-        state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
-                                          createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
-                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.syncAdvertisingIdentifier(event: event,
+                                        createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
+                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
         XCTAssertEqual("oldAdId", state.identityProperties.advertisingIdentifier) // no change
     }
 
-    private func assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
+    private func assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?) -> Event? {
         // setup
         let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
@@ -357,21 +375,20 @@ class IdentityStateTests: XCTestCase {
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
         var consentEvent: Event?
-        state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
-                                          createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
-                                          dispatchEvent: { event in
+        state.syncAdvertisingIdentifier(event: event,
+                                        createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                                        dispatchEvent: { event in
                                             consentEvent = event
                                             consentExpectation.fulfill()
-                                          })
+                                        })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation, consentExpectation], timeout: 3)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(expectedAdId, state.identityProperties.advertisingIdentifier)
-
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual(expectedConsent, ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        // TODO assert consent hit
+        return consentEvent
     }
 
     private func assertSyncAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?) {
@@ -387,10 +404,10 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
-        state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
-                                          createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
-                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.syncAdvertisingIdentifier(event: event,
+                                        createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 3)
@@ -408,10 +425,10 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
-        state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
-                                          createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
-                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.syncAdvertisingIdentifier(event: event,
+                                        createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
+                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -426,9 +443,7 @@ private extension Event {
     }
 
     static func fakeGenericIdentityEvent(adId: String?) -> Event {
-        return Event(name: "Test Event",
-                     type: EventType.genericIdentity,
-                     source: EventSource.requestIdentity,
-                     data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: adId as Any])
+        return Event(name: "Test Event", type: EventType.genericIdentity, source: EventSource.requestIdentity,
+                     data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: adId as Any])
     }
 }

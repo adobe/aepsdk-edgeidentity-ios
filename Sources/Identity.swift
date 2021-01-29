@@ -79,7 +79,8 @@ import Foundation
         if let _ = event.adId {
             state?.syncAdvertisingIdentifier(event: event,
                                              createSharedState: createSharedState(data:event:),
-                                             createXDMSharedState: createXDMSharedState(data:event:))
+                                             createXDMSharedState: createXDMSharedState(data:event:),
+                                             dispatchEvent: dispatch(event:))
         } else {
             processIdentifiersRequest(event: event)
         }
