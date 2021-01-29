@@ -45,7 +45,7 @@ struct IdentityProperties: Codable {
                                 id: ecid.ecidString)
         }
 
-        if let adId = advertisingIdentifier {
+        if let adId = advertisingIdentifier, !adId.isEmpty {
             identityMap.addItem(namespace: IdentityEdgeConstants.Namespaces.IDFA,
                                 id: adId)
         }

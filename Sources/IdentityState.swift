@@ -64,7 +64,8 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared state
     func syncAdvertisingIdentifier(event: Event,
                                    createSharedState: ([String: Any], Event) -> Void,
-                                   createXDMSharedState: ([String: Any], Event) -> Void) {
+                                   createXDMSharedState: ([String: Any], Event) -> Void,
+                                   dispatchEvent: (Event) -> Void) {
 
         // Early exit if privacy is opt-out
         if identityProperties.privacyStatus == .optedOut {
@@ -78,7 +79,11 @@ class IdentityState {
             identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                //dispatchAdIdConsent(identityProperties.advertisingIdentifier)
+                // TODO use Consent object
+                let val = adId.isEmpty ? "n" : "y"
+                let consentPayload = ["consents": ["adId": ["val": val]]]
+                let event = Event(name: "IDFA Consent Request", type: "consent", source: EventSource.requestContent, data: consentPayload)
+                dispatchEvent(event)
             }
 
             identityProperties.saveToPersistence()
@@ -123,7 +128,12 @@ class IdentityState {
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
         guard let newAdID = newAdID else { return (false, false) }
-        let existingAdId = identityProperties.advertisingIdentifier ?? ""
+
+        guard let existingAdId = identityProperties.advertisingIdentifier else {
+            // existing is nil but new is not, update with new and update consent
+            // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
+            return (true, true)
+        }
 
         // did the advertising identifier change?
         if (!newAdID.isEmpty && newAdID != existingAdId)
