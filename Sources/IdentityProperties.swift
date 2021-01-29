@@ -20,11 +20,7 @@ struct IdentityProperties: Codable {
     var ecid: ECID?
 
     /// The IDFA from retrieved Apple APIs
-    var advertisingIdentifier: String? {
-        didSet {
-            saveToPersistence()
-        }
-    }
+    var advertisingIdentifier: String?
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityEdgeConstants.Defaults.PRIVACY_STATUS

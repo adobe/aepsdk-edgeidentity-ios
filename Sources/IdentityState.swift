@@ -54,6 +54,40 @@ class IdentityState {
         return true
     }
 
+    /// Sets the advertising identifier from the `event` if changed from current value.
+    /// Updates the persistence values for the ad id and creates new shared state
+    /// Dispatches consent request event if advertising ID consent changed.
+    /// If privacy is optedout, call is ignored
+    /// - Parameters:
+    ///   - event: event containing a new ADID value.
+    ///   - createSharedState: function which creates a new shared state
+    ///   - createXDMSharedState: function which creates new XDM shared state
+    func syncAdvertisingIdentifier(event: Event,
+                                   createSharedState: ([String: Any], Event) -> Void,
+                                   createXDMSharedState: ([String: Any], Event) -> Void) {
+
+        // Early exit if privacy is opt-out
+        if identityProperties.privacyStatus == .optedOut {
+            Log.debug(label: LOG_TAG, "Ignoring sync advertising identifiers request as privacy is opted-out")
+            return
+        }
+
+        // update adid if changed and extract the new adid value
+        let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
+        if adIdChanged, let adId = event.adId {
+            identityProperties.advertisingIdentifier = adId
+
+            if shouldUpdateConsent {
+                //dispatchAdIdConsent(identityProperties.advertisingIdentifier)
+            }
+
+            identityProperties.saveToPersistence()
+            createSharedState(identityProperties.toEventData(), event)
+            createXDMSharedState(identityProperties.toXdmData(), event)
+        }
+
+    }
+
     /// Updates and makes any required actions when the privacy status has updated
     /// - Parameters:
     ///   - event: the event triggering the privacy change
@@ -70,6 +104,7 @@ class IdentityState {
 
         if newPrivacyStatus == .optedOut {
             identityProperties.ecid = nil
+            identityProperties.advertisingIdentifier = nil
             identityProperties.saveToPersistence()
             createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
@@ -81,6 +116,28 @@ class IdentityState {
             createXDMSharedState(identityProperties.toXdmData(), event)
         }
 
+    }
+
+    /// Determines if we should update the ad id with `newAdID`
+    /// - Parameter newAdID: the new ad id
+    /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
+    private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
+        guard let newAdID = newAdID else { return (false, false) }
+        let existingAdId = identityProperties.advertisingIdentifier ?? ""
+
+        // did the advertising identifier change?
+        if (!newAdID.isEmpty && newAdID != existingAdId)
+            || (newAdID.isEmpty && !existingAdId.isEmpty) {
+            // Now we know the value changed, but did it change to/from null?
+            // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
+                return (true, true)
+            }
+
+            return (true, false)
+        }
+
+        return (false, false)
     }
 
 }
