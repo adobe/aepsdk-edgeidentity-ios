@@ -30,7 +30,7 @@ class IdentityState {
         self.identityProperties = identityProperties
     }
 
-    /// Completes init for the Identity extension if we can force sync and determines if we need to share state
+    /// Completes init for the Identity extension.
     /// - Parameters:
     ///   - configSharedState: the current configuration shared state available at registration time
     ///   - event: The `Event` triggering the bootup
@@ -43,6 +43,11 @@ class IdentityState {
         // Load privacy status
         let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Defaults.PRIVACY_STATUS
+
+        // Generate new ECID if privacy status allows
+        if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
+            identityProperties.ecid = ECID()
+        }
 
         hasBooted = true
         Log.debug(label: LOG_TAG, "Identity has successfully booted up")

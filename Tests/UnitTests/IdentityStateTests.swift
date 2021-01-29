@@ -42,7 +42,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithOptInPrivacyReturnsTrue() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn]
+        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -55,7 +55,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithOptOutPrivacyReturnsTrue() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut] as [String: Any]
+        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -68,7 +68,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithUnknownPrivacyReturnsFalse() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown] as [String: Any]
+        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue] as [String: Any]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -124,7 +124,10 @@ class IdentityStateTests: XCTestCase {
         props.ecid = ECID()
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -146,7 +149,10 @@ class IdentityStateTests: XCTestCase {
         props.ecid = ECID()
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
