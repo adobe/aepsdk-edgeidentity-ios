@@ -10,6 +10,7 @@
 // governing permissions and limitations under the License.
 //
 
+import AEPCore
 import Foundation
 
 enum IdentityEdgeConstants {
@@ -18,6 +19,9 @@ enum IdentityEdgeConstants {
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
 
+    enum Defaults {
+        static let PRIVACY_STATUS = PrivacyStatus.unknown
+    }
     enum SharedStateKeys {
         static let CONFIGURATION = "com.adobe.module.configuration"
     }

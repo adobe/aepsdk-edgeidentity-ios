@@ -20,7 +20,7 @@ struct IdentityProperties: Codable {
     var ecid: ECID?
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
-    var privacyStatus = PrivacyStatus.unknown
+    var privacyStatus = IdentityEdgeConstants.Defaults.PRIVACY_STATUS
 
     /// Converts `IdentityProperties` into an event data representation
     /// - Returns: A dictionary representing this `IdentityProperties`
