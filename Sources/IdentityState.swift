@@ -54,18 +54,17 @@ class IdentityState {
         return true
     }
 
-    /// When the advertising identifier from the `event` is different from the current value, it updates the persisted value and creates
-    /// new shared state and XDM shared state. A consent request event is dispatched when advertising tracking preferences change.
-    /// If privacy is optedout the call is ignored
+    /// Sets the advertising identifier from the `event` if changed from current value.
+    /// Updates the persistence values for the ad id and creates new shared state
+    /// Dispatches consent request event if advertising ID consent changed.
+    /// If privacy is optedout, call is ignored
     /// - Parameters:
     ///   - event: event containing a new ADID value.
     ///   - createSharedState: function which creates a new shared state
     ///   - createXDMSharedState: function which creates new XDM shared state
-    ///   - dispatchEvent: function which dispatchs events to the event hub
-    func updateAdvertisingIdentifier(event: Event,
-                                     createSharedState: ([String: Any], Event) -> Void,
-                                     createXDMSharedState: ([String: Any], Event) -> Void,
-                                     dispatchEvent: (Event) -> Void) {
+    func syncAdvertisingIdentifier(event: Event,
+                                   createSharedState: ([String: Any], Event) -> Void,
+                                   createXDMSharedState: ([String: Any], Event) -> Void) {
 
         // Early exit if privacy is opt-out
         if identityProperties.privacyStatus == .optedOut {
@@ -79,8 +78,7 @@ class IdentityState {
             identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
-                dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
+                //dispatchAdIdConsent(identityProperties.advertisingIdentifier)
             }
 
             identityProperties.saveToPersistence()
@@ -121,24 +119,19 @@ class IdentityState {
 
     }
 
-    /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
+    /// Determines if we should update the ad id with `newAdID`
     /// - Parameter newAdID: the new ad id
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
         guard let newAdID = newAdID else { return (false, false) }
-
-        guard let existingAdId = identityProperties.advertisingIdentifier else {
-            // existing is nil but new is not, update with new and update consent
-            // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
-            return (true, true)
-        }
+        let existingAdId = identityProperties.advertisingIdentifier ?? ""
 
         // did the advertising identifier change?
         if (!newAdID.isEmpty && newAdID != existingAdId)
             || (newAdID.isEmpty && !existingAdId.isEmpty) {
             // Now we know the value changed, but did it change to/from null?
             // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
-            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
                 return (true, true)
             }
 
@@ -146,23 +139,6 @@ class IdentityState {
         }
 
         return (false, false)
-    }
-
-    /// Dispatch a consent request `Event` with `EventType.consent` and `EventSource.requestContent` which contains the consent value specifying
-    /// new advertising tracking preferences.
-    /// - Parameters:
-    ///   -  val: The new adId consent value, either "y" or "n"
-    ///   - dispatchEvent: a function which sends an event to the event hub
-    private func dispatchAdIdConsentRequestEvent(val: String, dispatchEvent: (Event) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
-                          type: EventType.consent,
-                          source: EventSource.requestContent,
-                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
-                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
-                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
-                                    ]
-                          ])
-        dispatchEvent(event)
     }
 
 }
