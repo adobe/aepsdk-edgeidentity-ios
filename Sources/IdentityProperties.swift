@@ -23,14 +23,14 @@ struct IdentityProperties: Codable {
     var advertisingIdentifier: String?
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
-    var privacyStatus = IdentityEdgeConstants.Default.PRIVACY_STATUS
+    var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
 
     /// Converts `IdentityProperties` into an event data representation
     /// - Returns: A dictionary representing this `IdentityProperties`
     func toEventData() -> [String: Any] {
         var eventData = [String: Any]()
-        eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
-        eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
+        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
+        eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
         return eventData
     }
 
@@ -46,7 +46,7 @@ struct IdentityProperties: Codable {
         }
 
         if let adId = advertisingIdentifier, !adId.isEmpty {
-            identityMap.addItem(namespace: IdentityEdgeConstants.Namespaces.IDFA,
+            identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
                                 id: adId)
         }
 

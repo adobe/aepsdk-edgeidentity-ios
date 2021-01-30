@@ -41,8 +41,8 @@ class IdentityState {
         identityProperties.loadFromPersistence()
 
         // Load privacy status
-        let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Default.PRIVACY_STATUS
+        let privacyStatusString = configSharedState[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityConstants.Default.PRIVACY_STATUS
 
         // Generate new ECID if privacy status allows
         if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
@@ -79,7 +79,7 @@ class IdentityState {
             identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                let val = adId.isEmpty ? IdentityEdgeConstants.XDMKeys.Consent.NO : IdentityEdgeConstants.XDMKeys.Consent.YES
+                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
                 let event = createAdIdConsentRequestEvent(val: val)
                 dispatchEvent(event)
             }
@@ -139,7 +139,7 @@ class IdentityState {
             || (newAdID.isEmpty && !existingAdId.isEmpty) {
             // Now we know the value changed, but did it change to/from null?
             // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
-            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
                 return (true, true)
             }
 
@@ -156,9 +156,9 @@ class IdentityState {
         return Event(name: "Ad ID Consent Request",
                      type: EventType.consent,
                      source: EventSource.requestContent,
-                     data: [IdentityEdgeConstants.XDMKeys.Consent.CONSENTS:
-                                [IdentityEdgeConstants.XDMKeys.Consent.AD_ID:
-                                    [IdentityEdgeConstants.XDMKeys.Consent.VAL: val]
+                     data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
+                                [IdentityConstants.XDMKeys.Consent.AD_ID:
+                                    [IdentityConstants.XDMKeys.Consent.VAL: val]
                                 ]
                      ])
     }

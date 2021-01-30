@@ -62,6 +62,10 @@ class IdentityTests: XCTestCase {
 
     /// Tests that when a configuration request content event contains opt-out that we update privacy status
     func testConfigurationResponseEventOptOut() {
+        // setup
+        identity = Identity(runtime: mockRuntime)
+        identity.onRegistered()
+
         let data = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: data)
 

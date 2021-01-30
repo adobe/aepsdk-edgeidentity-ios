@@ -17,8 +17,8 @@ extension Event {
 
     /// Reads the advertising from the event data
     var adId: String? {
-        let adId = data?[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String
-        if adId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
+        let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String
+        if adId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
             return ""
         }
 
