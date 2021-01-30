@@ -16,9 +16,9 @@ import Foundation
 @objc(AEPMobileIdentity) public class Identity: NSObject, Extension {
 
     // MARK: Extension
-    public let name = IdentityEdgeConstants.EXTENSION_NAME
-    public let friendlyName = IdentityEdgeConstants.FRIENDLY_NAME
-    public static let extensionVersion = IdentityEdgeConstants.EXTENSION_VERSION
+    public let name = IdentityConstants.EXTENSION_NAME
+    public let friendlyName = IdentityConstants.FRIENDLY_NAME
+    public static let extensionVersion = IdentityConstants.EXTENSION_VERSION
     public let metadata: [String: String]? = nil
     private(set) var state: IdentityState?
 
@@ -51,7 +51,7 @@ import Foundation
         guard let state = state else { return false }
         guard !state.hasBooted else { return true } // we have booted, return true
 
-        guard let configSharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
+        guard let configSharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
             createSharedState(data: state.identityProperties.toEventData(), event: nil)
@@ -77,7 +77,7 @@ import Foundation
 
     private func processIdentifiersRequest(event: Event) {
         let eventData = state?.identityProperties.toEventData()
-        let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+        let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identity,
                                                       source: EventSource.responseIdentity,
                                                       data: eventData)
@@ -89,7 +89,7 @@ import Foundation
     /// Handles the configuration response event
     /// - Parameter event: the configuration response event
     private func handleConfigurationResponse(event: Event) {
-        if event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
+        if event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
             // if config contains new global privacy status, process the request
             state?.processPrivacyChange(event: event,
                                         createSharedState: createSharedState(data:event:),

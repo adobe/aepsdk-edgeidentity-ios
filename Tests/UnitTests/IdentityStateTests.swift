@@ -42,7 +42,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithOptInPrivacyReturnsTrue() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue]
+        let configSharedState = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -55,7 +55,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithOptOutPrivacyReturnsTrue() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
+        let configSharedState = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -68,7 +68,7 @@ class IdentityStateTests: XCTestCase {
     /// Tests that the properties are updated
     func testBootupIfReadyWithUnknownPrivacyReturnsFalse() {
         // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue] as [String: Any]
+        let configSharedState = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue] as [String: Any]
 
         // test
         let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
@@ -129,7 +129,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -155,7 +155,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
+                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -182,7 +182,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -208,7 +208,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
+                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -234,7 +234,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
+                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
         // test
         state.processPrivacyChange(event: event,
@@ -267,7 +267,7 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updated from nil to empty on first call when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
         XCTAssertNotNil(consentEvent)
         XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
@@ -286,7 +286,7 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID call is ignored when old and new values are empty; passing all zeros is converted to empty string
     func testSyncAdvertisingIdentifierDoesNotUpdatesEmptyWithEZeros() {
-        assertSyncAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        assertSyncAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
     }
 
     /// Test ad ID is updated from old value to new value, and no consent event is dispatched
@@ -308,28 +308,28 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updaed from valid value to empty string when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesValidWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
         XCTAssertNotNil(consentEvent)
         XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updaed from all zeros to valid value and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithValidId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
         XCTAssertNotNil(consentEvent)
         XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithEmptyId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "")
         XCTAssertNotNil(consentEvent)
         XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     /// Test ad ID is updaed from all zeros to empty string and consent false is dispatched; passing all zeros is converted to empty string
     func testSyncAdvertisingIdentifierUpdatesZerosWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
+        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
         XCTAssertNotNil(consentEvent)
         XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
@@ -444,6 +444,6 @@ private extension Event {
 
     static func fakeGenericIdentityEvent(adId: String?) -> Event {
         return Event(name: "Test Event", type: EventType.genericIdentity, source: EventSource.requestIdentity,
-                     data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: adId as Any])
+                     data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: adId as Any])
     }
 }

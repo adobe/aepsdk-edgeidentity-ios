@@ -13,7 +13,7 @@
 import AEPCore
 import Foundation
 
-enum IdentityEdgeConstants {
+enum IdentityConstants {
     static let EXTENSION_NAME = "com.adobe.module.identity"
     static let FRIENDLY_NAME = "IdentityEdge"
     static let EXTENSION_VERSION = "1.0.0-alpha.1"

@@ -48,8 +48,8 @@ class IdentityPropertiesTests: XCTestCase {
 
         // verify
         XCTAssertEqual(2, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
+        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
     }
 
     /// When all properties all nil, the xdm data should be empty

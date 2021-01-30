@@ -33,7 +33,7 @@ class IdentityEdgeTests: XCTestCase {
     func testIdentityRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -66,7 +66,7 @@ class IdentityEdgeTests: XCTestCase {
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
 
-        let data = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
+        let data = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: data)
 
         // test
