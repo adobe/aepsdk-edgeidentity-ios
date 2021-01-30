@@ -79,10 +79,8 @@ class IdentityState {
             identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                // TODO use Consent object
-                let val = adId.isEmpty ? "n" : "y"
-                let consentPayload = ["consents": ["adId": ["val": val]]]
-                let event = Event(name: "IDFA Consent Request", type: "consent", source: EventSource.requestContent, data: consentPayload)
+                let val = adId.isEmpty ? IdentityEdgeConstants.XDMKeys.Consent.NO : IdentityEdgeConstants.XDMKeys.Consent.YES
+                let event = createAdIdConsentRequestEvent(val: val)
                 dispatchEvent(event)
             }
 
@@ -148,6 +146,20 @@ class IdentityState {
         }
 
         return (false, false)
+    }
+
+    /// Create `Event` with `EventType.consent` and `EventSource.requestContent` for sending advertising identifier consent
+    /// changes to the Consent extension.
+    /// - Parameter val: The new adId consent value, either "y" or "n"
+    private func createAdIdConsentRequestEvent(val: String) -> Event {
+        return Event(name: "Ad ID Consent Request",
+                     type: EventType.consent,
+                     source: EventSource.requestContent,
+                     data: [IdentityEdgeConstants.XDMKeys.Consent.CONSENTS:
+                                [IdentityEdgeConstants.XDMKeys.Consent.AD_ID:
+                                    [IdentityEdgeConstants.XDMKeys.Consent.VAL: val]
+                                ]
+                     ])
     }
 
 }

@@ -53,5 +53,14 @@ enum IdentityEdgeConstants {
 
     enum XDMKeys {
         static let IDENTITY_MAP = "identityMap"
+
+        enum Consent {
+            static let CONSENTS = "consents"
+            static let AD_ID = "adId"
+            static let VAL = "val"
+            static let YES = "y"
+            static let NO = "n"
+        }
     }
+
 }
