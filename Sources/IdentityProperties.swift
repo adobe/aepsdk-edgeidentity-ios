@@ -23,7 +23,7 @@ struct IdentityProperties: Codable {
     var advertisingIdentifier: String?
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
-    var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
+    var privacyStatus = IdentityEdgeConstants.Default.PRIVACY_STATUS
 
     /// Converts `IdentityProperties` into an event data representation
     /// - Returns: A dictionary representing this `IdentityProperties`

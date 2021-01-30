@@ -41,8 +41,8 @@ class IdentityState {
         identityProperties.loadFromPersistence()
 
         // Load privacy status
-        let privacyStatusString = configSharedState[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityConstants.Default.PRIVACY_STATUS
+        let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Default.PRIVACY_STATUS
 
         // Generate new ECID if privacy status allows
         if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
