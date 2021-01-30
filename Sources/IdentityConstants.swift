@@ -35,6 +35,7 @@ enum IdentityConstants {
     enum EventNames {
         static let IDENTITY_REQUEST_IDENTITY = "IdentityRequestIdentity"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "IDENTITY_RESPONSE_CONTENT_ONE_TIME"
+        static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
     }
 
     enum EventDataKeys {

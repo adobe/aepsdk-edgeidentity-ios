@@ -152,7 +152,7 @@ class IdentityState {
     /// changes to the Consent extension.
     /// - Parameter val: The new adId consent value, either "y" or "n"
     private func createAdIdConsentRequestEvent(val: String) -> Event {
-        return Event(name: "Ad ID Consent Request",
+        return Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
                      type: EventType.consent,
                      source: EventSource.requestContent,
                      data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
