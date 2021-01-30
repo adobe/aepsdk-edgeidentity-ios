@@ -19,7 +19,7 @@ enum IdentityEdgeConstants {
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
 
-    enum Defaults {
+    enum Default {
         static let PRIVACY_STATUS = PrivacyStatus.unknown
         static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"
     }
