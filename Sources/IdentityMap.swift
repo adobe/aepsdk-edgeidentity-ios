@@ -28,7 +28,7 @@ struct IdentityMap {
     /// - Parameters:
     ///   - namespace: The namespace for this identity
     ///   - id: Identity of the consumer in the related namespace.
-    ///   - authenticationState: The authentication state this identity as for an observed ExperienceEvent.
+    ///   - authenticationState: The current authentication state of this identity.
     ///   - primary: Indicates if this identity is the preferred identity. It is used as a hint to help systems better organize how identities are queried.
     mutating func addItem(namespace: String,
                           id: String,
