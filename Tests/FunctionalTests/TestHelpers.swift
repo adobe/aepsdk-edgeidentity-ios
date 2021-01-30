@@ -31,25 +31,22 @@ extension UserDefaults {
 extension FileManager {
 
     func clearCache() {
+
+        let cacheUrls: [String: Bool] = [
+            "Library/Caches/com.adobe.module.signal": false,
+            "Library/Caches/com.adobe.module.identity": false,
+            "Library/Caches/com.adobe.mobile.diskcache": true
+        ]
+
         if let _ = self.urls(for: .cachesDirectory, in: .userDomainMask).first {
 
-            do {
-                try self.removeItem(at: URL(fileURLWithPath: "Library/Caches/com.adobe.module.signal"))
-            } catch {
-                print("ERROR DESCRIPTION: \(error)")
+            for (url, isDirectory) in cacheUrls {
+                do {
+                    try self.removeItem(at: URL(fileURLWithPath: url, isDirectory: isDirectory))
+                } catch {
+                    print("ERROR DESCRIPTION: \(error)")
+                }
             }
-
-            do {
-                try self.removeItem(at: URL(fileURLWithPath: "Library/Caches/com.adobe.module.identity"))
-            } catch {
-                print("ERROR DESCRIPTION: \(error)")
-            }
-            do {
-                try self.removeItem(at: URL(fileURLWithPath: "Library/Caches/com.adobe.mobile.diskcache", isDirectory: true))
-            } catch {
-                print("ERROR DESCRIPTION: \(error)")
-            }
-
         }
 
     }

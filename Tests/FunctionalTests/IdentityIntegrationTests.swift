@@ -95,4 +95,39 @@ class IdentityIntegrationTests: XCTestCase {
         }
         wait(for: [expectation], timeout: 5)
     }
+
+    func testGetExperienceCloudIdWhenPrivacyChanges() {
+        initExtensionsAndWait()
+
+        let expectation1 = XCTestExpectation(description: "getExperienceCloudId callback")
+        var ecid1: String?
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
+        Identity.getExperienceCloudId { ecid, _ in
+            ecid1 = ecid
+            expectation1.fulfill()
+        }
+        wait(for: [expectation1], timeout: 1)
+
+        // toggle privacy
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
+
+        let configExpectation = XCTestExpectation(description: "getPrivacyStatus callback")
+        MobileCore.getPrivacyStatus { _ in
+            configExpectation.fulfill()
+        }
+        wait(for: [configExpectation], timeout: 1)
+
+        let expectation2 = XCTestExpectation(description: "getExperienceCloudId callback")
+        var ecid2: String?
+        Identity.getExperienceCloudId { ecid, _ in
+            ecid2 = ecid
+            expectation2.fulfill()
+        }
+        wait(for: [expectation2], timeout: 1)
+
+        XCTAssertFalse(((ecid1?.isEmpty) == nil))
+        XCTAssertFalse(((ecid2?.isEmpty) == nil))
+        XCTAssertNotEqual(ecid1, ecid2)
+    }
 }
