@@ -10,6 +10,24 @@
 		43E2977FF5B6CE67BFA18068 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */; };
 		5849D920BC4442F1FCEFD92E /* Pods_AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC8D595E8B8F0E9A6976C2C2 /* Pods_AEPIdentityEdge.framework */; };
 		969BD00DE9BC2B23CA13749C /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */; };
+		BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6491A25BFD1990012A4C5 /* ECID.swift */; };
+		BFF6492125BFD1CB0012A4C5 /* IdentityProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */; };
+		BFF6492725BFD3160012A4C5 /* Identity+PublicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */; };
+		BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492C25C087720012A4C5 /* IdentityState.swift */; };
+		BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6493D25C097560012A4C5 /* AppDelegate.swift */; };
+		BFF6495625C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */; };
+		BFF6497A25C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */; };
+		BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */; };
+		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
+		BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */; };
+		BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */; };
+		BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */; };
+		BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */; };
+		BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */; };
+		BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */; };
+		BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */; };
+		BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */; };
+		D076CE38E08EF904D1B9F82E /* Pods_AEPIdentityEdgeSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */; };
 		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */; };
 		D43BAB2A25BBA8A900B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
@@ -17,13 +35,19 @@
 		D43BAB3B25BBA8C700B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
 		D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB6925BBAF6000B08CC0 /* Identity.swift */; };
 		D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */; };
-		D43BABAA25BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */; };
 		D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */; };
 		D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */; };
 		D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BFF649DF25C160B60012A4C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D43BAB0725BBA4F700B08CC0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D43BAB0F25BBA4F700B08CC0;
+			remoteInfo = AEPIdentityEdge;
+		};
 		D43BAB2B25BBA8A900B08CC0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D43BAB0725BBA4F700B08CC0 /* Project object */;
@@ -41,14 +65,34 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPIdentityEdgeSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		21194EEA9E974D4025B62CB7 /* Pods-FunctionalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunctionalTests.release.xcconfig"; path = "Target Support Files/Pods-FunctionalTests/Pods-FunctionalTests.release.xcconfig"; sourceTree = "<group>"; };
 		4ADECD91E29628B33C7D45F5 /* Pods-UnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.release.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		4EC5B471416D7ABA4A62D49C /* Pods-AEPIdentityEdge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdge.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdge/Pods-AEPIdentityEdge.release.xcconfig"; sourceTree = "<group>"; };
+		56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		A727B285BE8D532A4EC65CC4 /* Pods-FunctionalTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunctionalTests.debug.xcconfig"; path = "Target Support Files/Pods-FunctionalTests/Pods-FunctionalTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AE8E1C131B5513AC576392C4 /* Pods-AEPIdentityEdge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdge.debug.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdge/Pods-AEPIdentityEdge.debug.xcconfig"; sourceTree = "<group>"; };
 		AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunctionalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFF6491A25BFD1990012A4C5 /* ECID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECID.swift; sourceTree = "<group>"; };
+		BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityProperties.swift; sourceTree = "<group>"; };
+		BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identity+PublicAPI.swift"; sourceTree = "<group>"; };
+		BFF6492C25C087720012A4C5 /* IdentityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityState.swift; sourceTree = "<group>"; };
+		BFF6493D25C097560012A4C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AEPIdentityEdgeSampleAppApp.swift; sourceTree = "<group>"; };
+		BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgePublicAPITests.swift; sourceTree = "<group>"; };
+		BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockExtension.swift; sourceTree = "<group>"; };
+		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
+		BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStore.swift; sourceTree = "<group>"; };
+		BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPropertiesTests.swift; sourceTree = "<group>"; };
+		BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityStateTests.swift; sourceTree = "<group>"; };
+		BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableExtensionRuntime.swift; sourceTree = "<group>"; };
+		BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMap.swift; sourceTree = "<group>"; };
+		BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMapTests.swift; sourceTree = "<group>"; };
+		BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityIntegrationTests.swift; sourceTree = "<group>"; };
+		BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		CB754BCCDBA7D33B9940E6ED /* Pods-UnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.debug.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.debug.xcconfig"; sourceTree = "<group>"; };
+		CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; sourceTree = "<group>"; };
 		D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AEPIdentityEdge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AEPIdentityEdge.h; sourceTree = "<group>"; };
 		D43BAB1425BBA4F700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -61,7 +105,6 @@
 		D43BAB6925BBAF6000B08CC0 /* Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity.swift; sourceTree = "<group>"; };
 		D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeConstants.swift; sourceTree = "<group>"; };
 		D43BABA725BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AEPIdentityEdgeSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEPIdentityEdgeSampleAppApp.swift; sourceTree = "<group>"; };
 		D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -100,6 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D076CE38E08EF904D1B9F82E /* Pods_AEPIdentityEdgeSampleApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,8 +156,19 @@
 				FC8D595E8B8F0E9A6976C2C2 /* Pods_AEPIdentityEdge.framework */,
 				AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */,
 				B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */,
+				0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFF6497F25C0A2A80012A4C5 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */,
+				BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */,
+				BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		D00D9C7ED5DCBE11F5BE521D /* Pods */ = {
@@ -125,6 +180,8 @@
 				21194EEA9E974D4025B62CB7 /* Pods-FunctionalTests.release.xcconfig */,
 				CB754BCCDBA7D33B9940E6ED /* Pods-UnitTests.debug.xcconfig */,
 				4ADECD91E29628B33C7D45F5 /* Pods-UnitTests.release.xcconfig */,
+				56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */,
+				CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -156,10 +213,15 @@
 		D43BAB1225BBA4F700B08CC0 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
 				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
-				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
+				BFF6491A25BFD1990012A4C5 /* ECID.swift */,
+				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
+				BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */,
 				D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */,
+				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
+				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
+				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
+				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -167,7 +229,13 @@
 		D43BAB2625BBA8A900B08CC0 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				BFF6497F25C0A2A80012A4C5 /* Mocks */,
+				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
+				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
 				D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */,
+				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
+				BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */,
+				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
 				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
 			);
 			name = UnitTests;
@@ -179,6 +247,8 @@
 			children = (
 				D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */,
 				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
+				BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */,
+				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
 			);
 			name = FunctionalTests;
 			path = Tests/FunctionalTests;
@@ -187,9 +257,10 @@
 		D43BABA825BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */ = {
 			isa = PBXGroup;
 			children = (
-				D43BABA925BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift */,
-				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
+				BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */,
+				BFF6493D25C097560012A4C5 /* AppDelegate.swift */,
 				D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */,
+				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
 				D43BABB225BBC4BB00B08CC0 /* Info.plist */,
 				D43BABAF25BBC4BB00B08CC0 /* Preview Content */,
 			);
@@ -285,14 +356,17 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D43BABB525BBC4BB00B08CC0 /* Build configuration list for PBXNativeTarget "AEPIdentityEdgeSampleApp" */;
 			buildPhases = (
+				F69A5533A32BE7971B2EDFDF /* [CP] Check Pods Manifest.lock */,
 				D43BABA325BBC4BA00B08CC0 /* Sources */,
 				D43BABA425BBC4BA00B08CC0 /* Frameworks */,
 				D43BABA525BBC4BA00B08CC0 /* Resources */,
 				D43BAC2325BF4A7F00B08CC0 /* ShellScript */,
+				8E1B8A4FCE2D2E232CF3CF92 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BFF649E025C160B60012A4C5 /* PBXTargetDependency */,
 			);
 			name = AEPIdentityEdgeSampleApp;
 			productName = AEPIdentityEdgeSampleApp;
@@ -439,6 +513,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		8E1B8A4FCE2D2E232CF3CF92 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		B256A447209E5CFC8F247606 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -546,6 +637,28 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ../../.swiftlint.yml SampleApps/AEPIdentityEdgeSampleApp\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
+		F69A5533A32BE7971B2EDFDF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AEPIdentityEdgeSampleApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -553,8 +666,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF6492725BFD3160012A4C5 /* Identity+PublicAPI.swift in Sources */,
+				BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */,
 				D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */,
+				BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */,
+				BFF6492125BFD1CB0012A4C5 /* IdentityProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */,
+				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,7 +680,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */,
+				BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */,
+				BFF6497A25C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift in Sources */,
+				BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */,
+				BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */,
+				BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */,
+				BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */,
+				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,7 +696,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */,
 				D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */,
+				BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,14 +706,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */,
 				D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */,
-				D43BABAA25BBC4BA00B08CC0 /* AEPIdentityEdgeSampleAppApp.swift in Sources */,
+				BFF6495625C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BFF649E025C160B60012A4C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D43BAB0F25BBA4F700B08CC0 /* AEPIdentityEdge */;
+			targetProxy = BFF649DF25C160B60012A4C5 /* PBXContainerItemProxy */;
+		};
 		D43BAB2C25BBA8A900B08CC0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D43BAB0F25BBA4F700B08CC0 /* AEPIdentityEdge */;
@@ -852,6 +986,7 @@
 		};
 		D43BABB325BBC4BB00B08CC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -874,6 +1009,7 @@
 		};
 		D43BABB425BBC4BB00B08CC0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
