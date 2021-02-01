@@ -19,7 +19,7 @@ struct AEPIdentityEdgeSampleAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(ecidText: "")
+            ContentView(ecidText: "", adIdText: "")
         }
     }
 }
