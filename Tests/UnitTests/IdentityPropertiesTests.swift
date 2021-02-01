@@ -52,6 +52,20 @@ class IdentityPropertiesTests: XCTestCase {
         XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
     }
 
+    func testToEventDataDoesNotIncludeEmptyValues() {
+        // setup
+        var properties = IdentityProperties()
+        properties.ecid = ECID()
+        properties.advertisingIdentifier = ""
+
+        // test
+        let eventData = properties.toEventData()
+
+        // verify
+        XCTAssertEqual(1, eventData.count)
+        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+    }
+
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup
@@ -84,6 +98,30 @@ class IdentityPropertiesTests: XCTestCase {
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)"] ],
                 "IDFA": [ ["id": "test-ad-id"] ]
+            ]
+            ]
+
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
+    }
+
+    func testToXdmDataDoesNotIncludeEmptyValues() {
+        // setup
+        var properties = IdentityProperties()
+        properties.ecid = ECID()
+        properties.advertisingIdentifier = ""
+
+        // test
+        let xdmData = properties.toXdmData()
+
+        guard let ecidString = properties.ecid?.ecidString else {
+            XCTFail("properties.ecid is nil, which is unexpected.")
+            return
+        }
+
+        // verify
+        let expectedResult: [String: Any] =
+            [ "identityMap": [
+                "ECID": [ ["id": "\(ecidString)"] ]
             ]
             ]
 
