@@ -10,28 +10,104 @@
 // governing permissions and limitations under the License.
 //
 
+@testable import AEPCore
+@testable import AEPIdentityEdge
+import AEPServices
 import XCTest
 
 class IdentityEdgeTests: XCTestCase {
+    var identity: Identity!
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    var mockRuntime: TestableExtensionRuntime!
+
+    override func setUp() {
+        ServiceProvider.shared.namedKeyValueService = MockDataStore()
+        mockRuntime = TestableExtensionRuntime()
+        identity = Identity(runtime: mockRuntime)
+        identity.onRegistered()
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    // MARK: handleIdentityRequest
+
+    func testGenericIdentityRequestSetsAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID()
+        props.privacyStatus = .optedIn
+        props.advertisingIdentifier = "oldAdId"
+        props.saveToPersistence()
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
+                                        event: event,
+                                        data: ([IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
+
+        _ = identity.readyForEvent(event) // trigger boot sequence
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("adId", identity.state?.identityProperties.advertisingIdentifier)
+
+        XCTAssertEqual("adId", mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")"]],
+                    "IDFA": [["id": "adId"]]
+                ]
+            ]
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+
+        XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty) // no Consent event dispatched
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+    func testGenericIdentityRequestClearsAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID()
+        props.privacyStatus = .optedIn
+        props.advertisingIdentifier = "oldAdId"
+        props.saveToPersistence()
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
-        }
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
+                                        event: event,
+                                        data: ([IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
+
+        _ = identity.readyForEvent(event) // trigger boot sequence
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("", identity.state?.identityProperties.advertisingIdentifier)
+
+        XCTAssertNil(mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")"]]
+                ]
+            ]
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+
+        let expectedConsent: [String: Any] =
+            [
+                "consents": [
+                    "adId": ["val": "n"]
+                ]
+            ]
+        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
     }
 
 }

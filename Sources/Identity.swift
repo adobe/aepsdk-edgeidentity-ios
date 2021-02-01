@@ -65,7 +65,7 @@ import Foundation
     // MARK: Event Listeners
 
     private func handleIdentityRequest(event: Event) {
-        if let _ = event.adId {
+        if event.adId != nil {
             state?.syncAdvertisingIdentifier(event: event,
                                              createSharedState: createSharedState(data:event:),
                                              createXDMSharedState: createXDMSharedState(data:event:),

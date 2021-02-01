@@ -62,10 +62,6 @@ class IdentityEdgeTests: XCTestCase {
 
     /// Tests that when a configuration request content event contains opt-out that we update privacy status
     func testConfigurationResponseEventOptOut() {
-        // setup
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
-
         let data = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: data)
 
@@ -78,9 +74,6 @@ class IdentityEdgeTests: XCTestCase {
 
     /// Tests that when no privacy status is in the configuration event that we do not update the privacy status
     func testConfigurationResponseEventNoPrivacyStatus() {
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
-
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: ["key": "value"])
         _ = identity.readyForEvent(event) // sets default privacy of unknown
 
