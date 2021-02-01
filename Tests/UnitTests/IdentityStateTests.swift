@@ -443,7 +443,9 @@ private extension Event {
     }
 
     static func fakeGenericIdentityEvent(adId: String?) -> Event {
-        return Event(name: "Test Event", type: EventType.genericIdentity, source: EventSource.requestIdentity,
+        return Event(name: "Test Event",
+                     type: EventType.genericIdentity,
+                     source: EventSource.requestIdentity,
                      data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: adId as Any])
     }
 }
