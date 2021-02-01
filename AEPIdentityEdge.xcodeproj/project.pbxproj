@@ -25,6 +25,9 @@
 		BFF64A3225C3A60E0012A4C5 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A3125C3A60E0012A4C5 /* Event+Identity.swift */; };
 		BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */; };
 		BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */; };
+		BFF64AD225C8A70F0012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */; };
+		BFF64AD725C8A7110012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */; };
+		BFF64AD825C8A7140012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */; };
 		D076CE38E08EF904D1B9F82E /* Pods_AEPIdentityEdgeSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */; };
 		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */; };
@@ -695,10 +698,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF64AD825C8A7140012A4C5 /* TestableExtensionRuntime.swift in Sources */,
+				BFF64AD725C8A7110012A4C5 /* MockDataStore.swift in Sources */,
 				BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */,
-				BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */,
-				D43BAB3925BBA8C700B08CC0 /* IdentityTests.swift in Sources */,
-				BFF64AEA25C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */,
+				BFF64AD225C8A70F0012A4C5 /* MockExtension.swift in Sources */,
+				D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */,
 				BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */,
 				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 			);
