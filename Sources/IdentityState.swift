@@ -54,18 +54,18 @@ class IdentityState {
         return true
     }
 
-    /// Sets the advertising identifier from the `event` if changed from current value.
-    /// Updates the persistence values for the ad id and creates new shared state
-    /// Dispatches consent request event if advertising ID consent changed.
-    /// If privacy is optedout, call is ignored
+    /// When the advertising identifier from the `event` is different from the current value, it updates the persisted value and creates
+    /// new shared state and XDM shared state. A consent request event is dispatched when advertising tracking preferences change.
+    /// If privacy is optedout the call is ignored
     /// - Parameters:
     ///   - event: event containing a new ADID value.
     ///   - createSharedState: function which creates a new shared state
     ///   - createXDMSharedState: function which creates new XDM shared state
-    func syncAdvertisingIdentifier(event: Event,
-                                   createSharedState: ([String: Any], Event) -> Void,
-                                   createXDMSharedState: ([String: Any], Event) -> Void,
-                                   dispatchEvent: (Event) -> Void) {
+    ///   - dispatchEvent: function which dispatchs events to the event hub
+    func updateAdvertisingIdentifier(event: Event,
+                                     createSharedState: ([String: Any], Event) -> Void,
+                                     createXDMSharedState: ([String: Any], Event) -> Void,
+                                     dispatchEvent: (Event) -> Void) {
 
         // Early exit if privacy is opt-out
         if identityProperties.privacyStatus == .optedOut {

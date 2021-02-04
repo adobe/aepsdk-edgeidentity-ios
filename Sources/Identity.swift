@@ -67,10 +67,10 @@ import Foundation
     /// Handles events to set the advertising identifier. Called by listener registered with event hub.
     /// - Parameter event: event containing `advertisingIdentifier` data
     private func handleRequestContent(event: Event) {
-        state?.syncAdvertisingIdentifier(event: event,
-                                         createSharedState: createSharedState(data:event:),
-                                         createXDMSharedState: createXDMSharedState(data:event:),
-                                         dispatchEvent: dispatch(event:))
+        state?.updateAdvertisingIdentifier(event: event,
+                                           createSharedState: createSharedState(data:event:),
+                                           createXDMSharedState: createXDMSharedState(data:event:),
+                                           dispatchEvent: dispatch(event:))
     }
 
     /// Handles events requesting for identifiers. Called by listener registered with event hub.
