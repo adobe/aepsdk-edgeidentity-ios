@@ -15,7 +15,7 @@
 import AEPServices
 import XCTest
 
-class IdentityEdgeTests: XCTestCase {
+class IdentityTests: XCTestCase {
     var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
