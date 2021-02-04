@@ -32,7 +32,7 @@ import Foundation
 
     public func onRegistered() {
         registerListener(type: EventType.identity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
-        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleIdentityRequest)
+        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
     }
 
@@ -64,17 +64,23 @@ import Foundation
 
     // MARK: Event Listeners
 
-    private func handleIdentityRequest(event: Event) {
-        if event.adId != nil {
-            state?.syncAdvertisingIdentifier(event: event,
-                                             createSharedState: createSharedState(data:event:),
-                                             createXDMSharedState: createXDMSharedState(data:event:),
-                                             dispatchEvent: dispatch(event:))
-        } else {
-            processIdentifiersRequest(event: event)
-        }
+    /// Handles events to set the advertising identifier. Called by listener registered with event hub.
+    /// - Parameter event: event containing `advertisingIdentifier` data
+    private func handleRequestContent(event: Event) {
+        state?.syncAdvertisingIdentifier(event: event,
+                                         createSharedState: createSharedState(data:event:),
+                                         createXDMSharedState: createXDMSharedState(data:event:),
+                                         dispatchEvent: dispatch(event:))
     }
 
+    /// Handles events requesting for identifiers. Called by listener registered with event hub.
+    /// - Parameter event: the identity request event
+    private func handleIdentityRequest(event: Event) {
+        processIdentifiersRequest(event: event)
+    }
+
+    /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
+    /// - Parameter event: the identity request event
     private func processIdentifiersRequest(event: Event) {
         let eventData = state?.identityProperties.toEventData()
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
