@@ -122,7 +122,7 @@ class IdentityState {
 
     }
 
-    /// Determines if we should update the ad id with `newAdID`
+    /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
     /// - Parameter newAdID: the new ad id
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
