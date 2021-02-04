@@ -80,8 +80,7 @@ class IdentityState {
 
             if shouldUpdateConsent {
                 let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
-                let event = createAdIdConsentRequestEvent(val: val)
-                dispatchEvent(event)
+                dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
             }
 
             identityProperties.saveToPersistence()
@@ -149,18 +148,21 @@ class IdentityState {
         return (false, false)
     }
 
-    /// Create `Event` with `EventType.consent` and `EventSource.requestContent` for sending advertising identifier consent
-    /// changes to the Consent extension.
-    /// - Parameter val: The new adId consent value, either "y" or "n"
-    private func createAdIdConsentRequestEvent(val: String) -> Event {
-        return Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
-                     type: EventType.consent,
-                     source: EventSource.requestContent,
-                     data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
-                                [IdentityConstants.XDMKeys.Consent.AD_ID:
-                                    [IdentityConstants.XDMKeys.Consent.VAL: val]
-                                ]
-                     ])
+    /// Dispatch a consent request `Event` with `EventType.consent` and `EventSource.requestContent` which contains the consent value specifying
+    /// new advertising tracking preferences.
+    /// - Parameters:
+    ///   -  val: The new adId consent value, either "y" or "n"
+    ///   - dispatchEvent: a function which sends an event to the event hub
+    private func dispatchAdIdConsentRequestEvent(val: String, dispatchEvent: (Event) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
+                          type: EventType.consent,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
+                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
+                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
+                                    ]
+                          ])
+        dispatchEvent(event)
     }
 
 }
