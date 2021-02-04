@@ -22,6 +22,24 @@ struct IdentityProperties: Codable {
     /// The IDFA from retrieved Apple APIs
     var advertisingIdentifier: String?
 
+    /// The push Identifier
+    var pushIdentifier: String?
+
+    /// The Blob value
+    var blob: String?
+
+    /// The Experience Cloud ID service region ID. A region ID (or location hint), is a numeric identifier for the geographic location of a particular ID service data center
+    var locationHint: String?
+
+    /// List of all the customer's customer identifiers
+    var customerIds: [CustomIdentity]?
+
+    /// Date of the last sync with the identity service
+    var lastSync: Date?
+
+    /// Time to live value
+    var ttl = IdentityConstants.Default.TTL
+
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
 
@@ -30,10 +48,22 @@ struct IdentityProperties: Codable {
     func toEventData() -> [String: Any] {
         var eventData = [String: Any]()
         eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
-        if let adId = advertisingIdentifier, !adId.isEmpty {
-            eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
+        eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
+        eventData[IdentityConstants.EventDataKeys.PUSH_IDENTIFIER] = pushIdentifier
+        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_BLOB] = blob
+        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_LOCATION_HINT] = locationHint
+        if let customerIds = customerIds, !customerIds.isEmpty {
+            eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LIST] = customerIds.map({$0.asDictionary()})
         }
-        return eventData
+        eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LAST_SYNC] = lastSync?.timeIntervalSince1970
+
+        return eventData.filter { _, value -> Bool in
+            // Remove any empty strings from the dictionary
+            if value is String, let value = value as? String {
+                return !value.isEmpty
+            }
+            return true
+        }
     }
 
     /// Converts `IdentityProperties` into an event data representation in XDM format

@@ -22,6 +22,7 @@ enum IdentityConstants {
     enum Default {
         static let PRIVACY_STATUS = PrivacyStatus.unknown
         static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"
+        static let TTL = TimeInterval(600)
     }
 
     enum SharedStateKeys {
@@ -41,6 +42,13 @@ enum IdentityConstants {
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
+
+        static let VISITOR_IDS_LIST = "visitoridslist"
+        static let AUTHENTICATION_STATE = "authenticationstate"
+        static let PUSH_IDENTIFIER = "pushidentifier"
+        static let VISITOR_ID_BLOB = "blob"
+        static let VISITOR_ID_LOCATION_HINT = "locationhint"
+        static let VISITOR_IDS_LAST_SYNC = "lastsync"
     }
 
     enum DataStoreKeys {
