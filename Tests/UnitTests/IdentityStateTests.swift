@@ -350,10 +350,10 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: "adId")
 
-        state.syncAdvertisingIdentifier(event: event,
-                                        createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
-                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
-                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.updateAdvertisingIdentifier(event: event,
+                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                          createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
+                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
@@ -375,13 +375,13 @@ class IdentityStateTests: XCTestCase {
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
         var consentEvent: Event?
-        state.syncAdvertisingIdentifier(event: event,
-                                        createSharedState: { _, _ in sharedStateExpectation.fulfill() },
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
-                                        dispatchEvent: { event in
+        state.updateAdvertisingIdentifier(event: event,
+                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                          createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                                          dispatchEvent: { event in
                                             consentEvent = event
                                             consentExpectation.fulfill()
-                                        })
+                                          })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation, consentExpectation], timeout: 3)
@@ -404,10 +404,10 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
-        state.syncAdvertisingIdentifier(event: event,
-                                        createSharedState: { _, _ in sharedStateExpectation.fulfill() },
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
-                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.updateAdvertisingIdentifier(event: event,
+                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
+                                          createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 3)
@@ -425,10 +425,10 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
-        state.syncAdvertisingIdentifier(event: event,
-                                        createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
-                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
-                                        dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
+        state.updateAdvertisingIdentifier(event: event,
+                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
+                                          createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
+                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
