@@ -42,14 +42,26 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
+        properties.pushIdentifier = "push-id"
+        properties.blob = "blob"
+        properties.locationHint = "locationHint"
+        properties.lastSync = Date.init()
+        properties.ttl = TimeInterval(3600)
+        properties.customerIds = [CustomIdentity.init(origin: "origin", type: "type", identifier: "id", authenticationState: .authenticated)]
 
         // test
         let eventData = properties.toEventData()
 
         // verify
-        XCTAssertEqual(2, eventData.count)
+        // Event Data will contain all the IdentityProperties
+        XCTAssertEqual(7, eventData.count)
         XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
         XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
+        XCTAssertEqual(properties.pushIdentifier, eventData[IdentityConstants.EventDataKeys.PUSH_IDENTIFIER] as? String)
+        XCTAssertEqual(properties.blob, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_BLOB] as? String)
+        XCTAssertEqual(properties.locationHint, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_LOCATION_HINT] as? String)
+        XCTAssertNotNil(eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LIST] as? [[String: Any]])
+        XCTAssertEqual(properties.lastSync?.timeIntervalSince1970, eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LAST_SYNC] as? TimeInterval)
     }
 
     func testToEventDataDoesNotIncludeEmptyValues() {
@@ -84,6 +96,12 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
+        properties.pushIdentifier = "push-id"
+        properties.blob = "blob"
+        properties.locationHint = "locationHint"
+        properties.lastSync = Date.init()
+        properties.ttl = TimeInterval(3600)
+        properties.customerIds = [CustomIdentity.init(origin: "origin", type: "type", identifier: "id", authenticationState: .authenticated)]
 
         // test
         let xdmData = properties.toXdmData()
@@ -94,6 +112,7 @@ class IdentityPropertiesTests: XCTestCase {
         }
 
         // verify
+        // XDM data only contains ECID and IDFA from IdentityProperties
         let expectedResult: [String: Any] =
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)"] ],
@@ -133,24 +152,31 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
-
-        let ecidString = properties.ecid?.ecidString
+        properties.pushIdentifier = "push-id"
+        properties.blob = "blob"
+        properties.locationHint = "locationHint"
+        properties.lastSync = Date.init()
+        properties.ttl = TimeInterval(3600)
+        properties.customerIds = [CustomIdentity.init(origin: "origin", type: "type", identifier: "id", authenticationState: .authenticated)]
 
         // test
         properties.saveToPersistence()
 
-        // reset
-        properties.ecid = nil
-        properties.advertisingIdentifier = nil
-
-        // test
-        properties.loadFromPersistence()
+        var props = IdentityProperties()
+        props.loadFromPersistence()
 
         //verify
         XCTAssertEqual(1, mockDataStore.dict.count)
-        XCTAssertNotNil(properties.ecid)
-        XCTAssertEqual(ecidString, properties.ecid?.ecidString)
-        XCTAssertEqual("test-ad-id", properties.advertisingIdentifier)
+        XCTAssertNotNil(props.ecid)
+        XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
+        XCTAssertEqual("test-ad-id", props.advertisingIdentifier)
+        XCTAssertEqual("push-id", props.pushIdentifier)
+        XCTAssertEqual("blob", props.blob)
+        XCTAssertEqual("locationHint", props.locationHint)
+        XCTAssertEqual(properties.lastSync, props.lastSync)
+        XCTAssertEqual(TimeInterval(3600), props.ttl)
+        XCTAssertNotNil(props.customerIds)
+
     }
 
 }
