@@ -95,6 +95,7 @@ class IdentityState {
     /// - Parameters:
     ///   - event: the event triggering the privacy change
     ///   - createSharedState: a function which can create Identity shared state
+    ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
     func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void, createXDMSharedState: ([String: Any], Event) -> Void) {
         let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
@@ -121,7 +122,7 @@ class IdentityState {
 
     }
 
-    /// Determines if we should update the ad id with `newAdID`
+    /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
     /// - Parameter newAdID: the new ad id
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
