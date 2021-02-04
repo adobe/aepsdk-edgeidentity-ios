@@ -53,7 +53,6 @@ class IdentityTests: XCTestCase {
         // verify
         XCTAssertEqual("adId", identity.state?.identityProperties.advertisingIdentifier)
 
-        XCTAssertEqual(2, mockRuntime.createdSharedStates.count) // bootup + request content event
         XCTAssertEqual("adId", mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
 
         let expectedIdentity: [String: Any] =
@@ -63,7 +62,6 @@ class IdentityTests: XCTestCase {
                     "IDFA": [["id": "adId"]]
                 ]
             ]
-        XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
 
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty) // no Consent event dispatched
@@ -93,7 +91,6 @@ class IdentityTests: XCTestCase {
         // verify
         XCTAssertEqual("", identity.state?.identityProperties.advertisingIdentifier)
 
-        XCTAssertEqual(2, mockRuntime.createdSharedStates.count) // bootup + request content event
         XCTAssertNil(mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
 
         let expectedIdentity: [String: Any] =
@@ -102,7 +99,6 @@ class IdentityTests: XCTestCase {
                     "ECID": [["id": "\(props.ecid?.ecidString ?? "")"]]
                 ]
             ]
-        XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
 
         let expectedConsent: [String: Any] =
@@ -111,7 +107,6 @@ class IdentityTests: XCTestCase {
                     "adId": ["val": "n"]
                 ]
             ]
-        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
         XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
     }
 
