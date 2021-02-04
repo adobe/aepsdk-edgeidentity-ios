@@ -253,30 +253,22 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithValidId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "adId", expectedAdId: "adId")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
     }
 
     /// Test ad ID is updated from nil to empty on first call, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithEmptyId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "", expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "", expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID is updated from nil to empty on first call when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesNilWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID is updated from empty to valid value and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesEmptyWithValidId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "", newAdId: "adId", expectedAdId: "adId")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "", newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
     }
 
     /// Test ad ID call is ignored when old and new values are empty
@@ -301,37 +293,27 @@ class IdentityStateTests: XCTestCase {
 
     /// Test ad ID is updated from valid value to empty string and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesValidWithEmptyId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: "", expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: "", expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID is updaed from valid value to empty string when all zeros is passed, and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesValidWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID is updaed from all zeros to valid value and consent true is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithValidId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("y", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
     }
 
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched
     func testSyncAdvertisingIdentifierUpdatesZerosWithEmptyId() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID is updaed from all zeros to empty string and consent false is dispatched; passing all zeros is converted to empty string
     func testSyncAdvertisingIdentifierUpdatesZerosWithZeros() {
-        let consentEvent = assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "")
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+        assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: "", expectedConsent: "n")
     }
 
     /// Test ad ID call is ignored if passing nil
@@ -360,7 +342,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("oldAdId", state.identityProperties.advertisingIdentifier) // no change
     }
 
-    private func assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?) -> Event? {
+    private func assertSyncAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
         // setup
         let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
@@ -387,8 +369,9 @@ class IdentityStateTests: XCTestCase {
         wait(for: [sharedStateExpectation, xdmSharedStateExpectation, consentExpectation], timeout: 3)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(expectedAdId, state.identityProperties.advertisingIdentifier)
-        // TODO assert consent hit
-        return consentEvent
+
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual(expectedConsent, ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
     }
 
     private func assertSyncAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?) {
