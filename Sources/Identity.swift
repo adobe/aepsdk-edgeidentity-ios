@@ -32,7 +32,7 @@ import Foundation
 
     public func onRegistered() {
         registerListener(type: EventType.identity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
-        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleIdentityRequest)
+        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
     }
 
@@ -67,23 +67,16 @@ import Foundation
     /// Handles events to set the advertising identifier. Called by listener registered with event hub.
     /// - Parameter event: event containing `advertisingIdentifier` data
     private func handleRequestContent(event: Event) {
-        state?.updateAdvertisingIdentifier(event: event,
-                                           createSharedState: createSharedState(data:event:),
-                                           createXDMSharedState: createXDMSharedState(data:event:),
-                                           dispatchEvent: dispatch(event:))
+        state?.syncAdvertisingIdentifier(event: event,
+                                         createSharedState: createSharedState(data:event:),
+                                         createXDMSharedState: createXDMSharedState(data:event:),
+                                         dispatchEvent: dispatch(event:))
     }
 
     /// Handles events requesting for identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
-        if event.adId != nil {
-            state?.syncAdvertisingIdentifier(event: event,
-                                             createSharedState: createSharedState(data:event:),
-                                             createXDMSharedState: createXDMSharedState(data:event:),
-                                             dispatchEvent: dispatch(event:))
-        } else {
-            processIdentifiersRequest(event: event)
-        }
+        processIdentifiersRequest(event: event)
     }
 
     /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
