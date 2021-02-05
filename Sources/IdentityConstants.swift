@@ -13,15 +13,17 @@
 import AEPCore
 import Foundation
 
-enum IdentityEdgeConstants {
+enum IdentityConstants {
     static let EXTENSION_NAME = "com.adobe.module.identity"
     static let FRIENDLY_NAME = "IdentityEdge"
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
 
-    enum Defaults {
+    enum Default {
         static let PRIVACY_STATUS = PrivacyStatus.unknown
+        static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"
     }
+
     enum SharedStateKeys {
         static let CONFIGURATION = "com.adobe.module.configuration"
     }
@@ -33,10 +35,12 @@ enum IdentityEdgeConstants {
     enum EventNames {
         static let IDENTITY_REQUEST_IDENTITY = "IdentityRequestIdentity"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "IDENTITY_RESPONSE_CONTENT_ONE_TIME"
+        static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
     }
 
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
+        static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
     }
 
     enum DataStoreKeys {
@@ -45,9 +49,19 @@ enum IdentityEdgeConstants {
 
     enum Namespaces {
         static let ECID = "ECID"
+        static let IDFA = "IDFA"
     }
 
     enum XDMKeys {
         static let IDENTITY_MAP = "identityMap"
+
+        enum Consent {
+            static let CONSENTS = "consents"
+            static let AD_ID = "adId"
+            static let VAL = "val"
+            static let YES = "y"
+            static let NO = "n"
+        }
     }
+
 }

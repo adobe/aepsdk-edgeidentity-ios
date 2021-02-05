@@ -16,25 +16,29 @@
 		BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492C25C087720012A4C5 /* IdentityState.swift */; };
 		BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6493D25C097560012A4C5 /* AppDelegate.swift */; };
 		BFF6495625C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */; };
-		BFF6497A25C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */; };
-		BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */; };
+		BFF6497A25C09ED80012A4C5 /* IdentityPublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */; };
 		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
-		BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */; };
 		BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */; };
 		BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */; };
-		BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */; };
 		BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */; };
 		BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */; };
+		BFF64A3225C3A60E0012A4C5 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A3125C3A60E0012A4C5 /* Event+Identity.swift */; };
 		BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */; };
 		BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */; };
+		BFF64AE925C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */; };
+		BFF64AEA25C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */; };
+		BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */; };
+		BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */; };
+		BFF64AED25C8A9B40012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */; };
+		BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */; };
 		D076CE38E08EF904D1B9F82E /* Pods_AEPIdentityEdgeSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0806EDB1CB0AAFDE96D5540F /* Pods_AEPIdentityEdgeSampleApp.framework */; };
 		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */; };
+		D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */; };
 		D43BAB2A25BBA8A900B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
-		D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */; };
+		D43BAB3925BBA8C700B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB3825BBA8C700B08CC0 /* IdentityTests.swift */; };
 		D43BAB3B25BBA8C700B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
 		D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB6925BBAF6000B08CC0 /* Identity.swift */; };
-		D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */; };
+		D43BAB7225BBAFC700B08CC0 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */; };
 		D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */; };
 		D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */; };
@@ -80,30 +84,31 @@
 		BFF6492C25C087720012A4C5 /* IdentityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityState.swift; sourceTree = "<group>"; };
 		BFF6493D25C097560012A4C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BFF6495525C09B2D0012A4C5 /* AEPIdentityEdgeSampleAppApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AEPIdentityEdgeSampleAppApp.swift; sourceTree = "<group>"; };
-		BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgePublicAPITests.swift; sourceTree = "<group>"; };
-		BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockExtension.swift; sourceTree = "<group>"; };
+		BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPublicAPITests.swift; sourceTree = "<group>"; };
 		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
-		BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStore.swift; sourceTree = "<group>"; };
 		BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPropertiesTests.swift; sourceTree = "<group>"; };
 		BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityStateTests.swift; sourceTree = "<group>"; };
-		BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableExtensionRuntime.swift; sourceTree = "<group>"; };
 		BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMap.swift; sourceTree = "<group>"; };
 		BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMapTests.swift; sourceTree = "<group>"; };
+		BFF64A3125C3A60E0012A4C5 /* Event+Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityIntegrationTests.swift; sourceTree = "<group>"; };
 		BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableExtensionRuntime.swift; sourceTree = "<group>"; };
+		BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockExtension.swift; sourceTree = "<group>"; };
+		BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockDataStore.swift; sourceTree = "<group>"; };
 		CB754BCCDBA7D33B9940E6ED /* Pods-UnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.debug.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; sourceTree = "<group>"; };
 		D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AEPIdentityEdge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AEPIdentityEdge.h; sourceTree = "<group>"; };
 		D43BAB1425BBA4F700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB2525BBA8A800B08CC0 /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeTests.swift; sourceTree = "<group>"; };
+		D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTests.swift; sourceTree = "<group>"; };
 		D43BAB2925BBA8A900B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB3625BBA8C700B08CC0 /* FunctionalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunctionalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeTests.swift; sourceTree = "<group>"; };
+		D43BAB3825BBA8C700B08CC0 /* IdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTests.swift; sourceTree = "<group>"; };
 		D43BAB3A25BBA8C700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB6925BBAF6000B08CC0 /* Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity.swift; sourceTree = "<group>"; };
-		D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeConstants.swift; sourceTree = "<group>"; };
+		D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityConstants.swift; sourceTree = "<group>"; };
 		D43BABA725BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AEPIdentityEdgeSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -161,14 +166,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		BFF6497F25C0A2A80012A4C5 /* Mocks */ = {
+		BFF64AE525C8A9B40012A4C5 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
-				BFF6498025C0A2BA0012A4C5 /* MockExtension.swift */,
-				BFF6499425C0AC9C0012A4C5 /* MockDataStore.swift */,
-				BFF649A625C0DB940012A4C5 /* TestableExtensionRuntime.swift */,
+				BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */,
+				BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */,
+				BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */,
 			);
-			path = Mocks;
+			name = Mocks;
+			path = Tests/Mocks;
 			sourceTree = "<group>";
 		};
 		D00D9C7ED5DCBE11F5BE521D /* Pods */ = {
@@ -192,6 +198,7 @@
 				D43BAB1225BBA4F700B08CC0 /* Sources */,
 				D43BAB2625BBA8A900B08CC0 /* UnitTests */,
 				D43BAB3725BBA8C700B08CC0 /* FunctionalTests */,
+				BFF64AE525C8A9B40012A4C5 /* Mocks */,
 				D43BABA825BBC4BA00B08CC0 /* AEPIdentityEdgeSampleApp */,
 				D43BAB1125BBA4F700B08CC0 /* Products */,
 				D00D9C7ED5DCBE11F5BE521D /* Pods */,
@@ -215,9 +222,10 @@
 			children = (
 				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
 				BFF6491A25BFD1990012A4C5 /* ECID.swift */,
+				BFF64A3125C3A60E0012A4C5 /* Event+Identity.swift */,
 				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
 				BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */,
-				D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */,
+				D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */,
 				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
 				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
 				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
@@ -229,10 +237,9 @@
 		D43BAB2625BBA8A900B08CC0 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
-				BFF6497F25C0A2A80012A4C5 /* Mocks */,
 				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
-				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
-				D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */,
+				BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */,
+				D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */,
 				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
 				BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
@@ -245,9 +252,9 @@
 		D43BAB3725BBA8C700B08CC0 /* FunctionalTests */ = {
 			isa = PBXGroup;
 			children = (
-				D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */,
-				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
+				D43BAB3825BBA8C700B08CC0 /* IdentityTests.swift */,
 				BFF64A5A25C4C5410012A4C5 /* IdentityIntegrationTests.swift */,
+				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
 				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
 			);
 			name = FunctionalTests;
@@ -668,10 +675,11 @@
 			files = (
 				BFF6492725BFD3160012A4C5 /* Identity+PublicAPI.swift in Sources */,
 				BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */,
-				D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */,
+				D43BAB7225BBAFC700B08CC0 /* IdentityConstants.swift in Sources */,
 				BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */,
 				BFF6492125BFD1CB0012A4C5 /* IdentityProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */,
+				BFF64A3225C3A60E0012A4C5 /* Event+Identity.swift in Sources */,
 				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -680,14 +688,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFF6499525C0AC9C0012A4C5 /* MockDataStore.swift in Sources */,
-				BFF6498125C0A2BA0012A4C5 /* MockExtension.swift in Sources */,
-				BFF6497A25C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift in Sources */,
+				BFF6497A25C09ED80012A4C5 /* IdentityPublicAPITests.swift in Sources */,
+				BFF64AED25C8A9B40012A4C5 /* MockDataStore.swift in Sources */,
+				BFF64AE925C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */,
 				BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */,
 				BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */,
-				BFF649A725C0DB940012A4C5 /* TestableExtensionRuntime.swift in Sources */,
-				D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */,
+				BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
+				D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */,
 				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,8 +705,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				BFF64A6025C4C63F0012A4C5 /* IdentityIntegrationTests.swift in Sources */,
-				D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */,
+				BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */,
+				D43BAB3925BBA8C700B08CC0 /* IdentityTests.swift in Sources */,
+				BFF64AEA25C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */,
+				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

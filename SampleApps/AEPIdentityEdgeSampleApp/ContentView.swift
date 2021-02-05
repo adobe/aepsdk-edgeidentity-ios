@@ -16,6 +16,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var ecidText: String
+    @State var adIdText: String
 
     var body: some View {
         HStack {
@@ -36,6 +37,32 @@ struct ContentView: View {
                 Text("unknown")
             }
         }.padding()
+
+        VStack {
+            HStack {
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier(adIdText)
+                }) {
+                    Text("Set AdId")
+                }.padding()
+                TextField("Enter Ad ID", text: $adIdText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .fixedSize()
+                    .autocapitalization(.none)
+            }
+            HStack {
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier(nil)
+                }) {
+                    Text("Set AdId as nil")
+                }.padding()
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
+                }) {
+                    Text("Set AdId as zeros")
+                }.padding()
+            }
+        }
 
         VStack {
             Button(action: {
@@ -59,6 +86,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(ecidText: "")
+        ContentView(ecidText: "", adIdText: "")
     }
 }

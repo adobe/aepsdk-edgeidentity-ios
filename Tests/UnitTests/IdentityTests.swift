@@ -15,7 +15,7 @@
 import AEPServices
 import XCTest
 
-class IdentityEdgeTests: XCTestCase {
+class IdentityTests: XCTestCase {
     var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
@@ -33,7 +33,7 @@ class IdentityEdgeTests: XCTestCase {
     func testIdentityRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -62,11 +62,7 @@ class IdentityEdgeTests: XCTestCase {
 
     /// Tests that when a configuration request content event contains opt-out that we update privacy status
     func testConfigurationResponseEventOptOut() {
-        // setup
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
-
-        let data = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
+        let data = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: data)
 
         // test
@@ -78,9 +74,6 @@ class IdentityEdgeTests: XCTestCase {
 
     /// Tests that when no privacy status is in the configuration event that we do not update the privacy status
     func testConfigurationResponseEventNoPrivacyStatus() {
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
-
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: ["key": "value"])
         _ = identity.readyForEvent(event) // sets default privacy of unknown
 

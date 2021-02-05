@@ -19,14 +19,20 @@ struct IdentityProperties: Codable {
     /// The current Experience Cloud ID
     var ecid: ECID?
 
+    /// The IDFA from retrieved Apple APIs
+    var advertisingIdentifier: String?
+
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
-    var privacyStatus = IdentityEdgeConstants.Defaults.PRIVACY_STATUS
+    var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
 
     /// Converts `IdentityProperties` into an event data representation
     /// - Returns: A dictionary representing this `IdentityProperties`
     func toEventData() -> [String: Any] {
         var eventData = [String: Any]()
-        eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
+        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
+        if let adId = advertisingIdentifier, !adId.isEmpty {
+            eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
+        }
         return eventData
     }
 
@@ -37,12 +43,17 @@ struct IdentityProperties: Codable {
 
         var identityMap = IdentityMap()
         if let ecid = ecid {
-            identityMap.addItem(namespace: IdentityEdgeConstants.Namespaces.ECID,
+            identityMap.addItem(namespace: IdentityConstants.Namespaces.ECID,
                                 id: ecid.ecidString)
         }
 
+        if let adId = advertisingIdentifier, !adId.isEmpty {
+            identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
+                                id: adId)
+        }
+
         if let dict = identityMap.asDictionary() {
-            map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
+            map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 
         return map
@@ -50,8 +61,8 @@ struct IdentityProperties: Codable {
 
     /// Populates the fields with values stored in the Identity data store
     mutating func loadFromPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        let savedProperties: IdentityProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
+        let savedProperties: IdentityProperties? = dataStore.getObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES)
 
         if let savedProperties = savedProperties {
             self = savedProperties
@@ -60,8 +71,8 @@ struct IdentityProperties: Codable {
 
     /// Saves this instance of `IdentityProperties` to the Identity data store
     func saveToPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
+        dataStore.setObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
 }

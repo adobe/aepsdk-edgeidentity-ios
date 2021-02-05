@@ -41,8 +41,8 @@ class IdentityState {
         identityProperties.loadFromPersistence()
 
         // Load privacy status
-        let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Defaults.PRIVACY_STATUS
+        let privacyStatusString = configSharedState[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityConstants.Default.PRIVACY_STATUS
 
         // Generate new ECID if privacy status allows
         if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
@@ -54,12 +54,49 @@ class IdentityState {
         return true
     }
 
+    /// When the advertising identifier from the `event` is different from the current value, it updates the persisted value and creates
+    /// new shared state and XDM shared state. A consent request event is dispatched when advertising tracking preferences change.
+    /// If privacy is optedout the call is ignored
+    /// - Parameters:
+    ///   - event: event containing a new ADID value.
+    ///   - createSharedState: function which creates a new shared state
+    ///   - createXDMSharedState: function which creates new XDM shared state
+    ///   - dispatchEvent: function which dispatchs events to the event hub
+    func updateAdvertisingIdentifier(event: Event,
+                                     createSharedState: ([String: Any], Event) -> Void,
+                                     createXDMSharedState: ([String: Any], Event) -> Void,
+                                     dispatchEvent: (Event) -> Void) {
+
+        // Early exit if privacy is opt-out
+        if identityProperties.privacyStatus == .optedOut {
+            Log.debug(label: LOG_TAG, "Ignoring sync advertising identifiers request as privacy is opted-out")
+            return
+        }
+
+        // update adid if changed and extract the new adid value
+        let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
+        if adIdChanged, let adId = event.adId {
+            identityProperties.advertisingIdentifier = adId
+
+            if shouldUpdateConsent {
+                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
+                dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
+            }
+
+            identityProperties.saveToPersistence()
+            createSharedState(identityProperties.toEventData(), event)
+            createXDMSharedState(identityProperties.toXdmData(), event)
+        }
+
+    }
+
     /// Updates and makes any required actions when the privacy status has updated
     /// - Parameters:
     ///   - event: the event triggering the privacy change
     ///   - createSharedState: a function which can create Identity shared state
+    ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
     func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void, createXDMSharedState: ([String: Any], Event) -> Void) {
-        let privacyStatusStr = event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
 
         if newPrivacyStatus == identityProperties.privacyStatus {
@@ -70,6 +107,7 @@ class IdentityState {
 
         if newPrivacyStatus == .optedOut {
             identityProperties.ecid = nil
+            identityProperties.advertisingIdentifier = nil
             identityProperties.saveToPersistence()
             createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
@@ -81,6 +119,50 @@ class IdentityState {
             createXDMSharedState(identityProperties.toXdmData(), event)
         }
 
+    }
+
+    /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
+    /// - Parameter newAdID: the new ad id
+    /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
+    private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
+        guard let newAdID = newAdID else { return (false, false) }
+
+        guard let existingAdId = identityProperties.advertisingIdentifier else {
+            // existing is nil but new is not, update with new and update consent
+            // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
+            return (true, true)
+        }
+
+        // did the advertising identifier change?
+        if (!newAdID.isEmpty && newAdID != existingAdId)
+            || (newAdID.isEmpty && !existingAdId.isEmpty) {
+            // Now we know the value changed, but did it change to/from null?
+            // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+                return (true, true)
+            }
+
+            return (true, false)
+        }
+
+        return (false, false)
+    }
+
+    /// Dispatch a consent request `Event` with `EventType.consent` and `EventSource.requestContent` which contains the consent value specifying
+    /// new advertising tracking preferences.
+    /// - Parameters:
+    ///   -  val: The new adId consent value, either "y" or "n"
+    ///   - dispatchEvent: a function which sends an event to the event hub
+    private func dispatchAdIdConsentRequestEvent(val: String, dispatchEvent: (Event) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
+                          type: EventType.consent,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
+                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
+                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
+                                    ]
+                          ])
+        dispatchEvent(event)
     }
 
 }

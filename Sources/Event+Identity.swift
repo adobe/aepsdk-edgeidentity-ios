@@ -10,16 +10,18 @@
 // governing permissions and limitations under the License.
 //
 
-import SwiftUI
+import AEPCore
+import Foundation
 
-@main
-struct AEPIdentityEdgeSampleAppApp: App {
-    // swiftlint:disable weak_delegate
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+extension Event {
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView(ecidText: "", adIdText: "")
+    /// Reads the advertising from the event data
+    var adId: String? {
+        let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String
+        if adId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+            return ""
         }
+
+        return adId
     }
 }
