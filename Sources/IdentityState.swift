@@ -108,6 +108,10 @@ class IdentityState {
         if newPrivacyStatus == .optedOut {
             identityProperties.ecid = nil
             identityProperties.advertisingIdentifier = nil
+            identityProperties.blob = nil
+            identityProperties.locationHint = nil
+            identityProperties.customerIds?.removeAll()
+            identityProperties.pushIdentifier = nil
             identityProperties.saveToPersistence()
             createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
