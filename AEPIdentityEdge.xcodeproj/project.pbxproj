@@ -225,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
+				BF648E7125CCADAD00417A56 /* CustomIdentity.swift */,
 				BFF6491A25BFD1990012A4C5 /* ECID.swift */,
 				BFF64A3125C3A60E0012A4C5 /* Event+Identity.swift */,
 				D43BAB6925BBAF6000B08CC0 /* Identity.swift */,
@@ -234,7 +235,6 @@
 				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
 				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
 				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
-				BF648E7125CCADAD00417A56 /* CustomIdentity.swift */,
 				BF648E7725CCADD000417A56 /* MobileVisitorAuthenticationState.swift */,
 			);
 			path = Sources;
