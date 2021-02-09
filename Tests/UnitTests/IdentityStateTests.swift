@@ -151,10 +151,6 @@ class IdentityStateTests: XCTestCase {
         props.ecid = ECID()
         props.advertisingIdentifier = "adId"
         props.pushIdentifier = "push-id"
-        props.blob = "blob"
-        props.locationHint = "locationHint"
-        props.lastSync = Date.init()
-        props.ttl = TimeInterval(3600)
         props.customerIds = [CustomIdentity.init(origin: "origin", type: "type", identifier: "id", authenticationState: .authenticated)]
 
         state = IdentityState(identityProperties: props)
@@ -175,11 +171,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecid) // ecid is cleared
         XCTAssertNil(state.identityProperties.advertisingIdentifier) // ad id is cleared
         XCTAssertNil(state.identityProperties.pushIdentifier) // push id is cleared
-        XCTAssertNil(state.identityProperties.blob) // blob is cleared
-        XCTAssertNil(state.identityProperties.locationHint) // location hint is cleared
         XCTAssertEqual(true, state.identityProperties.customerIds?.isEmpty) // customer ids is cleared
-
-        XCTAssertNotNil(state.identityProperties.lastSync) // lastSync is not cleared
     }
 
     /// Tests that when we got from opt out to opt in

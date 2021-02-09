@@ -25,20 +25,8 @@ struct IdentityProperties: Codable {
     /// The push Identifier
     var pushIdentifier: String?
 
-    /// The Blob value
-    var blob: String?
-
-    /// The Experience Cloud ID service region ID. A region ID (or location hint), is a numeric identifier for the geographic location of a particular ID service data center
-    var locationHint: String?
-
     /// List of all the customer's customer identifiers
     var customerIds: [CustomIdentity]?
-
-    /// Date of the last sync with the identity service
-    var lastSync: Date?
-
-    /// Time to live value
-    var ttl = IdentityConstants.Default.TTL
 
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
@@ -50,12 +38,9 @@ struct IdentityProperties: Codable {
         eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
         eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
         eventData[IdentityConstants.EventDataKeys.PUSH_IDENTIFIER] = pushIdentifier
-        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_BLOB] = blob
-        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_LOCATION_HINT] = locationHint
         if let customerIds = customerIds, !customerIds.isEmpty {
             eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LIST] = customerIds.map({$0.asDictionary()})
         }
-        eventData[IdentityConstants.EventDataKeys.VISITOR_IDS_LAST_SYNC] = lastSync?.timeIntervalSince1970
 
         return eventData.filter { _, value -> Bool in
             // Remove any empty strings from the dictionary
