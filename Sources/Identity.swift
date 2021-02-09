@@ -56,7 +56,7 @@ import Foundation
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
             createSharedState(data: state.identityProperties.toEventData(), event: nil)
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
-            return true; // bootup completed
+            return true // bootup completed
         }
 
         return false // cannot handle any events until we have booted
