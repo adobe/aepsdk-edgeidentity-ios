@@ -44,7 +44,6 @@ enum IdentityConstants {
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
 
         static let VISITOR_IDS_LIST = "visitoridslist"
-        static let AUTHENTICATION_STATE = "authenticationstate"
         static let PUSH_IDENTIFIER = "pushidentifier"
         static let VISITOR_ID_BLOB = "blob"
         static let VISITOR_ID_LOCATION_HINT = "locationhint"
