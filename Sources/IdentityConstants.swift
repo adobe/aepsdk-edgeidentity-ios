@@ -52,6 +52,12 @@ enum IdentityConstants {
         static let IDFA = "IDFA"
     }
 
+    enum AuthenticationStates {
+        static let AMBIGUOUS = "ambiguous"
+        static let AUTHENTICATED = "authenticated"
+        static let LOGGED_OUT = "loggedOut"
+    }
+
     enum XDMKeys {
         static let IDENTITY_MAP = "identityMap"
 

@@ -59,8 +59,8 @@ class IdentityTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")"]],
-                    "IDFA": [["id": "adId"]]
+                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]],
+                    "IDFA": [["id": "adId", "authenticationState": "ambiguous", "primary": 0]]
                 ]
             ]
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
@@ -99,7 +99,7 @@ class IdentityTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")"]]
+                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]]
                 ]
             ]
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event

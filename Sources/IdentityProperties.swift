@@ -41,18 +41,18 @@ struct IdentityProperties: Codable {
     func toXdmData() -> [String: Any] {
         var map: [String: Any] = [:]
 
-        var identityMap = IdentityMap()
+        let identityMap = IdentityMap()
         if let ecid = ecid {
             identityMap.addItem(namespace: IdentityConstants.Namespaces.ECID,
-                                id: ecid.ecidString)
+                                item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true))
         }
 
         if let adId = advertisingIdentifier, !adId.isEmpty {
             identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
-                                id: adId)
+                                item: IdentityItem(id: adId))
         }
 
-        if let dict = identityMap.asDictionary() {
+        if let dict = identityMap.asDictionary(), !dict.isEmpty {
             map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 
