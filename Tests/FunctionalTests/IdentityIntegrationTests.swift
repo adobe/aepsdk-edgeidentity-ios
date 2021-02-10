@@ -51,7 +51,7 @@ class IdentityIntegrationTests: XCTestCase {
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertFalse(ecid!.isEmpty)
+            XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
         }
@@ -64,7 +64,7 @@ class IdentityIntegrationTests: XCTestCase {
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "unknown"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertFalse(ecid!.isEmpty)
+            XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
         }

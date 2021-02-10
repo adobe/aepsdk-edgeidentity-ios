@@ -96,8 +96,6 @@ public class IdentityMap: NSObject, Codable {
         let container = try decoder.singleValueContainer()
         if let identityItems = try? container.decode([String: [IdentityItem]].self) {
             items = identityItems
-        } else {
-            items = [:]
         }
     }
 
@@ -105,17 +103,17 @@ public class IdentityMap: NSObject, Codable {
 
 /// Identity is used to clearly distinguish people that are interacting with digital experiences.
 @objc(AEPIdentityItem)
+@objcMembers
 public class IdentityItem: NSObject, Codable {
-    @objc public let id: String
-    @objc public let authenticationState: AuthenticationState
-    @objc public let primary: Bool
+    public let id: String
+    public let authenticationState: AuthenticationState
+    public let primary: Bool
 
     /// Creates a new `IdentityItem`.
     /// - Parameters:
     ///   - id: Identity of the consumer in the related namespace.
     ///   - authenticationState: The state this identity is authenticated as. Default is 'ambiguous'.
     ///   - primary: Indicates this identity is the preferred identity. Is used as a hint to help systems better organize how identities are queried. Default is false.
-    @objc
     public init(id: String, authenticationState: AuthenticationState = .ambiguous, primary: Bool = false) {
         self.id = id
         self.authenticationState = authenticationState
@@ -124,10 +122,8 @@ public class IdentityItem: NSObject, Codable {
 
     /// Defines two `IdentityItem` objects are equal if they have the same `id`.
     public override func isEqual(_ object: Any?) -> Bool {
-        if let object = object as? IdentityItem {
-            return self.id == object.id
-        }
-        return false
+        guard let object = object as? IdentityItem else { return false }
+        return self.id == object.id
     }
 
     enum CodingKeys: String, CodingKey {
