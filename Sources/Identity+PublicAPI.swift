@@ -69,7 +69,7 @@ import Foundation
             return nil
         }
 
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: identityData, options: .prettyPrinted) else {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: identityData) else {
             return nil
         }
 
