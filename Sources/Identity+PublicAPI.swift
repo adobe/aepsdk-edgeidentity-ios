@@ -32,8 +32,8 @@ import Foundation
             }
 
             if let identityMap = decodeIdentityMapFrom(event: responseEvent) {
-                if let items = identityMap.getItemsFor(namespace: IdentityConstants.Namespaces.ECID), !items.isEmpty {
-                    completion(items[0].id, .none)
+                if let items = identityMap.getItemsFor(namespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first {
+                    completion(ecidItem.id, .none)
                     return
                 }
             }
