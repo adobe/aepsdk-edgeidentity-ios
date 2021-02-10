@@ -96,8 +96,11 @@ public class IdentityMap: NSObject, Codable {
         let container = try decoder.singleValueContainer()
         if let identityItems = try? container.decode([String: [IdentityItem]].self) {
             items = identityItems
+        } else {
+            items = [:]
         }
     }
+
 }
 
 /// Identity is used to clearly distinguish people that are interacting with digital experiences.

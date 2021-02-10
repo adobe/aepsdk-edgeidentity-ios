@@ -31,12 +31,49 @@ import Foundation
                 return
             }
 
-            guard let experienceCloudId = responseEvent.data?[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String else {
-                completion(nil, AEPError.unexpected)
+            if let identityMap = decodeIdentityMapFrom(event: responseEvent) {
+                if let items = identityMap.getItemsFor(namespace: IdentityConstants.Namespaces.ECID), !items.isEmpty {
+                    completion(items[0].id, .none)
+                    return
+                }
+            }
+
+            completion(nil, AEPError.unexpected)
+        }
+    }
+
+    @objc(getIdentity:)
+    static func getIdentity(completion: @escaping (IdentityMap?, Error?) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.IDENTITY_REQUEST_IDENTITY,
+                          type: EventType.identity,
+                          source: EventSource.requestIdentity,
+                          data: nil)
+
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                completion(nil, AEPError.callbackTimeout)
                 return
             }
 
-            completion(experienceCloudId, .none)
+            if let identityMap = decodeIdentityMapFrom(event: responseEvent) {
+                completion(identityMap, .none)
+                return
+            }
+
+            completion(nil, AEPError.unexpected)
         }
+    }
+
+    private static func decodeIdentityMapFrom(event: Event) -> IdentityMap? {
+        guard let identityData = event.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] else {
+            return nil
+        }
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: identityData, options: .prettyPrinted) else {
+            return nil
+        }
+
+        let decoder = JSONDecoder()
+        return try? decoder.decode(IdentityMap.self, from: jsonData)
     }
 }

@@ -130,4 +130,33 @@ class IdentityIntegrationTests: XCTestCase {
         XCTAssertFalse(((ecid2?.isEmpty) == nil))
         XCTAssertNotEqual(ecid1, ecid2)
     }
+
+    func testGetIdentityWithECID() {
+        initExtensionsAndWait()
+
+        let expectation = XCTestExpectation(description: "getIdentity callback")
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
+        Identity.getIdentity { identityMap, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(1, identityMap?.getItems().count)
+            XCTAssertEqual(1, identityMap?.getItemsFor(namespace: "ECID")?.count)
+            XCTAssertNotNil(identityMap?.getItemsFor(namespace: "ECID")?[0].id)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetIdentityWhenPrivacyOptedOut() {
+        initExtensionsAndWait()
+
+        let expectation = XCTestExpectation(description: "getIdentity callback")
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
+        Identity.getIdentity { identityMap, error in
+            XCTAssertNil(identityMap)
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
 }
