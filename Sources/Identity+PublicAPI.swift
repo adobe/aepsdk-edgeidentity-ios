@@ -31,14 +31,18 @@ import Foundation
                 return
             }
 
-            if let identityMap = decodeIdentityMapFrom(event: responseEvent) {
-                if let items = identityMap.getItemsWith(namespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first {
-                    completion(ecidItem.id, .none)
-                    return
-                }
+            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+                  let identityMap = IdentityMap.from(eventData: data) else {
+                completion(nil, AEPError.unexpected)
+                return
             }
 
-            completion(nil, AEPError.unexpected)
+            guard let items = identityMap.getItemsWith(namespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
+                completion(nil, AEPError.unexpected)
+                return
+            }
+
+            completion(ecidItem.id, .none)
         }
     }
 
@@ -57,25 +61,13 @@ import Foundation
                 return
             }
 
-            if let identityMap = decodeIdentityMapFrom(event: responseEvent) {
-                completion(identityMap, .none)
+            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+                  let identityMap = IdentityMap.from(eventData: data) else {
+                completion(nil, AEPError.unexpected)
                 return
             }
 
-            completion(nil, AEPError.unexpected)
+            completion(identityMap, .none)
         }
-    }
-
-    private static func decodeIdentityMapFrom(event: Event) -> IdentityMap? {
-        guard let identityData = event.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] else {
-            return nil
-        }
-
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: identityData) else {
-            return nil
-        }
-
-        let decoder = JSONDecoder()
-        return try? decoder.decode(IdentityMap.self, from: jsonData)
     }
 }
