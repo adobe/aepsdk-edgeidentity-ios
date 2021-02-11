@@ -353,4 +353,80 @@ class IdentityMapTests: XCTestCase {
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
     }
+
+    // MARK: merge(identityMap:)
+
+    func testMerge() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
+        identityMap.addItem(namespace: "space2", item: IdentityItem(id: "item1", authenticationState: .loggedOut, primary: false))
+        identityMap.addItem(namespace: "space2", item: IdentityItem(id: "item2"))
+
+        let otherIdentityMap = IdentityMap()
+        otherIdentityMap.addItem(namespace: "space2", item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true))
+        otherIdentityMap.addItem(namespace: "space2", item: IdentityItem(id: "item3"))
+        otherIdentityMap.addItem(namespace: "space3", item: IdentityItem(id: "item1"))
+
+        // test
+        identityMap.merge(otherIdentityMap: otherIdentityMap)
+
+        // verify
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)
+        // namespace: space1, item: 1: same as original
+        XCTAssertEqual("item1", identityMap.getItemsWith(namespace: "space1")?[0].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space1")?[0].primary)
+
+        XCTAssertEqual(3, identityMap.getItemsWith(namespace: "space2")?.count)
+        // namespace: space2, item: 1: overwritten by other
+        XCTAssertEqual("item1", identityMap.getItemsWith(namespace: "space2")?[0].id)
+        XCTAssertEqual(AuthenticationState.authenticated, identityMap.getItemsWith(namespace: "space2")?[0].authenticationState)
+        XCTAssertEqual(true, identityMap.getItemsWith(namespace: "space2")?[0].primary)
+        // namespace: space2, item: 2: same as original
+        XCTAssertEqual("item2", identityMap.getItemsWith(namespace: "space2")?[1].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space2")?[1].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space2")?[1].primary)
+        // namespace: space2, item: 3: added by other
+        XCTAssertEqual("item3", identityMap.getItemsWith(namespace: "space2")?[2].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space2")?[2].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space2")?[2].primary)
+
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space3")?.count)
+        // namespace: space3, item: 1: added by other
+        XCTAssertEqual("item1", identityMap.getItemsWith(namespace: "space3")?[0].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space3")?[0].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space3")?[0].primary)
+    }
+
+    func testMergeOtherIdentityMapEmpty() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
+
+        // test
+        identityMap.merge(otherIdentityMap: IdentityMap())
+
+        // verify
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)
+        // namespace: space1, item: 1
+        XCTAssertEqual("item1", identityMap.getItemsWith(namespace: "space1")?[0].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space1")?[0].primary)
+    }
+
+    func testMergeIdentityMapEmpty() {
+        let identityMap = IdentityMap()
+
+        let otherIdentityMap = IdentityMap()
+        otherIdentityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
+
+        // test
+        identityMap.merge(otherIdentityMap: otherIdentityMap)
+
+        // verify
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)
+        // namespace: space1, item: 1
+        XCTAssertEqual("item1", identityMap.getItemsWith(namespace: "space1")?[0].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space1")?[0].primary)
+    }
 }
