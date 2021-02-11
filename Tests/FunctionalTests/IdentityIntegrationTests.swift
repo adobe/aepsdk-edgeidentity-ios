@@ -139,8 +139,8 @@ class IdentityIntegrationTests: XCTestCase {
         Identity.getIdentities { identityMap, error in
             XCTAssertNil(error)
             XCTAssertNotNil(identityMap)
-            XCTAssertEqual(1, identityMap?.getItemsFor(namespace: "ECID")?.count)
-            XCTAssertNotNil(identityMap?.getItemsFor(namespace: "ECID")?[0].id)
+            XCTAssertEqual(1, identityMap?.getItemsWith(namespace: "ECID")?.count)
+            XCTAssertNotNil(identityMap?.getItemsWith(namespace: "ECID")?[0].id)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)

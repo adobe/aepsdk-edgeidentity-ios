@@ -58,7 +58,7 @@ public class IdentityMap: NSObject, Codable {
     /// - Parameters:
     ///   - namespace: The namespace for this identity
     ///   - item: The identity as an `IdentityItem` object
-    @objc(addItemToNamespace:item:)
+    @objc(addItemWithNamespace:item:)
     public func addItem(namespace: String, item: IdentityItem) {
         if var namespaceItems = items[namespace] {
             if let index = namespaceItems.firstIndex(of: item) {
@@ -75,8 +75,8 @@ public class IdentityMap: NSObject, Codable {
     /// Get the array of `IdentityItem`(s) for the given namespace.
     /// - Parameter namespace: the namespace of items to retrieve
     /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
-    @objc(getItemsForNamespace:)
-    public func getItemsFor(namespace: String) -> [IdentityItem]? {
+    @objc(getItemsWithNamespace:)
+    public func getItemsWith(namespace: String) -> [IdentityItem]? {
         return items[namespace]
     }
 
