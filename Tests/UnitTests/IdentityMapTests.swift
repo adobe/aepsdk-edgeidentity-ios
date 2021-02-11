@@ -81,28 +81,6 @@ class IdentityMapTests: XCTestCase {
         XCTAssertFalse(spaceItems[0].primary)
     }
 
-    // MARK: getItemsFor tests
-
-    func testGetItems() {
-        let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id2"))
-        identityMap.addItem(namespace: "galaxy", item: IdentityItem(id: "milky way"))
-
-        let items = identityMap.getItems()
-        XCTAssertNotNil(items)
-        XCTAssertEqual(2, items.count)
-        XCTAssertEqual(2, items["space"]?.count)
-        XCTAssertEqual(1, items["galaxy"]?.count)
-    }
-
-    func testGetItemsEmptyReturnsEmptyMap() {
-        let identityMap = IdentityMap()
-        let items = identityMap.getItems()
-        XCTAssertNotNil(items)
-        XCTAssertTrue(items.isEmpty)
-    }
-
     // MARK: encoder tests
 
     func testEncode_oneItem() {

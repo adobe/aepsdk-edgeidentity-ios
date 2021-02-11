@@ -72,13 +72,6 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Get all identfiers as a map of `IdentityItem` arrays keyed to namespaces.
-    /// - Returns: map of `IdentityItem` arrays keyed to namespaces or an empty dictionary if this `IdentityMap` contains to identifiers.
-    @objc
-    public func getItems() -> [String: [IdentityItem]] {
-        return items
-    }
-
     /// Get the array of `IdentityItem`(s) for the given namespace.
     /// - Parameter namespace: the namespace of items to retrieve
     /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
