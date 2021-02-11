@@ -85,6 +85,10 @@ class IdentityPropertiesTests: XCTestCase {
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "custom", item: IdentityItem(id: "identifier"))
+        properties.customerIdentifiers = identityMap
+
         // test
         let xdmData = properties.toXdmData()
 
@@ -97,7 +101,8 @@ class IdentityPropertiesTests: XCTestCase {
         let expectedResult: [String: Any] =
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
-                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ]
+                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ],
+                "custom": [ ["id": "identifier", "authenticationState": "ambiguous", "primary": 0] ]
             ]
             ]
 
@@ -109,6 +114,7 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
+        properties.customerIdentifiers = nil
 
         // test
         let xdmData = properties.toXdmData()
@@ -133,24 +139,26 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
-
-        let ecidString = properties.ecid?.ecidString
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "custom", item: IdentityItem(id: "identifier"))
+        properties.customerIdentifiers = identityMap
 
         // test
         properties.saveToPersistence()
 
-        // reset
-        properties.ecid = nil
-        properties.advertisingIdentifier = nil
-
         // test
-        properties.loadFromPersistence()
+        var props = IdentityProperties()
+        props.loadFromPersistence()
 
         //verify
         XCTAssertEqual(1, mockDataStore.dict.count)
-        XCTAssertNotNil(properties.ecid)
-        XCTAssertEqual(ecidString, properties.ecid?.ecidString)
-        XCTAssertEqual("test-ad-id", properties.advertisingIdentifier)
+        XCTAssertNotNil(props.ecid)
+        XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
+        XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
+        XCTAssertNotNil(props.customerIdentifiers)
+        XCTAssertEqual("identifier", props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].primary)
     }
 
 }

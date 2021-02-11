@@ -368,7 +368,7 @@ class IdentityMapTests: XCTestCase {
         otherIdentityMap.addItem(namespace: "space3", item: IdentityItem(id: "item1"))
 
         // test
-        identityMap.merge(otherIdentityMap: otherIdentityMap)
+        identityMap.merge(otherIdentityMap)
 
         // verify
         XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)
@@ -403,7 +403,7 @@ class IdentityMapTests: XCTestCase {
         identityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
 
         // test
-        identityMap.merge(otherIdentityMap: IdentityMap())
+        identityMap.merge(IdentityMap())
 
         // verify
         XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)
@@ -420,7 +420,7 @@ class IdentityMapTests: XCTestCase {
         otherIdentityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
 
         // test
-        identityMap.merge(otherIdentityMap: otherIdentityMap)
+        identityMap.merge(otherIdentityMap)
 
         // verify
         XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space1")?.count)

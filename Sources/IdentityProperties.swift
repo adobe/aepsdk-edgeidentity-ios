@@ -22,6 +22,9 @@ struct IdentityProperties: Codable {
     /// The IDFA from retrieved Apple APIs
     var advertisingIdentifier: String?
 
+    /// Customer Identifiers.
+    var customerIdentifiers: IdentityMap?
+
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
 
@@ -44,16 +47,25 @@ struct IdentityProperties: Codable {
         var map: [String: Any] = [:]
 
         let identityMap = IdentityMap()
+
+        // add ECID
         if let ecid = ecid {
             identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
                             withNamespace: IdentityConstants.Namespaces.ECID)
         }
 
+        // add IDFA
         if let adId = advertisingIdentifier, !adId.isEmpty {
             identityMap.add(item: IdentityItem(id: adId),
                             withNamespace: IdentityConstants.Namespaces.IDFA)
         }
 
+        // add identifiers
+        if let customerIdentifiers = customerIdentifiers {
+            identityMap.merge(customerIdentifiers)
+        }
+
+        // encode to event data
         if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
             map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
         }
