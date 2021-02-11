@@ -20,7 +20,7 @@ import Foundation
     /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available.
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.IDENTITY_REQUEST_IDENTITY,
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -42,9 +42,11 @@ import Foundation
         }
     }
 
+    /// Returns all  identifiers, including customer identifiers which were previously added.
+    /// - Parameter completion: closure which will be invoked once the identifiers are available.
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.IDENTITY_REQUEST_IDENTITY,
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
                           data: nil)
