@@ -60,10 +60,10 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    /// Tests that getIdentity dispatches an identity request identity event
-    func testGetIdentity() {
+    /// Tests that getIdentities dispatches an identity request identity event
+    func testGetIdentities() {
         // setup
-        let expectation = XCTestExpectation(description: "getIdentity should dispatch an event")
+        let expectation = XCTestExpectation(description: "getIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identity, source: EventSource.requestIdentity) { _ in
             expectation.fulfill()

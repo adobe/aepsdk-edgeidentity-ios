@@ -131,10 +131,10 @@ class IdentityIntegrationTests: XCTestCase {
         XCTAssertNotEqual(ecid1, ecid2)
     }
 
-    func testGetIdentityWithECID() {
+    func testGetIdentitiesWithECID() {
         initExtensionsAndWait()
 
-        let expectation = XCTestExpectation(description: "getIdentity callback")
+        let expectation = XCTestExpectation(description: "getIdentities callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
         Identity.getIdentities { identityMap, error in
             XCTAssertNil(error)
@@ -146,10 +146,10 @@ class IdentityIntegrationTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetIdentityWhenPrivacyOptedOut() {
+    func testGetIdentitiesWhenPrivacyOptedOut() {
         initExtensionsAndWait()
 
-        let expectation = XCTestExpectation(description: "getIdentity callback")
+        let expectation = XCTestExpectation(description: "getIdentities callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
         Identity.getIdentities { identityMap, error in
             XCTAssertNil(identityMap)
