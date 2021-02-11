@@ -42,8 +42,8 @@ import Foundation
         }
     }
 
-    @objc(getIdentity:)
-    static func getIdentity(completion: @escaping (IdentityMap?, Error?) -> Void) {
+    @objc(getIdentities:)
+    static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.IDENTITY_REQUEST_IDENTITY,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,

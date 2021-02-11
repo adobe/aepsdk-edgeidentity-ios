@@ -70,7 +70,7 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.getIdentity { _, _ in }
+        Identity.getIdentities { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)

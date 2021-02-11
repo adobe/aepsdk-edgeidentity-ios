@@ -136,7 +136,7 @@ class IdentityIntegrationTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "getIdentity callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
-        Identity.getIdentity { identityMap, error in
+        Identity.getIdentities { identityMap, error in
             XCTAssertNil(error)
             XCTAssertNotNil(identityMap)
             XCTAssertEqual(1, identityMap?.getItems().count)
@@ -152,7 +152,7 @@ class IdentityIntegrationTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "getIdentity callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
-        Identity.getIdentity { identityMap, error in
+        Identity.getIdentities { identityMap, error in
             XCTAssertNil(identityMap)
             XCTAssertEqual(AEPError.unexpected, error as? AEPError)
             expectation.fulfill()
