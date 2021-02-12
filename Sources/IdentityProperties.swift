@@ -61,7 +61,7 @@ struct IdentityProperties: Codable {
         }
 
         // add identifiers
-        if let customerIdentifiers = customerIdentifiers {
+        if let customerIdentifiers = customerIdentifiers, !customerIdentifiers.isEmpty {
             identityMap.merge(customerIdentifiers)
         }
 

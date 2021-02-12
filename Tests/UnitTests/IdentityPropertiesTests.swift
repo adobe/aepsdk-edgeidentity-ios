@@ -114,7 +114,7 @@ class IdentityPropertiesTests: XCTestCase {
         var properties = IdentityProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
-        properties.customerIdentifiers = nil
+        properties.customerIdentifiers = IdentityMap()
 
         // test
         let xdmData = properties.toXdmData()
