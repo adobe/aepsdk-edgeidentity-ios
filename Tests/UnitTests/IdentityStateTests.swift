@@ -150,6 +150,7 @@ class IdentityStateTests: XCTestCase {
         props.privacyStatus = .unknown
         props.ecid = ECID()
         props.advertisingIdentifier = "adId"
+        props.customerIdentifiers = IdentityMap()
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
@@ -168,6 +169,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual(PrivacyStatus.optedOut, state.identityProperties.privacyStatus) // privacy status should change to opt out
         XCTAssertNil(state.identityProperties.ecid) // ecid is cleared
         XCTAssertNil(state.identityProperties.advertisingIdentifier) // ad id is cleared
+        XCTAssertNil(state.identityProperties.customerIdentifiers) // customer identifiers are cleared
     }
 
     /// Tests that when we got from opt out to opt in
@@ -229,6 +231,7 @@ class IdentityStateTests: XCTestCase {
         props.privacyStatus = .optedIn
         props.ecid = ECID()
         props.advertisingIdentifier = "adId"
+        props.customerIdentifiers = IdentityMap()
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
@@ -247,6 +250,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNotNil(state.identityProperties.ecid)
         XCTAssertEqual(props.ecid?.ecidString, state.identityProperties.ecid?.ecidString)
         XCTAssertEqual(props.advertisingIdentifier, state.identityProperties.advertisingIdentifier)
+        XCTAssertNotNil(state.identityProperties.customerIdentifiers)
     }
 
     // MARK: updateCustomerIdentifiers(...)
