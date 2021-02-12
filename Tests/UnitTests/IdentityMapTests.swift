@@ -482,4 +482,29 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space1")?[0].authenticationState)
         XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space1")?[0].primary)
     }
+
+    // MARK: removeItems(...)
+
+    func testRemoveItems() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1"))
+        identityMap.addItem(namespace: "space2", item: IdentityItem(id: "item1", authenticationState: .loggedOut, primary: false))
+        identityMap.addItem(namespace: "space2", item: IdentityItem(id: "item2"))
+
+        let otherIdentityMap = IdentityMap()
+        otherIdentityMap.addItem(namespace: "space1", item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true))
+        otherIdentityMap.addItem(namespace: "space2", item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true))
+        otherIdentityMap.addItem(namespace: "space2", item: IdentityItem(id: "item3"))
+        otherIdentityMap.addItem(namespace: "space3", item: IdentityItem(id: "item1"))
+
+        identityMap.removeItems(otherIdentityMap)
+
+        XCTAssertNil(identityMap.getItemsWith(namespace: "space1"))
+        XCTAssertNil(identityMap.getItemsWith(namespace: "space3"))
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space2")?.count)
+        XCTAssertEqual("item2", identityMap.getItemsWith(namespace: "space2")?[0].id)
+        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItemsWith(namespace: "space2")?[0].authenticationState)
+        XCTAssertEqual(false, identityMap.getItemsWith(namespace: "space2")?[0].primary)
+
+    }
 }

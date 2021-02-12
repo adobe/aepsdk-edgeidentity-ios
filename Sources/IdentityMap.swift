@@ -145,6 +145,16 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
+    /// Remove identites in `otherIdentityMap` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
+    /// - Parameter otherIdentityMap: Identities to remove from this `IdentityMap`
+    func removeItems(_ otherIdentityMap: IdentityMap) {
+        for (namespace, items) in otherIdentityMap.items {
+            for item in items {
+                self.removeItem(namespace: namespace, item: item)
+            }
+        }
+    }
+
     /// Decodes a [String: Any] dictionary into an `IdentityMap`
     /// - Parameter eventData: the event data representing `IdentityMap`
     /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
