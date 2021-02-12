@@ -327,6 +327,78 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
     }
 
+    // MARK: removeCustomerIdentifiers(...)
+
+    func testRemoveCustomerIdentifiers() {
+        let currentIdentities = IdentityMap()
+        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
+        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier2"))
+        var props = IdentityProperties()
+        props.customerIdentifiers = currentIdentities
+
+        state = IdentityState(identityProperties: props)
+
+        let customerIdentities = IdentityMap()
+        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
+        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier2"))
+
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: "com.adobe.eventSource.removeIdentity",
+                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.removeCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+    }
+
+    func testRemoveCustomerIdentifiersNoCurrentIdentifiers() {
+        var props = IdentityProperties()
+        props.customerIdentifiers = nil
+
+        state = IdentityState(identityProperties: props)
+
+        let customerIdentities = IdentityMap()
+        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
+
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: "com.adobe.eventSource.removeIdentity",
+                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+
+        state.removeCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
+
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
+        XCTAssertNil(state.identityProperties.customerIdentifiers)
+    }
+
+    func testRemoveCustomerIdentifiersNoEventDataDoesNotUpdateState() {
+        let currentIdentities = IdentityMap()
+        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
+        var props = IdentityProperties()
+        props.customerIdentifiers = currentIdentities
+
+        state = IdentityState(identityProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identity,
+                          source: "com.adobe.eventSource.updateIdentity",
+                          data: nil)
+
+        state.removeCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
+
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+    }
+
     // MARK: updateAdvertisingIdentifier(...)
 
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
