@@ -42,6 +42,7 @@ enum IdentityConstants {
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
+        static let VISITOR_IDENTIFIERS = "visitoridentifiers"
     }
 
     enum DataStoreKeys {

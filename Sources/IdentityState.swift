@@ -90,6 +90,32 @@ class IdentityState {
 
     }
 
+    /// Update the customer identifiers by merging `updateIdentityMap` with the current identifiers. Any identifier in `updateIdentityMap` which
+    /// has the same id in the same namespace will update the current identifier.
+    /// - Parameters
+    ///   - event: event containing customer identifiers to add or update with the current identifiers
+    ///   - createXDMSharedState: function which creates new XDM shared state
+    func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
+        guard let eventData = event.data, let identifiersData = eventData[IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS] as? [String: Any] else {
+            Log.debug(label: LOG_TAG, "Failed to update customer identifiers as no identifiers were found in the event data.")
+            return
+        }
+
+        guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
+            Log.debug(label: LOG_TAG, "Failed to update customer identifiers as the event data could not be encoded to an IdentityMap.")
+            return
+        }
+
+        if identityProperties.customerIdentifiers == nil {
+            identityProperties.customerIdentifiers = updateIdentityMap
+        } else {
+            identityProperties.customerIdentifiers?.merge(updateIdentityMap)
+        }
+
+        identityProperties.saveToPersistence()
+        createXDMSharedState(identityProperties.toXdmData(), event)
+    }
+
     /// Updates and makes any required actions when the privacy status has updated
     /// - Parameters:
     ///   - event: the event triggering the privacy change
