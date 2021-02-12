@@ -37,6 +37,8 @@ class IdentityMapTests: XCTestCase {
         XCTAssertNil(unknown)
     }
 
+    // MARK: addItems(...)
+
     func testAddItems() {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
@@ -94,6 +96,57 @@ class IdentityMapTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "")
 
         XCTAssertNil(identityMap.getItems(withNamespace: ""))
+    }
+
+    // MARK: removeItem(...)
+
+    func testRemoveItem() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id2", authenticationState: AuthenticationState.authenticated, primary: true))
+        identityMap.addItem(namespace: "email", item: IdentityItem(id: "example@adobe.com"))
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true))
+
+        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id"))
+        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id2"))
+
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space")?.count)
+        XCTAssertEqual("custom", identityMap.getItemsWith(namespace: "space")?[0].id)
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "email")?.count)
+        XCTAssertEqual("example@adobe.com", identityMap.getItemsWith(namespace: "email")?[0].id)
+    }
+
+    func testRemoveItemNotExist() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
+
+        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "custom"))
+
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space")?.count)
+        XCTAssertEqual("id", identityMap.getItemsWith(namespace: "space")?[0].id)
+    }
+
+    func testRemoveItemWrongNamespace() {
+        let identityMap = IdentityMap()
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
+
+        identityMap.removeItem(namespace: "galaxy", item: IdentityItem(id: "custom"))
+
+        XCTAssertEqual(1, identityMap.getItemsWith(namespace: "space")?.count)
+        XCTAssertEqual("id", identityMap.getItemsWith(namespace: "space")?[0].id)
+    }
+
+    // MARK: isEmpty
+
+    func testIsEmpty() {
+        let identityMap = IdentityMap()
+        XCTAssertTrue(identityMap.isEmpty)
+
+        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id"))
+        XCTAssertFalse(identityMap.isEmpty)
+
+        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id"))
+        XCTAssertTrue(identityMap.isEmpty)
     }
 
     // MARK: encoder tests

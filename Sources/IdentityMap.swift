@@ -57,9 +57,11 @@ public class IdentityMap: NSObject, Codable {
     private static let LOG_TAG = "IdentityMap"
     private var items: [String: [IdentityItem]] = [:]
 
-    /// Determine if this `IdentityMap` is empty.
-    public var isEmpty: Bool {
-        return items.isEmpty
+    /// Determines if this `IdentityMap` has no identities.
+    @objc public var isEmpty: Bool {
+        get {
+            return items.isEmpty
+        }
     }
 
     public override init() {}
@@ -85,6 +87,25 @@ public class IdentityMap: NSObject, Codable {
             items[withNamespace] = namespaceItems
         } else {
             items[withNamespace] = [item]
+        }
+    }
+
+    /// Remove a single `IdentityItem` from this map.
+    /// - Parameters:
+    ///   - namespace: The namespace for the identity to remove
+    ///   - item: The identity to remove from the given `namespace`
+    @objc(removeItemWithNamespace:item:)
+    public func removeItem(namespace: String, item: IdentityItem) {
+        guard var namespaceItems = items[namespace], let index = namespaceItems.firstIndex(of: item) else {
+            return
+        }
+
+        namespaceItems.remove(at: index)
+
+        if namespaceItems.isEmpty {
+            items.removeValue(forKey: namespace)
+        } else {
+            items[namespace] = namespaceItems
         }
     }
 
