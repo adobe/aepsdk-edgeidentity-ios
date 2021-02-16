@@ -59,13 +59,18 @@ public class IdentityMap: NSObject, Codable {
 
     public override init() {}
 
-    /// Adds an `IdentityItem` to this map. If an item is added which shares the same `namespace` and `id` as an item
-    /// already in the map, then the new item replaces the existing item.
+    /// Adds an `IdentityItem` to this map. If an item is added which shares the same `withNamespace` and `item.id` as an item
+    /// already in the map, then the new item replaces the existing item. Empty `withNamepace` or items with an empty `item.id` are not allowed and are ignored.
     /// - Parameters:
     ///   - item: The identity as an `IdentityItem` object
     ///   - namespace: The namespace for this identity
     @objc(addItem:withNamespace:)
     public func add(item: IdentityItem, withNamespace: String) {
+        if item.id.isEmpty || withNamespace.isEmpty {
+            Log.debug(label: IdentityMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
+            return
+        }
+
         if var namespaceItems = items[withNamespace] {
             if let index = namespaceItems.firstIndex(of: item) {
                 namespaceItems[index] = item
@@ -92,9 +97,14 @@ public class IdentityMap: NSObject, Codable {
     }
 
     public required init(from decoder: Decoder) throws {
+        super.init()
         let container = try decoder.singleValueContainer()
         if let identityItems = try? container.decode([String: [IdentityItem]].self) {
-            items = identityItems
+            for (namespace, items) in identityItems {
+                for item in items {
+                    self.add(item: item, withNamespace: namespace)
+                }
+            }
         }
     }
 

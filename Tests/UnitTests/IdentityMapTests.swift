@@ -81,20 +81,19 @@ class IdentityMapTests: XCTestCase {
         XCTAssertFalse(spaceItems[0].primary)
     }
 
-    func testAddItems_withEmptyId() {
+    func testAddItems_withEmptyIdNotAllowed() {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
         identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
-            XCTFail("Namespace 'space' is nil but expected not nil.")
-            return
-        }
+        XCTAssertNil(identityMap.getItems(withNamespace: "space"))
+    }
 
-        XCTAssertEqual(1, spaceItems.count)
-        XCTAssertEqual("", spaceItems[0].id)
-        XCTAssertEqual(AuthenticationState.authenticated, spaceItems[0].authenticationState)
-        XCTAssertFalse(spaceItems[0].primary)
+    func testAddItems_withEmptyNamespaceNotAllowed() {
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "")
+
+        XCTAssertNil(identityMap.getItems(withNamespace: ""))
     }
 
     // MARK: encoder tests
@@ -150,18 +149,11 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
 
-    func testEncode_itemWithEmptyId() {
+    func testEncode_itemWithEmptyIdNotAllowed() {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
-            XCTFail("IdentityMap.asDictionary returned nil!")
-            return
-        }
-        let expectedResult: [String: Any] =
-            ["space": [ ["id": "", "authenticationState": "ambiguous", "primary": false] ]]
-
-        XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
+        XCTAssertEqual(true, identityMap.asDictionary()?.isEmpty)
     }
 
     // MARK: decoder tests
@@ -314,7 +306,7 @@ class IdentityMapTests: XCTestCase {
     func testDecode_itemWithEmptyId() {
         guard let data = """
             {
-              "" : [
+              "space" : [
                 {
                   "id" : ""
                 }
@@ -328,15 +320,27 @@ class IdentityMapTests: XCTestCase {
 
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
-        guard let items = identityMap?.getItems(withNamespace: "") else {
-            XCTFail("Namespace 'space' is nil but expected not nil.")
+        XCTAssertNil(identityMap?.getItems(withNamespace: "space"))
+    }
+
+    func testDecode_itemWithEmptyNamespace() {
+        guard let data = """
+            {
+              "" : [
+                {
+                  "id" : "id"
+                }
+              ]
+            }
+        """.data(using: .utf8) else {
+            XCTFail("Failed to convert json string to data")
             return
         }
+        let decoder = JSONDecoder()
 
-        XCTAssertEqual(1, items.count)
-        XCTAssertEqual("", items[0].id)
-        XCTAssertEqual("ambiguous", items[0].authenticationState.rawValue)
-        XCTAssertFalse(items[0].primary)
+        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
+        XCTAssertNotNil(identityMap)
+        XCTAssertNil(identityMap?.getItems(withNamespace: ""))
     }
 
     func testDecode_emptyJson() {
