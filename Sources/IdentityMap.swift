@@ -13,6 +13,10 @@
 import AEPServices
 import Foundation
 
+/// The state this identity is authenticated.
+/// - ambiguous - Ambiguous.
+/// - authenticated - User identified by a login or similar action that was valid at the time of the event observation.
+/// - loggedOut - User was identified by a login action at some point of time previously, but is not currently logged in.
 @objc(AEPAuthenticationState)
 public enum AuthenticationState: Int, RawRepresentable, Codable {
     case ambiguous = 0
@@ -58,19 +62,19 @@ public class IdentityMap: NSObject, Codable {
     /// Adds an `IdentityItem` to this map. If an item is added which shares the same `namespace` and `id` as an item
     /// already in the map, then the new item replaces the existing item.
     /// - Parameters:
-    ///   - namespace: The namespace for this identity
     ///   - item: The identity as an `IdentityItem` object
-    @objc(addItemWithNamespace:item:)
-    public func addItem(namespace: String, item: IdentityItem) {
-        if var namespaceItems = items[namespace] {
+    ///   - namespace: The namespace for this identity
+    @objc(addItem:withNamespace:)
+    public func add(item: IdentityItem, withNamespace: String) {
+        if var namespaceItems = items[withNamespace] {
             if let index = namespaceItems.firstIndex(of: item) {
                 namespaceItems[index] = item
             } else {
                 namespaceItems.append(item)
             }
-            items[namespace] = namespaceItems
+            items[withNamespace] = namespaceItems
         } else {
-            items[namespace] = [item]
+            items[withNamespace] = [item]
         }
     }
 
@@ -78,8 +82,8 @@ public class IdentityMap: NSObject, Codable {
     /// - Parameter namespace: the namespace of items to retrieve
     /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
     @objc(getItemsWithNamespace:)
-    public func getItemsWith(namespace: String) -> [IdentityItem]? {
-        return items[namespace]
+    public func getItems(withNamespace: String) -> [IdentityItem]? {
+        return items[withNamespace]
     }
 
     public func encode(to encoder: Encoder) throws {

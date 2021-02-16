@@ -24,26 +24,26 @@ class IdentityMapTests: XCTestCase {
 
     func testGetItemsWith() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        let spaceItems = identityMap.getItemsWith(namespace: "space")
+        let spaceItems = identityMap.getItems(withNamespace: "space")
         XCTAssertNotNil(spaceItems)
         XCTAssertEqual(1, spaceItems?.count)
         XCTAssertEqual("id", spaceItems?[0].id)
         XCTAssertEqual("ambiguous", spaceItems?[0].authenticationState.rawValue)
         XCTAssertFalse(spaceItems?[0].primary ?? true)
 
-        let unknown = identityMap.getItemsWith(namespace: "unknown")
+        let unknown = identityMap.getItems(withNamespace: "unknown")
         XCTAssertNil(unknown)
     }
 
     func testAddItems() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "email", item: IdentityItem(id: "example@adobe.com"))
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
+        identityMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -56,7 +56,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(AuthenticationState.ambiguous, spaceItems[1].authenticationState)
         XCTAssertTrue(spaceItems[1].primary)
 
-        guard let emailItems = identityMap.getItemsWith(namespace: "email") else {
+        guard let emailItems = identityMap.getItems(withNamespace: "email") else {
             XCTFail("Namespace 'email' is nil but expected not nil.")
             return
         }
@@ -67,10 +67,10 @@ class IdentityMapTests: XCTestCase {
 
     func testAddItems_overwrite() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.authenticated))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -83,10 +83,10 @@ class IdentityMapTests: XCTestCase {
 
     func testAddItems_withEmptyId() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated))
+        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -101,7 +101,7 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_oneItem() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
             XCTFail("IdentityMap.asDictionary returned nil!")
@@ -115,8 +115,8 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_twoItems() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "A", item: IdentityItem(id: "123"))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "123"), withNamespace: "A")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
             XCTFail("IdentityMap.asDictionary returned nil!")
@@ -133,8 +133,8 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_twoItemsSameNamespace() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false))
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "123"))
+        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "123"), withNamespace: "space")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
             XCTFail("IdentityMap.asDictionary returned nil!")
@@ -152,7 +152,7 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_itemWithEmptyId() {
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "space", item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false))
+        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
             XCTFail("IdentityMap.asDictionary returned nil!")
@@ -185,7 +185,7 @@ class IdentityMapTests: XCTestCase {
 
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
-        guard let items = identityMap?.getItemsWith(namespace: "space") else {
+        guard let items = identityMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -220,7 +220,7 @@ class IdentityMapTests: XCTestCase {
 
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
-        guard let spaceItems = identityMap?.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -230,7 +230,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual("loggedOut", spaceItems[0].authenticationState.rawValue)
         XCTAssertTrue(spaceItems[0].primary)
 
-        guard let aItems = identityMap?.getItemsWith(namespace: "A") else {
+        guard let aItems = identityMap?.getItems(withNamespace: "A") else {
             XCTFail("Namespace 'A' is nil but expected not nil.")
             return
         }
@@ -263,7 +263,7 @@ class IdentityMapTests: XCTestCase {
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
 
-        guard let spaceItems = identityMap?.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -300,7 +300,7 @@ class IdentityMapTests: XCTestCase {
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
 
-        guard let spaceItems = identityMap?.getItemsWith(namespace: "space") else {
+        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -328,7 +328,7 @@ class IdentityMapTests: XCTestCase {
 
         let identityMap = try? decoder.decode(IdentityMap.self, from: data)
         XCTAssertNotNil(identityMap)
-        guard let items = identityMap?.getItemsWith(namespace: "") else {
+        guard let items = identityMap?.getItems(withNamespace: "") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }

@@ -37,7 +37,7 @@ import Foundation
                 return
             }
 
-            guard let items = identityMap.getItemsWith(namespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
+            guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
                 completion(nil, AEPError.unexpected)
                 return
             }

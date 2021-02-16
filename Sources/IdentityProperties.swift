@@ -43,13 +43,13 @@ struct IdentityProperties: Codable {
 
         let identityMap = IdentityMap()
         if let ecid = ecid {
-            identityMap.addItem(namespace: IdentityConstants.Namespaces.ECID,
-                                item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true))
+            identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
+                            withNamespace: IdentityConstants.Namespaces.ECID)
         }
 
         if let adId = advertisingIdentifier, !adId.isEmpty {
-            identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
-                                item: IdentityItem(id: adId))
+            identityMap.add(item: IdentityItem(id: adId),
+                            withNamespace: IdentityConstants.Namespaces.IDFA)
         }
 
         if let dict = identityMap.asDictionary(), !dict.isEmpty {
