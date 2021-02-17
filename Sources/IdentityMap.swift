@@ -143,10 +143,10 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Remove identites in `otherIdentityMap` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
-    /// - Parameter otherIdentityMap: Identities to remove from this `IdentityMap`
-    func removeItems(_ otherIdentityMap: IdentityMap) {
-        for (namespace, items) in otherIdentityMap.items {
+    /// Remove identites in `map` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
+    /// - Parameter map: Identities to remove from this `IdentityMap`
+    func remove(map: IdentityMap) {
+        for (namespace, items) in map.items {
             for item in items {
                 self.remove(item: item, withNamespace: namespace)
             }

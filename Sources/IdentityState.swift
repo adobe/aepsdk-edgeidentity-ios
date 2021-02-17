@@ -135,7 +135,7 @@ class IdentityState {
             return
         }
 
-        customerIdentityMap.removeItems(removeIdentityMap)
+        customerIdentityMap.remove(map: removeIdentityMap)
 
         identityProperties.saveToPersistence()
         createXDMSharedState(identityProperties.toXdmData(), event)
