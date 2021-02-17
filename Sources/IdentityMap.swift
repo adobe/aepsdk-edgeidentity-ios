@@ -59,9 +59,7 @@ public class IdentityMap: NSObject, Codable {
 
     /// Determines if this `IdentityMap` has no identities.
     @objc public var isEmpty: Bool {
-        get {
-            return items.isEmpty
-        }
+        return items.isEmpty
     }
 
     public override init() {}
@@ -92,26 +90,26 @@ public class IdentityMap: NSObject, Codable {
 
     /// Remove a single `IdentityItem` from this map.
     /// - Parameters:
-    ///   - namespace: The namespace for the identity to remove
-    ///   - item: The identity to remove from the given `namespace`
-    @objc(removeItemWithNamespace:item:)
-    public func removeItem(namespace: String, item: IdentityItem) {
-        guard var namespaceItems = items[namespace], let index = namespaceItems.firstIndex(of: item) else {
+    ///   - withNamespace: The namespace for the identity to remove
+    ///   - item: The identity to remove from the given `withNamespace`
+    @objc(removeItem:withNamespace:)
+    public func remove(item: IdentityItem, withNamespace: String) {
+        guard var namespaceItems = items[withNamespace], let index = namespaceItems.firstIndex(of: item) else {
             return
         }
 
         namespaceItems.remove(at: index)
 
         if namespaceItems.isEmpty {
-            items.removeValue(forKey: namespace)
+            items.removeValue(forKey: withNamespace)
         } else {
-            items[namespace] = namespaceItems
+            items[withNamespace] = namespaceItems
         }
     }
 
     /// Get the array of `IdentityItem`(s) for the given namespace.
-    /// - Parameter namespace: the namespace of items to retrieve
-    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
+    /// - Parameter withNamesapce: the namespace of items to retrieve
+    /// - Returns: An array of `IdentityItem`s for the given `withNamespace` or nil if this `IdentityMap` does not contain the `withNamespace`.
     @objc(getItemsWithNamespace:)
     public func getItems(withNamespace: String) -> [IdentityItem]? {
         return items[withNamespace]
@@ -150,7 +148,7 @@ public class IdentityMap: NSObject, Codable {
     func removeItems(_ otherIdentityMap: IdentityMap) {
         for (namespace, items) in otherIdentityMap.items {
             for item in items {
-                self.removeItem(namespace: namespace, item: item)
+                self.remove(item: item, withNamespace: namespace)
             }
         }
     }

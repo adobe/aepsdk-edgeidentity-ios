@@ -107,8 +107,8 @@ class IdentityMapTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
         identityMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
 
-        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id"))
-        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id2"))
+        identityMap.remove(item: IdentityItem(id: "id"), withNamespace: "space")
+        identityMap.remove(item: IdentityItem(id: "id2"), withNamespace: "space")
 
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space")?.count)
         XCTAssertEqual("custom", identityMap.getItems(withNamespace: "space")?[0].id)
@@ -120,7 +120,7 @@ class IdentityMapTests: XCTestCase {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "custom"))
+        identityMap.remove(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space")?.count)
         XCTAssertEqual("id", identityMap.getItems(withNamespace: "space")?[0].id)
@@ -130,7 +130,7 @@ class IdentityMapTests: XCTestCase {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        identityMap.removeItem(namespace: "galaxy", item: IdentityItem(id: "custom"))
+        identityMap.remove(item: IdentityItem(id: "custom"), withNamespace: "galaxy")
 
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space")?.count)
         XCTAssertEqual("id", identityMap.getItems(withNamespace: "space")?[0].id)
@@ -145,7 +145,7 @@ class IdentityMapTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
         XCTAssertFalse(identityMap.isEmpty)
 
-        identityMap.removeItem(namespace: "space", item: IdentityItem(id: "id"))
+        identityMap.remove(item: IdentityItem(id: "id"), withNamespace: "space")
         XCTAssertTrue(identityMap.isEmpty)
     }
 
