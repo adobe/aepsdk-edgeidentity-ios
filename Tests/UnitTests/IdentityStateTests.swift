@@ -282,6 +282,35 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[1].id)
     }
 
+    func testUpdateCustomerIdentifiersFiltersOutUnallowedNamespaces() {
+        let currentIdentities = IdentityMap()
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        var props = IdentityProperties()
+        props.customerIdentifiers = currentIdentities
+
+        state = IdentityState(identityProperties: props)
+
+        let customerIdentities = IdentityMap()
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "ecid"), withNamespace: IdentityConstants.Namespaces.ECID)
+        customerIdentities.add(item: IdentityItem(id: "idfa"), withNamespace: IdentityConstants.Namespaces.IDFA)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: "com.adobe.eventSource.updateIdentity",
+                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.updateCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertEqual(2, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[1].id)
+    }
+
     func testUpdateCustomerIdentifiersNoCurrentIdentifiers() {
         var props = IdentityProperties()
         props.customerIdentifiers = nil

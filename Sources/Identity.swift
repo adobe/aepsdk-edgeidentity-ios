@@ -34,6 +34,8 @@ import Foundation
         registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
+        registerListener(type: EventType.identityEdge, source: "com.adobe.eventSource.updateIdentity", listener: handleUpdateIdentity)
+        registerListener(type: EventType.identityEdge, source: "com.adobe.eventSource.removeIdentity", listener: handleRemoveIdentity)
     }
 
     public func onUnregistered() {
@@ -101,5 +103,17 @@ import Foundation
                                         createSharedState: createSharedState(data:event:),
                                         createXDMSharedState: createXDMSharedState(data:event:))
         }
+    }
+
+    /// Handles update identity requests to add/update customer identifiers.
+    /// - Parameter event: the identity request event
+    private func handleUpdateIdentity(event: Event) {
+        state?.updateCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+    }
+
+    /// Handles remove identity requests to remove customer identififers.
+    /// - Parameter event: the identity request event
+    private func handleRemoveIdentity(event: Event) {
+        state?.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
     }
 }

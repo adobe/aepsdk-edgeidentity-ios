@@ -92,6 +92,11 @@ class IdentityState {
 
     /// Update the customer identifiers by merging `updateIdentityMap` with the current identifiers. Any identifier in `updateIdentityMap` which
     /// has the same id in the same namespace will update the current identifier.
+    /// Certain namespaces are not allowed to be modified and if exist in the given customer identifiers will be removed before the update operation is executed.
+    /// The namespaces which cannot be modified through this function call include:
+    /// - ECID
+    /// - IDFA
+    ///
     /// - Parameters
     ///   - event: event containing customer identifiers to add or update with the current customer identifiers
     ///   - createXDMSharedState: function which creates new XDM shared state
@@ -104,6 +109,21 @@ class IdentityState {
         guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
             Log.debug(label: LOG_TAG, "Failed to update customer identifiers as the event data could not be encoded to an IdentityMap.")
             return
+        }
+
+        // Filter out known identifiers to prevent modification of certain namespaces
+        let filterItems = IdentityMap()
+        for namespace in [IdentityConstants.Namespaces.ECID, IdentityConstants.Namespaces.IDFA] {
+            if let items = updateIdentityMap.getItems(withNamespace: namespace) {
+                Log.debug(label: LOG_TAG, "Adding/Updating customer identifiers in namespace '\(namespace)' is not allowed.")
+                for item in items {
+                    filterItems.add(item: item, withNamespace: namespace)
+                }
+            }
+        }
+
+        if !filterItems.isEmpty {
+            updateIdentityMap.remove(map: filterItems)
         }
 
         if identityProperties.customerIdentifiers == nil {

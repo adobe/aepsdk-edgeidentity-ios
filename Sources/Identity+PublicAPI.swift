@@ -71,4 +71,35 @@ import Foundation
             completion(identityMap, .none)
         }
     }
+
+    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The IdentityEdge extension will merge the received identifiers
+    ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
+    /// - Parameter map: The identifiers to add or update
+    @objc(updateIdentitiesWith:)
+    static func updateIdentities(with map: IdentityMap) {
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_IDENTITIES,
+                          type: EventType.identityEdge,
+                          source: "com.adobe.eventSource.updateIdentity", // TODO
+                          data: map.asDictionary())
+
+        MobileCore.dispatch(event: event)
+    }
+
+    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The IdentityEdge extension will stop sending this identifier.
+    /// This does not clear the identifier from the User Profile Graph.
+    /// - Parameters:
+    ///   - item: The identity to remove.
+    ///   - withNamespace: The namespace the identity to remove is under.
+    @objc(removeIdentityItem:withNamespace:)
+    static func removeIdentity(item: IdentityItem, withNamespace: String) {
+        let identities = IdentityMap()
+        identities.add(item: item, withNamespace: withNamespace)
+
+        let event = Event(name: IdentityConstants.EventNames.REMOVE_IDENTITIES,
+                          type: EventType.identityEdge,
+                          source: "com.adobe.eventSource.removeIdentity", // TODO
+                          data: identities.asDictionary())
+
+        MobileCore.dispatch(event: event)
+    }
 }
