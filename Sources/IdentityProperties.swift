@@ -62,7 +62,7 @@ struct IdentityProperties: Codable {
 
         // add identifiers
         if let customerIdentifiers = customerIdentifiers, !customerIdentifiers.isEmpty {
-            identityMap.merge(customerIdentifiers)
+            identityMap.merge(map: customerIdentifiers)
         }
 
         // encode to event data

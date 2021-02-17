@@ -109,7 +109,7 @@ class IdentityState {
         if identityProperties.customerIdentifiers == nil {
             identityProperties.customerIdentifiers = updateIdentityMap
         } else {
-            identityProperties.customerIdentifiers?.merge(updateIdentityMap)
+            identityProperties.customerIdentifiers?.merge(map: updateIdentityMap)
         }
 
         identityProperties.saveToPersistence()

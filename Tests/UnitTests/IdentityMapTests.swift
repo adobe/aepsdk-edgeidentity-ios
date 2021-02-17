@@ -407,7 +407,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertNotNil(identityMap)
     }
 
-    // MARK: merge(identityMap:)
+    // MARK: merge(map:)
 
     func testMerge() {
         let identityMap = IdentityMap()
@@ -421,7 +421,7 @@ class IdentityMapTests: XCTestCase {
         otherIdentityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space3")
 
         // test
-        identityMap.merge(otherIdentityMap)
+        identityMap.merge(map: otherIdentityMap)
 
         // verify
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)
@@ -456,7 +456,7 @@ class IdentityMapTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space1")
 
         // test
-        identityMap.merge(IdentityMap())
+        identityMap.merge(map: IdentityMap())
 
         // verify
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)
@@ -473,7 +473,7 @@ class IdentityMapTests: XCTestCase {
         otherIdentityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space1")
 
         // test
-        identityMap.merge(otherIdentityMap)
+        identityMap.merge(map: otherIdentityMap)
 
         // verify
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)

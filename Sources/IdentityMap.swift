@@ -132,11 +132,11 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Merge `otherIdentityMap` on to this `IdentityMap`. Any `IdentityItem` in `otherIdentityMap` which shares the same
+    /// Merge `map` on to this `IdentityMap`. Any `IdentityItem` in `map` which shares the same
     /// namespace and id as an item in this `IdentityMap` will replace that `IdentityItem`.
-    /// - Parameter otherIdentityMap: an `IdentityMap` to add onto this `IdentityMap`
-    func merge(_ otherIdentityMap: IdentityMap) {
-        for (namespace, items) in otherIdentityMap.items {
+    /// - Parameter map: an `IdentityMap` to add onto this `IdentityMap`
+    func merge(map: IdentityMap) {
+        for (namespace, items) in map.items {
             for item in items {
                 self.add(item: item, withNamespace: namespace)
             }
