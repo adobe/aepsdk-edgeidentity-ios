@@ -75,15 +75,9 @@ import Foundation
                                            dispatchEvent: dispatch(event:))
     }
 
-    /// Handles events requesting for identifiers. Called by listener registered with event hub.
+    /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
-        processIdentifiersRequest(event: event)
-    }
-
-    /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
-    /// - Parameter event: the identity request event
-    private func processIdentifiersRequest(event: Event) {
         let xdmData = state?.identityProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identityEdge,
