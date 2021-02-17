@@ -79,7 +79,7 @@ import Foundation
     static func updateIdentities(with map: IdentityMap) {
         let event = Event(name: IdentityConstants.EventNames.UPDATE_IDENTITIES,
                           type: EventType.identityEdge,
-                          source: "com.adobe.eventSource.updateIdentity", // TODO
+                          source: EventSource.updateIdentity,
                           data: map.asDictionary())
 
         MobileCore.dispatch(event: event)
@@ -97,7 +97,7 @@ import Foundation
 
         let event = Event(name: IdentityConstants.EventNames.REMOVE_IDENTITIES,
                           type: EventType.identityEdge,
-                          source: "com.adobe.eventSource.removeIdentity", // TODO
+                          source: EventSource.removeIdentity,
                           data: identities.asDictionary())
 
         MobileCore.dispatch(event: event)

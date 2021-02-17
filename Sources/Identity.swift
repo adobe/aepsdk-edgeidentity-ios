@@ -34,8 +34,8 @@ import Foundation
         registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
-        registerListener(type: EventType.identityEdge, source: "com.adobe.eventSource.updateIdentity", listener: handleUpdateIdentity)
-        registerListener(type: EventType.identityEdge, source: "com.adobe.eventSource.removeIdentity", listener: handleRemoveIdentity)
+        registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
+        registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
     }
 
     public func onUnregistered() {
