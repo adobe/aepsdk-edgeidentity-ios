@@ -32,7 +32,7 @@ class IdentityTests: XCTestCase {
     /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
     func testIdentityRequestIdentifiersHappy() {
         // setup
-        let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
+        let event = Event(name: "Test Request Identifiers", type: EventType.identityEdge, source: EventSource.requestIdentity, data: nil)
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
 
         // test
@@ -47,7 +47,7 @@ class IdentityTests: XCTestCase {
     /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
     func testIdentityRequestIdentifiersNoConfig() {
         // setup
-        let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
+        let event = Event(name: "Test Request Identifiers", type: EventType.identityEdge, source: EventSource.requestIdentity, data: nil)
 
         // test
         mockRuntime.simulateComingEvent(event: event)

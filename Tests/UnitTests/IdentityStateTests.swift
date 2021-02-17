@@ -105,7 +105,7 @@ class IdentityStateTests: XCTestCase {
         props.advertisingIdentifier = "adId"
 
         state = IdentityState(identityProperties: props)
-        let event = Event(name: "Test event", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
+        let event = Event(name: "Test event", type: EventType.identityEdge, source: EventSource.requestIdentity, data: nil)
 
         // test
         state.processPrivacyChange(event: event,
@@ -127,7 +127,7 @@ class IdentityStateTests: XCTestCase {
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
@@ -154,7 +154,7 @@ class IdentityStateTests: XCTestCase {
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
 
@@ -182,7 +182,7 @@ class IdentityStateTests: XCTestCase {
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
@@ -208,7 +208,7 @@ class IdentityStateTests: XCTestCase {
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
 
@@ -235,7 +235,7 @@ class IdentityStateTests: XCTestCase {
 
         state = IdentityState(identityProperties: props)
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
 
@@ -267,7 +267,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.updateIdentity",
                           data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
 
@@ -292,7 +292,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.updateIdentity",
                           data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
 
@@ -315,7 +315,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.updateIdentity",
                           data: nil)
 
@@ -343,7 +343,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.removeIdentity",
                           data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
 
@@ -367,7 +367,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.removeIdentity",
                           data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
 
@@ -387,7 +387,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let event = Event(name: "Test event",
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: "com.adobe.eventSource.updateIdentity",
                           data: nil)
 
@@ -572,7 +572,7 @@ class IdentityStateTests: XCTestCase {
 
 private extension Event {
     static func fakeIdentityEvent() -> Event {
-        return Event(name: "Fake Identity Event", type: EventType.identity, source: EventSource.requestContent, data: nil)
+        return Event(name: "Fake Identity Event", type: EventType.identityEdge, source: EventSource.requestContent, data: nil)
     }
 
     static func fakeGenericIdentityEvent(adId: String?) -> Event {

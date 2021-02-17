@@ -49,7 +49,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getExperienceCloudId should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identity, source: EventSource.requestIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { _ in
             expectation.fulfill()
         }
 
@@ -65,7 +65,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identity, source: EventSource.requestIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { _ in
             expectation.fulfill()
         }
 

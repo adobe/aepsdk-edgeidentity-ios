@@ -31,7 +31,7 @@ import Foundation
     }
 
     public func onRegistered() {
-        registerListener(type: EventType.identity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
+        registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
     }
@@ -84,7 +84,7 @@ import Foundation
     private func processIdentifiersRequest(event: Event) {
         let xdmData = state?.identityProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                      type: EventType.identity,
+                                                      type: EventType.identityEdge,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)
 

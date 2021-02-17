@@ -21,7 +21,7 @@ import Foundation
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
 
@@ -52,7 +52,7 @@ import Foundation
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
-                          type: EventType.identity,
+                          type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
 
