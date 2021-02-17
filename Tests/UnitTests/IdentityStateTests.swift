@@ -257,14 +257,14 @@ class IdentityStateTests: XCTestCase {
 
     func testUpdateCustomerIdentifiers() {
         let currentIdentities = IdentityMap()
-        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
         var props = IdentityProperties()
         props.customerIdentifiers = currentIdentities
 
         state = IdentityState(identityProperties: props)
 
         let customerIdentities = IdentityMap()
-        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
                           type: EventType.identity,
@@ -277,9 +277,9 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(2, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
-        XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[1].id)
+        XCTAssertEqual(2, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[1].id)
     }
 
     func testUpdateCustomerIdentifiersNoCurrentIdentifiers() {
@@ -289,7 +289,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let customerIdentities = IdentityMap()
-        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
                           type: EventType.identity,
@@ -302,13 +302,13 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
-        XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("custom", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
     func testUpdateCustomerIdentifiersNoEventDataDoesNotUpdateState() {
         let currentIdentities = IdentityMap()
-        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
         var props = IdentityProperties()
         props.customerIdentifiers = currentIdentities
 
@@ -323,24 +323,24 @@ class IdentityStateTests: XCTestCase {
                                         createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
-        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
     // MARK: removeCustomerIdentifiers(...)
 
     func testRemoveCustomerIdentifiers() {
         let currentIdentities = IdentityMap()
-        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
-        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier2"))
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        currentIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
         var props = IdentityProperties()
         props.customerIdentifiers = currentIdentities
 
         state = IdentityState(identityProperties: props)
 
         let customerIdentities = IdentityMap()
-        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
-        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier2"))
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
 
         let event = Event(name: "Test event",
                           type: EventType.identity,
@@ -353,8 +353,8 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
     func testRemoveCustomerIdentifiersNoCurrentIdentifiers() {
@@ -364,7 +364,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let customerIdentities = IdentityMap()
-        customerIdentities.addItem(namespace: "space", item: IdentityItem(id: "custom"))
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
                           type: EventType.identity,
@@ -380,7 +380,7 @@ class IdentityStateTests: XCTestCase {
 
     func testRemoveCustomerIdentifiersNoEventDataDoesNotUpdateState() {
         let currentIdentities = IdentityMap()
-        currentIdentities.addItem(namespace: "space", item: IdentityItem(id: "identifier"))
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
         var props = IdentityProperties()
         props.customerIdentifiers = currentIdentities
 
@@ -395,8 +395,8 @@ class IdentityStateTests: XCTestCase {
                                         createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
-        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItemsWith(namespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
     // MARK: updateAdvertisingIdentifier(...)

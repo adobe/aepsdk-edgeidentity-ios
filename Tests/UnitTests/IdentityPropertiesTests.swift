@@ -86,7 +86,7 @@ class IdentityPropertiesTests: XCTestCase {
         properties.advertisingIdentifier = "test-ad-id"
 
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "custom", item: IdentityItem(id: "identifier"))
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
         properties.customerIdentifiers = identityMap
 
         // test
@@ -140,7 +140,7 @@ class IdentityPropertiesTests: XCTestCase {
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
-        identityMap.addItem(namespace: "custom", item: IdentityItem(id: "identifier"))
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
         properties.customerIdentifiers = identityMap
 
         // test
@@ -156,9 +156,9 @@ class IdentityPropertiesTests: XCTestCase {
         XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
         XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
         XCTAssertNotNil(props.customerIdentifiers)
-        XCTAssertEqual("identifier", props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].authenticationState)
-        XCTAssertEqual(false, props.customerIdentifiers?.getItemsWith(namespace: "custom")?[0].primary)
+        XCTAssertEqual("identifier", props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].primary)
     }
 
 }

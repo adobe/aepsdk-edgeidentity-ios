@@ -140,7 +140,7 @@ public class IdentityMap: NSObject, Codable {
     func merge(_ otherIdentityMap: IdentityMap) {
         for (namespace, items) in otherIdentityMap.items {
             for item in items {
-                self.addItem(namespace: namespace, item: item)
+                self.add(item: item, withNamespace: namespace)
             }
         }
     }
