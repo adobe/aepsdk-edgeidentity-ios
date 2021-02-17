@@ -16,8 +16,8 @@ import Foundation
 /// Defines the public interface for the Identity extension
 @objc public extension Identity {
 
-    /// Returns the Experience Cloud ID.
-    /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an error if any occurred
+    /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
+    /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
@@ -46,8 +46,9 @@ import Foundation
         }
     }
 
-    /// Returns all  identifiers, including customer identifiers which were previously added.
-    /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an error if any occurred
+    /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
+    /// in the `IdentityEdge` extension, then an empty `IdentityMap` is returned.
+    /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
