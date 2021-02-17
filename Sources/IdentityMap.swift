@@ -57,6 +57,11 @@ public class IdentityMap: NSObject, Codable {
     private static let LOG_TAG = "IdentityMap"
     private var items: [String: [IdentityItem]] = [:]
 
+    /// Determine if this `IdentityMap` is empty.
+    public var isEmpty: Bool {
+        return items.isEmpty
+    }
+
     public override init() {}
 
     /// Adds an `IdentityItem` to this map. If an item is added which shares the same `withNamespace` and `item.id` as an item

@@ -38,7 +38,7 @@ import Foundation
             }
 
             guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
-                completion(nil, AEPError.unexpected)
+                completion("", .none) // IdentityMap exists but ECID has no value, return an empty string
                 return
             }
 

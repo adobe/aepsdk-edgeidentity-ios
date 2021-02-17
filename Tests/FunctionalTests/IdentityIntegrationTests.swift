@@ -71,14 +71,14 @@ class IdentityIntegrationTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetExperienceCloudIdWhenPrivacyOptedOut() {
+    func testGetExperienceCloudIdWhenPrivacyOptedOutReturnsEmptyString() {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertNil(ecid)
-            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            XCTAssertEqual("", ecid)
+            XCTAssertNil(error)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
@@ -146,14 +146,15 @@ class IdentityIntegrationTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetIdentitiesWhenPrivacyOptedOut() {
+    func testGetIdentitiesWhenPrivacyOptedOutReturnsEmptyIdentityMap() {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getIdentities callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
         Identity.getIdentities { identityMap, error in
-            XCTAssertNil(identityMap)
-            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(true, identityMap?.isEmpty)
+            XCTAssertNil(error)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
