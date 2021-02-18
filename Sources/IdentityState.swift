@@ -59,11 +59,9 @@ class IdentityState {
     /// If privacy is optedout the call is ignored
     /// - Parameters:
     ///   - event: event containing a new ADID value.
-    ///   - createSharedState: function which creates a new shared state
     ///   - createXDMSharedState: function which creates new XDM shared state
     ///   - dispatchEvent: function which dispatchs events to the event hub
     func updateAdvertisingIdentifier(event: Event,
-                                     createSharedState: ([String: Any], Event) -> Void,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      dispatchEvent: (Event) -> Void) {
 
@@ -84,7 +82,6 @@ class IdentityState {
             }
 
             identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
         }
 
@@ -164,9 +161,8 @@ class IdentityState {
     /// Updates and makes any required actions when the privacy status has updated
     /// - Parameters:
     ///   - event: the event triggering the privacy change
-    ///   - createSharedState: a function which can create Identity shared state
     ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
-    func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void, createXDMSharedState: ([String: Any], Event) -> Void) {
+    func processPrivacyChange(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
 
@@ -181,13 +177,11 @@ class IdentityState {
             identityProperties.advertisingIdentifier = nil
             identityProperties.customerIdentifiers = nil
             identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
         } else if identityProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
             identityProperties.ecid = ECID()
             identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
             createXDMSharedState(identityProperties.toXdmData(), event)
         }
 

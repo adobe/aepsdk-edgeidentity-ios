@@ -56,7 +56,6 @@ import Foundation
         guard let configSharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
-            createSharedState(data: state.identityProperties.toEventData(), event: nil)
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
         }
 
@@ -70,7 +69,6 @@ import Foundation
     /// - Parameter event: event containing `advertisingIdentifier` data
     private func handleRequestContent(event: Event) {
         state?.updateAdvertisingIdentifier(event: event,
-                                           createSharedState: createSharedState(data:event:),
                                            createXDMSharedState: createXDMSharedState(data:event:),
                                            dispatchEvent: dispatch(event:))
     }
@@ -93,9 +91,7 @@ import Foundation
     private func handleConfigurationResponse(event: Event) {
         if event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
             // if config contains new global privacy status, process the request
-            state?.processPrivacyChange(event: event,
-                                        createSharedState: createSharedState(data:event:),
-                                        createXDMSharedState: createXDMSharedState(data:event:))
+            state?.processPrivacyChange(event: event, createXDMSharedState: createXDMSharedState(data:event:))
         }
     }
 

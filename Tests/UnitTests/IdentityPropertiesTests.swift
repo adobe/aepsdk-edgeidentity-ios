@@ -24,48 +24,6 @@ class IdentityPropertiesTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
     }
 
-    /// When all properties all nil, the event data should be empty
-    func testToEventDataEmpty() {
-        // setup
-        let properties = IdentityProperties()
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertTrue(eventData.isEmpty)
-    }
-
-    /// Test that event data is populated correctly when all properties are non-nil
-    func testToEventDataFull() {
-        // setup
-        var properties = IdentityProperties()
-        properties.ecid = ECID()
-        properties.advertisingIdentifier = "test-ad-id"
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertEqual(2, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
-    }
-
-    func testToEventDataDoesNotIncludeEmptyValues() {
-        // setup
-        var properties = IdentityProperties()
-        properties.ecid = ECID()
-        properties.advertisingIdentifier = ""
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertEqual(1, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-    }
-
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup

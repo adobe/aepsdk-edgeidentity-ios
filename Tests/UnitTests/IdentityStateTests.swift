@@ -109,7 +109,6 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
                                    createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
@@ -133,7 +132,6 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
                                    createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
@@ -144,7 +142,6 @@ class IdentityStateTests: XCTestCase {
     /// Tests that when we update privacy to opt-out
     func testProcessPrivacyChangeToOptOut() {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .unknown
@@ -160,11 +157,10 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
                                    createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
-        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.optedOut, state.identityProperties.privacyStatus) // privacy status should change to opt out
         XCTAssertNil(state.identityProperties.ecid) // ecid is cleared
@@ -175,7 +171,6 @@ class IdentityStateTests: XCTestCase {
     /// Tests that when we got from opt out to opt in
     func testProcessPrivacyChangeFromOptOutToOptIn() {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .optedOut
@@ -188,11 +183,10 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
                                    createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
-        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.optedIn, state.identityProperties.privacyStatus) // privacy status should change to opt in
         XCTAssertNotNil(state.identityProperties.ecid) // ecid is set
@@ -201,7 +195,6 @@ class IdentityStateTests: XCTestCase {
     /// When we go from opt-out to unknown
     func testProcessPrivacyChangeFromOptOutToUnknown() {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         var props = IdentityProperties()
         props.privacyStatus = .optedOut
@@ -214,11 +207,10 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in sharedStateExpectation.fulfill() },
                                    createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
 
         // verify
-        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 2)
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(PrivacyStatus.unknown, state.identityProperties.privacyStatus) // privacy status should change to opt in
         XCTAssertNotNil(state.identityProperties.ecid) // ecid is set
@@ -241,7 +233,6 @@ class IdentityStateTests: XCTestCase {
 
         // test
         state.processPrivacyChange(event: event,
-                                   createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
                                    createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         // verify
@@ -512,7 +503,6 @@ class IdentityStateTests: XCTestCase {
         let event = Event.fakeGenericIdentityEvent(adId: "adId")
 
         state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
                                           createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
                                           dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
@@ -523,7 +513,6 @@ class IdentityStateTests: XCTestCase {
 
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         let consentExpectation = XCTestExpectation(description: "Consent event should be dispatched once")
 
@@ -537,7 +526,6 @@ class IdentityStateTests: XCTestCase {
 
         var consentEvent: Event?
         state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
                                           createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
                                           dispatchEvent: { event in
                                             consentEvent = event
@@ -545,7 +533,7 @@ class IdentityStateTests: XCTestCase {
                                           })
 
         // verify
-        wait(for: [sharedStateExpectation, xdmSharedStateExpectation, consentExpectation], timeout: 3)
+        wait(for: [xdmSharedStateExpectation, consentExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(expectedAdId, state.identityProperties.advertisingIdentifier)
 
@@ -555,7 +543,6 @@ class IdentityStateTests: XCTestCase {
 
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?) {
         // setup
-        let sharedStateExpectation = XCTestExpectation(description: "Shared state should be updated once")
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
 
         var props = IdentityProperties()
@@ -567,12 +554,11 @@ class IdentityStateTests: XCTestCase {
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
         state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in sharedStateExpectation.fulfill() },
                                           createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
                                           dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 
         // verify
-        wait(for: [sharedStateExpectation, xdmSharedStateExpectation], timeout: 3)
+        wait(for: [xdmSharedStateExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertEqual(expectedAdId, state.identityProperties.advertisingIdentifier)
     }
@@ -588,7 +574,6 @@ class IdentityStateTests: XCTestCase {
         let event = Event.fakeGenericIdentityEvent(adId: newAdId)
 
         state.updateAdvertisingIdentifier(event: event,
-                                          createSharedState: { _, _ in XCTFail("Shared state should not be updated") },
                                           createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
                                           dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
 

@@ -28,17 +28,6 @@ struct IdentityProperties: Codable {
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityConstants.Default.PRIVACY_STATUS
 
-    /// Converts `IdentityProperties` into an event data representation
-    /// - Returns: A dictionary representing this `IdentityProperties`
-    func toEventData() -> [String: Any] {
-        var eventData = [String: Any]()
-        eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
-        if let adId = advertisingIdentifier, !adId.isEmpty {
-            eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
-        }
-        return eventData
-    }
-
     /// Converts `IdentityProperties` into an event data representation in XDM format
     /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityMap` key
     /// to represent an empty IdentityMap when `allowEmpty` is true

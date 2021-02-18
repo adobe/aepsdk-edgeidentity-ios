@@ -53,9 +53,6 @@ class IdentityTests: XCTestCase {
         // verify
         XCTAssertEqual("adId", identity.state?.identityProperties.advertisingIdentifier)
 
-        XCTAssertEqual(2, mockRuntime.createdSharedStates.count) // bootup + request content event
-        XCTAssertEqual("adId", mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
-
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
@@ -92,9 +89,6 @@ class IdentityTests: XCTestCase {
 
         // verify
         XCTAssertEqual("", identity.state?.identityProperties.advertisingIdentifier)
-
-        XCTAssertEqual(2, mockRuntime.createdSharedStates.count) // bootup + request content event
-        XCTAssertNil(mockRuntime.createdSharedStates[1]?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
 
         let expectedIdentity: [String: Any] =
             [
