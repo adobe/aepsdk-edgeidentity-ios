@@ -22,9 +22,22 @@ class IdentityAPITests: XCTestCase {
         registerMockExtension(MockExtension.self)
     }
 
+    override func tearDown() {
+        unregisterMockExtension(MockExtension.self)
+    }
+
     private func registerMockExtension<T: Extension> (_ type: T.Type) {
         let semaphore = DispatchSemaphore(value: 0)
         EventHub.shared.registerExtension(type) { _ in
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+    }
+
+    private func unregisterMockExtension<T: Extension> (_ type: T.Type) {
+        let semaphore = DispatchSemaphore(value: 0)
+        EventHub.shared.unregisterExtension(type) { _ in
             semaphore.signal()
         }
 
@@ -42,6 +55,22 @@ class IdentityAPITests: XCTestCase {
 
         // test
         Identity.getExperienceCloudId { _, _ in }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getIdentities dispatches an identity request identity event
+    func testGetIdentities() {
+        // setup
+        let expectation = XCTestExpectation(description: "getIdentities should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identity, source: EventSource.requestIdentity) { _ in
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.getIdentities { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)

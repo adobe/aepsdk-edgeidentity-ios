@@ -51,7 +51,7 @@ class IdentityIntegrationTests: XCTestCase {
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertFalse(ecid!.isEmpty)
+            XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
         }
@@ -64,21 +64,21 @@ class IdentityIntegrationTests: XCTestCase {
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "unknown"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertFalse(ecid!.isEmpty)
+            XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetExperienceCloudIdWhenPrivacyOptedOut() {
+    func testGetExperienceCloudIdWhenPrivacyOptedOutReturnsEmptyString() {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
         Identity.getExperienceCloudId { ecid, error in
-            XCTAssertNil(ecid)
-            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            XCTAssertEqual("", ecid)
+            XCTAssertNil(error)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
@@ -129,5 +129,34 @@ class IdentityIntegrationTests: XCTestCase {
         XCTAssertFalse(((ecid1?.isEmpty) == nil))
         XCTAssertFalse(((ecid2?.isEmpty) == nil))
         XCTAssertNotEqual(ecid1, ecid2)
+    }
+
+    func testGetIdentitiesWithECID() {
+        initExtensionsAndWait()
+
+        let expectation = XCTestExpectation(description: "getIdentities callback")
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
+        Identity.getIdentities { identityMap, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(1, identityMap?.getItems(withNamespace: "ECID")?.count)
+            XCTAssertNotNil(identityMap?.getItems(withNamespace: "ECID")?[0].id)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetIdentitiesWhenPrivacyOptedOutReturnsEmptyIdentityMap() {
+        initExtensionsAndWait()
+
+        let expectation = XCTestExpectation(description: "getIdentities callback")
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
+        Identity.getIdentities { identityMap, error in
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(true, identityMap?.isEmpty)
+            XCTAssertNil(error)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
     }
 }

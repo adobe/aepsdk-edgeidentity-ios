@@ -37,22 +37,24 @@ struct IdentityProperties: Codable {
     }
 
     /// Converts `IdentityProperties` into an event data representation in XDM format
+    /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityMap` key
+    /// to represent an empty IdentityMap when `allowEmpty` is true
     /// - Returns: A dictionary representing this `IdentityProperties` in XDM format
-    func toXdmData() -> [String: Any] {
+    func toXdmData(_ allowEmpty: Bool = false) -> [String: Any] {
         var map: [String: Any] = [:]
 
-        var identityMap = IdentityMap()
+        let identityMap = IdentityMap()
         if let ecid = ecid {
-            identityMap.addItem(namespace: IdentityConstants.Namespaces.ECID,
-                                id: ecid.ecidString)
+            identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
+                            withNamespace: IdentityConstants.Namespaces.ECID)
         }
 
         if let adId = advertisingIdentifier, !adId.isEmpty {
-            identityMap.addItem(namespace: IdentityConstants.Namespaces.IDFA,
-                                id: adId)
+            identityMap.add(item: IdentityItem(id: adId),
+                            withNamespace: IdentityConstants.Namespaces.IDFA)
         }
 
-        if let dict = identityMap.asDictionary() {
+        if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
             map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 

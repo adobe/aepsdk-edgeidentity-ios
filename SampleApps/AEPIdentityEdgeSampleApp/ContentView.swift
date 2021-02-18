@@ -17,6 +17,7 @@ import SwiftUI
 struct ContentView: View {
     @State var ecidText: String
     @State var adIdText: String
+    @State var identityMapText: String
 
     var body: some View {
         HStack {
@@ -71,7 +72,7 @@ struct ContentView: View {
                     if let ecid = ecid {
                         self.ecidText = ecid
                     } else {
-                        self.ecidText = "ecid is null"
+                        self.ecidText = "ecid is nil"
                     }
                 }
             }) {
@@ -79,6 +80,35 @@ struct ContentView: View {
             }.padding()
 
             Text(ecidText)
+                .font(.system(size: 12))
+                .padding()
+                .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+        }
+
+        VStack {
+            Button(action: {
+                self.identityMapText = ""
+                Identity.getIdentities { identityMap, _ in
+                    if let identityMap = identityMap {
+                        let encoder = JSONEncoder()
+                        encoder.outputFormatting = .prettyPrinted
+                        guard let data = try? encoder.encode(identityMap) else {
+                            self.identityMapText = "failed to encode IdentityMap"
+                            return
+                        }
+                        self.identityMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
+                    } else {
+                        self.identityMapText = "IdentityMap was nil"
+                    }
+                }
+            }) {
+                Text("Get Identities")
+            }.padding()
+
+            Text(identityMapText)
+                .font(.system(size: 12))
+                .padding()
+                .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
         }
 
     }
@@ -86,6 +116,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(ecidText: "", adIdText: "")
+        ContentView(ecidText: "", adIdText: "", identityMapText: "")
     }
 }

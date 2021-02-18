@@ -82,11 +82,11 @@ import Foundation
     /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
     /// - Parameter event: the identity request event
     private func processIdentifiersRequest(event: Event) {
-        let eventData = state?.identityProperties.toEventData()
+        let xdmData = state?.identityProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identity,
                                                       source: EventSource.responseIdentity,
-                                                      data: eventData)
+                                                      data: xdmData)
 
         // dispatch identity response event with shared state data
         dispatch(event: responseEvent)

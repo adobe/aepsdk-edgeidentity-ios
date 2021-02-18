@@ -96,8 +96,8 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)"] ],
-                "IDFA": [ ["id": "test-ad-id"] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
+                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ]
             ]
             ]
 
@@ -121,7 +121,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)"] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ]
             ]
             ]
 
