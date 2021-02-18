@@ -60,6 +60,30 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that getIdentities returns an error if the response event contains no data
+    func testGetExperienceCloudIdReturnsErrorIfResponseContainsNoData() {
+        // setup
+        let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.identityEdge,
+                                                          source: EventSource.responseIdentity,
+                                                          data: nil)
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getExperienceCloudId { _, error in
+            XCTAssertNotNil(error)
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
     /// Tests that getIdentities dispatches an identity request identity event
     func testGetIdentities() {
         // setup
@@ -71,6 +95,85 @@ class IdentityAPITests: XCTestCase {
 
         // test
         Identity.getIdentities { _, _ in }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getIdentities returns an error if the response event contains no data
+    func testGetIdentitiesReturnsErrorIfResponseContainsNoData() {
+        // setup
+        let expectation = XCTestExpectation(description: "getIdentities callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.identityEdge,
+                                                          source: EventSource.responseIdentity,
+                                                          data: nil)
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getIdentities { _, error in
+            XCTAssertNotNil(error)
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getIdentities returns an empty IdentityMap if the response map is empty
+    func testGetIdentitiesReturnsEmptyIdentitiesWhenResponseIsEmpty() {
+        // setup
+        let expectation = XCTestExpectation(description: "getIdentities callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.identityEdge,
+                                                          source: EventSource.responseIdentity,
+                                                          data: [IdentityConstants.XDMKeys.IDENTITY_MAP: [:]])
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getIdentities { identityMap, _ in
+            XCTAssertEqual(true, identityMap?.isEmpty)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that updateIdentifiers dispatches an identity update identity event
+    func testUpdateIdentifiers() {
+        // setup
+        let expectation = XCTestExpectation(description: "updateIdentities should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity) { _ in
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.updateIdentities(with: IdentityMap())
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that removeIdentity dispatches an identity remove identity event
+    func testRemoveIdentity() {
+        // setup
+        let expectation = XCTestExpectation(description: "removeIdentity should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity) { _ in
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.removeIdentity(item: IdentityItem(id: "id"), withNamespace: "namespace")
 
         // verify
         wait(for: [expectation], timeout: 1)

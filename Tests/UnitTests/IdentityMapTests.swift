@@ -507,4 +507,19 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space2")?[0].primary)
 
     }
+
+    // MARK: from(...)
+
+    func testFromValidEventData() {
+        let data = ["ECID": [["id": "1234"]]]
+        let identityMap = IdentityMap.from(eventData: data)
+        XCTAssertNotNil(identityMap)
+        XCTAssertEqual("1234", identityMap?.getItems(withNamespace: "ECID")?[0].id)
+    }
+
+    func testFromWithEmptyDataReturnsEmptyIdentityMap() {
+        let identityMap = IdentityMap.from(eventData: [:])
+        XCTAssertEqual(true, identityMap?.isEmpty)
+    }
+
 }
