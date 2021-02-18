@@ -18,6 +18,10 @@ struct ContentView: View {
     @State var ecidText: String
     @State var adIdText: String
     @State var identityMapText: String
+    @State var identityItemText: String = ""
+    @State var identityNamespaceText: String = ""
+    @State var selectedAuthenticationState: AuthenticationState = .ambiguous
+    @State var isPrimaryChecked: Bool = false
 
     var body: some View {
         HStack {
@@ -82,7 +86,54 @@ struct ContentView: View {
             Text(ecidText)
                 .font(.system(size: 12))
                 .padding()
-                .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+        }.padding()
+
+        VStack {
+            VStack {
+                TextField("Enter Identifier", text: $identityItemText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .fixedSize()
+                    .autocapitalization(.none)
+
+                HStack {
+                    TextField("namespace", text: $identityNamespaceText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .fixedSize()
+                        .autocapitalization(.none)
+
+                    HStack {
+                        Image(systemName: isPrimaryChecked ? "checkmark.square" : "square")
+                            .onTapGesture {
+                                isPrimaryChecked.toggle()
+                            }
+                        Text("primary")
+                    }
+                }
+            }
+            HStack {
+                Picker("AuthenticationState", selection: $selectedAuthenticationState) {
+                    Text("ambiguous").tag(AuthenticationState.ambiguous)
+                    Text("authenticated").tag(AuthenticationState.authenticated)
+                    Text("logged out").tag(AuthenticationState.loggedOut)
+                }.pickerStyle(SegmentedPickerStyle())
+            }
+            HStack {
+                Button(action: {
+                    let map = IdentityMap()
+                    map.add(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                            withNamespace: identityNamespaceText)
+                    Identity.updateIdentities(with: map)
+                }) {
+                    Text("Update Identity")
+                }.padding()
+                Button(action: {
+                    Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                                            withNamespace: identityNamespaceText)
+                }) {
+                    Text("Remove Identity")
+                }.padding()
+            }
+
         }
 
         VStack {
@@ -105,10 +156,12 @@ struct ContentView: View {
                 Text("Get Identities")
             }.padding()
 
-            Text(identityMapText)
-                .font(.system(size: 12))
-                .padding()
-                .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+            ScrollView {
+                Text(identityMapText)
+                    .font(.system(size: 12))
+                    .padding()
+                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+            }
         }
 
     }
