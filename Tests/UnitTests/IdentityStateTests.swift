@@ -260,7 +260,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+                          data: customerIdentities.asDictionary())
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
@@ -289,7 +289,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+                          data: customerIdentities.asDictionary())
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
@@ -314,7 +314,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+                          data: customerIdentities.asDictionary())
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
@@ -365,7 +365,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+                          data: customerIdentities.asDictionary())
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.removeCustomerIdentifiers(event: event,
@@ -389,7 +389,7 @@ class IdentityStateTests: XCTestCase {
         let event = Event(name: "Test event",
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: customerIdentities.asDictionary() as Any])
+                          data: customerIdentities.asDictionary())
 
         state.removeCustomerIdentifiers(event: event,
                                         createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })

@@ -98,7 +98,7 @@ class IdentityState {
     ///   - event: event containing customer identifiers to add or update with the current customer identifiers
     ///   - createXDMSharedState: function which creates new XDM shared state
     func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
-        guard let eventData = event.data, let identifiersData = eventData[IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS] as? [String: Any] else {
+        guard let identifiersData = event.data else {
             Log.debug(label: LOG_TAG, "Failed to update customer identifiers as no identifiers were found in the event data.")
             return
         }
@@ -138,7 +138,7 @@ class IdentityState {
     ///   - event: event containing customer identifiers to remove from the current customer identities
     ///   - createXDMSharedState: function which creates new XDM shared states
     func removeCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
-        guard let eventData = event.data, let identifiersData = eventData[IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS] as? [String: Any] else {
+        guard let identifiersData = event.data else {
             Log.debug(label: LOG_TAG, "Failed to remove customer identifier as no identifiers were found in the event data.")
             return
         }

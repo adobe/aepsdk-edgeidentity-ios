@@ -138,7 +138,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Update Identity",
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: identityMap.asDictionary() as Any] as [String: Any])
+                          data: identityMap.asDictionary())
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -148,15 +148,12 @@ class IdentityTests: XCTestCase {
     }
 
     /// Tests when Identity receives an update identity event without valid data the customer identifiers are not updated
-    func testIdentityUpdateIdentityWithoutValidData() {
+    func testIdentityUpdateIdentityWithNilData() {
         // setup
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
-
         let event = Event(name: "Test Update Identity",
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: ["someKey": identityMap.asDictionary() as Any] as [String: Any])
+                          data: nil)
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -183,7 +180,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Remove Identity",
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
-                          data: [IdentityConstants.EventDataKeys.VISITOR_IDENTIFIERS: identityMap.asDictionary() as Any] as [String: Any])
+                          data: identityMap.asDictionary())
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -193,7 +190,7 @@ class IdentityTests: XCTestCase {
     }
 
     /// Tests when Identity receives a remove identity event without valid data the customer identifiers are not modified
-    func testIdentityRemoveIdentityWithoutValidData() {
+    func testIdentityRemoveIdentityWithNilData() {
         // set default identites
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
@@ -203,13 +200,10 @@ class IdentityTests: XCTestCase {
         XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
 
         // setup
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
-
         let event = Event(name: "Test Remove Identity",
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
-                          data: ["someKey": identityMap.asDictionary() as Any] as [String: Any])
+                          data: nil)
         // test
         mockRuntime.simulateComingEvent(event: event)
 
