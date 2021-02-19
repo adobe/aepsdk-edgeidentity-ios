@@ -104,12 +104,12 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared state
     func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         guard let identifiersData = event.data else {
-            Log.debug(label: LOG_TAG, "Failed to update customer identifiers as no identifiers were found in the event data.")
+            Log.debug(label: LOG_TAG, "Failed to update identifiers as no identifiers were found in the event data.")
             return
         }
 
         guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
-            Log.debug(label: LOG_TAG, "Failed to update customer identifiers as the event data could not be encoded to an IdentityMap.")
+            Log.debug(label: LOG_TAG, "Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
             return
         }
 
@@ -131,12 +131,12 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared states
     func removeCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         guard let identifiersData = event.data else {
-            Log.debug(label: LOG_TAG, "Failed to remove customer identifier as no identifiers were found in the event data.")
+            Log.debug(label: LOG_TAG, "Failed to remove identifier as no identifiers were found in the event data.")
             return
         }
 
         guard let removeIdentityMap = IdentityMap.from(eventData: identifiersData) else {
-            Log.debug(label: LOG_TAG, "Failed to remove customer identifier as the event data could not be encoded to an IdentityMap.")
+            Log.debug(label: LOG_TAG, "Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
             return
         }
 
@@ -228,7 +228,7 @@ class IdentityState {
         let filterItems = IdentityMap()
         for namespace in IdentityState.reservedNamspaces {
             if let items = identityMap.getItems(withNamespace: namespace) {
-                Log.debug(label: LOG_TAG, "Adding/Updating customer identifiers in namespace '\(namespace)' is not allowed.")
+                Log.debug(label: LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                 for item in items {
                     filterItems.add(item: item, withNamespace: namespace)
                 }
