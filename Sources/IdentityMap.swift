@@ -90,8 +90,8 @@ public class IdentityMap: NSObject, Codable {
 
     /// Remove a single `IdentityItem` from this map.
     /// - Parameters:
-    ///   - withNamespace: The namespace for the identity to remove
     ///   - item: The identity to remove from the given `withNamespace`
+    ///   - withNamespace: The namespace for the identity to remove
     @objc(removeItem:withNamespace:)
     public func remove(item: IdentityItem, withNamespace: String) {
         guard var namespaceItems = items[withNamespace], let index = namespaceItems.firstIndex(of: item) else {
