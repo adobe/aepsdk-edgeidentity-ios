@@ -87,8 +87,7 @@ class IdentityState {
                 dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
             }
 
-            identityProperties.saveToPersistence()
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            saveToPersistence(and: createXDMSharedState, using: event)
         }
 
     }
@@ -123,8 +122,7 @@ class IdentityState {
             identityProperties.customerIdentifiers?.merge(map: updateIdentityMap)
         }
 
-        identityProperties.saveToPersistence()
-        createXDMSharedState(identityProperties.toXdmData(), event)
+        saveToPersistence(and: createXDMSharedState, using: event)
     }
 
     /// Remove customer identifiers specified in `event` from the current `IdentityMap`.
@@ -148,8 +146,7 @@ class IdentityState {
 
         customerIdentityMap.remove(map: removeIdentityMap)
 
-        identityProperties.saveToPersistence()
-        createXDMSharedState(identityProperties.toXdmData(), event)
+        saveToPersistence(and: createXDMSharedState, using: event)
     }
 
     /// Updates and makes any required actions when the privacy status has updated
@@ -170,13 +167,11 @@ class IdentityState {
             identityProperties.ecid = nil
             identityProperties.advertisingIdentifier = nil
             identityProperties.customerIdentifiers = nil
-            identityProperties.saveToPersistence()
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            saveToPersistence(and: createXDMSharedState, using: event)
         } else if identityProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
             identityProperties.ecid = ECID()
-            identityProperties.saveToPersistence()
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            saveToPersistence(and: createXDMSharedState, using: event)
         }
 
     }
@@ -243,5 +238,14 @@ class IdentityState {
         if !filterItems.isEmpty {
             identityMap.remove(map: filterItems)
         }
+    }
+
+    /// Save `IdentityProperties` to persistence and create an XDM shared state.
+    /// - Parameters:
+    ///   - createXDMSharedState: function which creates an XDM shared state
+    ///   - event: the event used to share the XDM state
+    private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
+        identityProperties.saveToPersistence()
+        createXDMSharedState(identityProperties.toXdmData(), event)
     }
 }
