@@ -24,6 +24,12 @@ class IdentityState {
     private(set) var identityProperties: IdentityProperties
     #endif
 
+    /// List of namespaces which are not allowed to be modified from customer identifier
+    private static let reservedNamspaces = [
+        IdentityConstants.Namespaces.ECID,
+        IdentityConstants.Namespaces.IDFA
+    ]
+
     /// Creates a new `IdentityState` with the given identity properties
     /// - Parameter identityProperties: identity properties
     init(identityProperties: IdentityProperties) {
@@ -109,19 +115,7 @@ class IdentityState {
         }
 
         // Filter out known identifiers to prevent modification of certain namespaces
-        let filterItems = IdentityMap()
-        for namespace in [IdentityConstants.Namespaces.ECID, IdentityConstants.Namespaces.IDFA] {
-            if let items = updateIdentityMap.getItems(withNamespace: namespace) {
-                Log.debug(label: LOG_TAG, "Adding/Updating customer identifiers in namespace '\(namespace)' is not allowed.")
-                for item in items {
-                    filterItems.add(item: item, withNamespace: namespace)
-                }
-            }
-        }
-
-        if !filterItems.isEmpty {
-            updateIdentityMap.remove(map: filterItems)
-        }
+        removeIdentitiesWithReservedNamespaces(from: updateIdentityMap)
 
         if identityProperties.customerIdentifiers == nil {
             identityProperties.customerIdentifiers = updateIdentityMap
@@ -231,4 +225,23 @@ class IdentityState {
         dispatchEvent(event)
     }
 
+    /// Filter out any items contained in reserved namespaces from the given `identityMap`.
+    /// The list of reserved namespaces can be found at `IdentityState.reservedNamespaces`.
+    /// - Parameter identityMap: the `IdentityMap` to filter out items contained in reserved namespaces.
+    private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
+        // Filter out known identifiers to prevent modification of certain namespaces
+        let filterItems = IdentityMap()
+        for namespace in IdentityState.reservedNamspaces {
+            if let items = identityMap.getItems(withNamespace: namespace) {
+                Log.debug(label: LOG_TAG, "Adding/Updating customer identifiers in namespace '\(namespace)' is not allowed.")
+                for item in items {
+                    filterItems.add(item: item, withNamespace: namespace)
+                }
+            }
+        }
+
+        if !filterItems.isEmpty {
+            identityMap.remove(map: filterItems)
+        }
+    }
 }
