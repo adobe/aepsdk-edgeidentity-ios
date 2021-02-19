@@ -157,7 +157,9 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.updateIdentities(with: IdentityMap())
+        let map = IdentityMap()
+        map.add(item: IdentityItem(id: "id"), withNamespace: "namespace")
+        Identity.updateIdentities(with: map)
 
         // verify
         wait(for: [expectation], timeout: 1)

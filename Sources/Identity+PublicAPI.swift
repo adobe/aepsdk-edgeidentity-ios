@@ -11,10 +11,12 @@
 //
 
 import AEPCore
+import AEPServices
 import Foundation
 
 /// Defines the public interface for the Identity extension
 @objc public extension Identity {
+    private static let LOG_TAG = "Identity"
 
     /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
     /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
@@ -77,10 +79,15 @@ import Foundation
     /// - Parameter map: The identifiers to add or update
     @objc(updateIdentitiesWith:)
     static func updateIdentities(with map: IdentityMap) {
+        guard !map.isEmpty, let identityDict = map.asDictionary() else {
+            Log.debug(label: LOG_TAG, "Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")
+            return
+        }
+
         let event = Event(name: IdentityConstants.EventNames.UPDATE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
-                          data: map.asDictionary())
+                          data: identityDict)
 
         MobileCore.dispatch(event: event)
     }
@@ -95,10 +102,15 @@ import Foundation
         let identities = IdentityMap()
         identities.add(item: item, withNamespace: withNamespace)
 
+        guard !identities.isEmpty, let identityDict = identities.asDictionary() else {
+            Log.debug(label: LOG_TAG, "Unable to removeIdentity as IdentityItem is empty or could not be encoded to a dictionary.")
+            return
+        }
+
         let event = Event(name: IdentityConstants.EventNames.REMOVE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
-                          data: identities.asDictionary())
+                          data: identityDict)
 
         MobileCore.dispatch(event: event)
     }
