@@ -76,6 +76,7 @@ import Foundation
 
     /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The IdentityEdge extension will merge the received identifiers
     ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
+    ///  Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameter map: The identifiers to add or update
     @objc(updateIdentitiesWith:)
     static func updateIdentities(with map: IdentityMap) {
@@ -94,6 +95,7 @@ import Foundation
 
     /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The IdentityEdge extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
+    /// Identifiers which have an empty `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameters:
     ///   - item: The identity to remove.
     ///   - withNamespace: The namespace the identity to remove is under.
