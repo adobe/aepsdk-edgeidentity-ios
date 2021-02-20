@@ -37,21 +37,14 @@ class IdentityState {
     }
 
     /// Completes init for the Identity extension.
-    /// - Parameters:
-    ///   - configSharedState: the current configuration shared state available at registration time
-    ///   - event: The `Event` triggering the bootup
     /// - Returns: True if we should share state after bootup, false otherwise
-    func bootupIfReady(configSharedState: [String: Any], event: Event) -> Bool {
+    func bootupIfReady() -> Bool {
 
         // load data from local storage
         identityProperties.loadFromPersistence()
 
-        // Load privacy status
-        let privacyStatusString = configSharedState[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityConstants.Default.PRIVACY_STATUS
-
-        // Generate new ECID if privacy status allows
-        if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
+        // Generate new ECID on first launch
+        if identityProperties.ecid == nil {
             identityProperties.ecid = ECID()
         }
 
@@ -70,12 +63,6 @@ class IdentityState {
     func updateAdvertisingIdentifier(event: Event,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      dispatchEvent: (Event) -> Void) {
-
-        // Early exit if privacy is opt-out
-        if identityProperties.privacyStatus == .optedOut {
-            Log.debug(label: LOG_TAG, "Ignoring sync advertising identifiers request as privacy is opted-out")
-            return
-        }
 
         // update adid if changed and extract the new adid value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
@@ -147,33 +134,6 @@ class IdentityState {
         customerIdentityMap.remove(map: removeIdentityMap)
 
         saveToPersistence(and: createXDMSharedState, using: event)
-    }
-
-    /// Updates and makes any required actions when the privacy status has updated
-    /// - Parameters:
-    ///   - event: the event triggering the privacy change
-    ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
-    func processPrivacyChange(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
-        let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
-
-        if newPrivacyStatus == identityProperties.privacyStatus {
-            return
-        }
-
-        identityProperties.privacyStatus = newPrivacyStatus
-
-        if newPrivacyStatus == .optedOut {
-            identityProperties.ecid = nil
-            identityProperties.advertisingIdentifier = nil
-            identityProperties.customerIdentifiers = nil
-            saveToPersistence(and: createXDMSharedState, using: event)
-        } else if identityProperties.ecid == nil {
-            // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
-            identityProperties.ecid = ECID()
-            saveToPersistence(and: createXDMSharedState, using: event)
-        }
-
     }
 
     /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.

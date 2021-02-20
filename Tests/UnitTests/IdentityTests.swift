@@ -96,37 +96,6 @@ class IdentityTests: XCTestCase {
         XCTAssertNil(identity.state?.identityProperties.advertisingIdentifier)
     }
 
-    // MARK: handleConfigurationRequest
-
-    /// Tests that when a configuration request content event contains opt-out that we update privacy status
-    func testConfigurationResponseEventOptOut() {
-        let event = Event(name: "Test Configuration response",
-                          type: EventType.configuration,
-                          source: EventSource.responseContent,
-                          data: [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any])
-
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertEqual(PrivacyStatus.optedOut, identity.state?.identityProperties.privacyStatus) // identity state should have updated to opt-out
-    }
-
-    /// Tests that when no privacy status is in the configuration event that we do not update the privacy status
-    func testConfigurationResponseEventNoPrivacyStatus() {
-        let event = Event(name: "Test Configuration response",
-                          type: EventType.configuration,
-                          source: EventSource.responseContent,
-                          data: ["key": "value"])
-        _ = identity.readyForEvent(event) // sets default privacy of unknown
-
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertEqual(PrivacyStatus.unknown, identity.state?.identityProperties.privacyStatus) // identity state should have remained unknown
-    }
-
     // MARK: handleUpdateIdentity
 
     /// Tests when Identity receives an update identity event with valid data the customer identifiers are updated

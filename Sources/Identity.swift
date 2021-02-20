@@ -33,7 +33,6 @@ import Foundation
     public func onRegistered() {
         registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
-        registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
         registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
     }
@@ -53,10 +52,10 @@ import Foundation
         guard let state = state else { return false }
         guard !state.hasBooted else { return true } // we have booted, return true
 
-        guard let configSharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
-        if state.bootupIfReady(configSharedState: configSharedState, event: event) {
+        if state.bootupIfReady() {
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
+            return true
         }
 
         return false // cannot handle any events until we have booted
@@ -84,15 +83,6 @@ import Foundation
 
         // dispatch identity response event with shared state data
         dispatch(event: responseEvent)
-    }
-
-    /// Handles the configuration response event
-    /// - Parameter event: the configuration response event
-    private func handleConfigurationResponse(event: Event) {
-        if event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
-            // if config contains new global privacy status, process the request
-            state?.processPrivacyChange(event: event, createXDMSharedState: createXDMSharedState(data:event:))
-        }
     }
 
     /// Handles update identity requests to add/update customer identifiers.

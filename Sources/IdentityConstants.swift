@@ -20,16 +20,11 @@ enum IdentityConstants {
     static let DATASTORE_NAME = EXTENSION_NAME
 
     enum Default {
-        static let PRIVACY_STATUS = PrivacyStatus.unknown
         static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"
     }
 
     enum SharedStateKeys {
         static let CONFIGURATION = "com.adobe.module.configuration"
-    }
-
-    enum Configuration {
-        static let GLOBAL_CONFIG_PRIVACY = "global.privacy"
     }
 
     enum EventNames {

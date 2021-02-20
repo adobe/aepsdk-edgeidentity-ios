@@ -32,7 +32,6 @@ class IdentityTests: XCTestCase {
     func testGenericIdentityRequestSetsAdId() {
         var props = IdentityProperties()
         props.ecid = ECID()
-        props.privacyStatus = .optedIn
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -40,10 +39,6 @@ class IdentityTests: XCTestCase {
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
-
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
-                                        event: event,
-                                        data: ([IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
 
         _ = identity.readyForEvent(event) // trigger boot sequence
 
@@ -69,7 +64,6 @@ class IdentityTests: XCTestCase {
     func testGenericIdentityRequestClearsAdId() {
         var props = IdentityProperties()
         props.ecid = ECID()
-        props.privacyStatus = .optedIn
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -77,10 +71,6 @@ class IdentityTests: XCTestCase {
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
-
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
-                                        event: event,
-                                        data: ([IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
 
         _ = identity.readyForEvent(event) // trigger boot sequence
 
