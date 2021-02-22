@@ -101,6 +101,8 @@ import Foundation
     /// Handles IdentityEdge request reset events.
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
-        state?.resetIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+        state?.resetIdentifiers(event: event,
+                                createXDMSharedState: createXDMSharedState(data:event:),
+                                dispatchEvent: dispatch(event:))
     }
 }

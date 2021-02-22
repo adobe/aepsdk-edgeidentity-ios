@@ -263,14 +263,68 @@ class IdentityStateTests: XCTestCase {
                           data: nil)
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
-        state.resetIdentifiers(event: event, createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+        let dispatchConsentExpectation = XCTestExpectation(description: "Consent request event should be dispatched")
+        var consentEvent: Event?
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { event in
+                                consentEvent = event
+                                dispatchConsentExpectation.fulfill()
+                               })
 
-        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        wait(for: [xdmSharedStateExpectation, dispatchConsentExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityProperties.advertisingIdentifier)
         XCTAssertNil(state.identityProperties.customerIdentifiers)
         XCTAssertNotNil(state.identityProperties.ecid)
         XCTAssertNotEqual(props.ecid?.ecidString, state.identityProperties.ecid?.ecidString)
+
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+    }
+
+    func testResetIdentitiesAdIdIsEmptyDoesNotDispatchConsentEvent() {
+        var props = IdentityProperties()
+        props.advertisingIdentifier = ""
+        props.ecid = ECID()
+
+        state = IdentityState(identityProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { _ in XCTFail("Consent request event should not be dispatched")})
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityProperties.advertisingIdentifier)
+    }
+
+    func testResetIdentitiesAdIdIsNilDoesNotDispatchConsentEvent() {
+        var props = IdentityProperties()
+        props.advertisingIdentifier = nil
+        props.ecid = ECID()
+
+        state = IdentityState(identityProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { _ in XCTFail("Consent request event should not be dispatched")})
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityProperties.advertisingIdentifier)
     }
 
     // MARK: updateAdvertisingIdentifier(...)
