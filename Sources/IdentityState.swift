@@ -24,6 +24,12 @@ class IdentityState {
     private(set) var identityProperties: IdentityProperties
     #endif
 
+    /// List of namespaces which are not allowed to be modified from customer identifier
+    private static let reservedNamespaces = [
+        IdentityConstants.Namespaces.ECID,
+        IdentityConstants.Namespaces.IDFA
+    ]
+
     /// Creates a new `IdentityState` with the given identity properties
     /// - Parameter identityProperties: identity properties
     init(identityProperties: IdentityProperties) {
@@ -59,11 +65,9 @@ class IdentityState {
     /// If privacy is optedout the call is ignored
     /// - Parameters:
     ///   - event: event containing a new ADID value.
-    ///   - createSharedState: function which creates a new shared state
     ///   - createXDMSharedState: function which creates new XDM shared state
     ///   - dispatchEvent: function which dispatchs events to the event hub
     func updateAdvertisingIdentifier(event: Event,
-                                     createSharedState: ([String: Any], Event) -> Void,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      dispatchEvent: (Event) -> Void) {
 
@@ -83,19 +87,73 @@ class IdentityState {
                 dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
             }
 
-            identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            saveToPersistence(and: createXDMSharedState, using: event)
         }
 
+    }
+
+    /// Update the customer identifiers by merging `updateIdentityMap` with the current identifiers. Any identifier in `updateIdentityMap` which
+    /// has the same id in the same namespace will update the current identifier.
+    /// Certain namespaces are not allowed to be modified and if exist in the given customer identifiers will be removed before the update operation is executed.
+    /// The namespaces which cannot be modified through this function call include:
+    /// - ECID
+    /// - IDFA
+    ///
+    /// - Parameters
+    ///   - event: event containing customer identifiers to add or update with the current customer identifiers
+    ///   - createXDMSharedState: function which creates new XDM shared state
+    func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
+        guard let identifiersData = event.data else {
+            Log.debug(label: LOG_TAG, "Failed to update identifiers as no identifiers were found in the event data.")
+            return
+        }
+
+        guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
+            Log.debug(label: LOG_TAG, "Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
+            return
+        }
+
+        // Filter out known identifiers to prevent modification of certain namespaces
+        removeIdentitiesWithReservedNamespaces(from: updateIdentityMap)
+
+        if identityProperties.customerIdentifiers == nil {
+            identityProperties.customerIdentifiers = updateIdentityMap
+        } else {
+            identityProperties.customerIdentifiers?.merge(map: updateIdentityMap)
+        }
+
+        saveToPersistence(and: createXDMSharedState, using: event)
+    }
+
+    /// Remove customer identifiers specified in `event` from the current `IdentityMap`.
+    /// - Parameters:
+    ///   - event: event containing customer identifiers to remove from the current customer identities
+    ///   - createXDMSharedState: function which creates new XDM shared states
+    func removeCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
+        guard let identifiersData = event.data else {
+            Log.debug(label: LOG_TAG, "Failed to remove identifier as no identifiers were found in the event data.")
+            return
+        }
+
+        guard let removeIdentityMap = IdentityMap.from(eventData: identifiersData) else {
+            Log.debug(label: LOG_TAG, "Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
+            return
+        }
+
+        guard let customerIdentityMap = identityProperties.customerIdentifiers else {
+            return
+        }
+
+        customerIdentityMap.remove(map: removeIdentityMap)
+
+        saveToPersistence(and: createXDMSharedState, using: event)
     }
 
     /// Updates and makes any required actions when the privacy status has updated
     /// - Parameters:
     ///   - event: the event triggering the privacy change
-    ///   - createSharedState: a function which can create Identity shared state
     ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
-    func processPrivacyChange(event: Event, createSharedState: ([String: Any], Event) -> Void, createXDMSharedState: ([String: Any], Event) -> Void) {
+    func processPrivacyChange(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
 
@@ -108,15 +166,12 @@ class IdentityState {
         if newPrivacyStatus == .optedOut {
             identityProperties.ecid = nil
             identityProperties.advertisingIdentifier = nil
-            identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            identityProperties.customerIdentifiers = nil
+            saveToPersistence(and: createXDMSharedState, using: event)
         } else if identityProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
             identityProperties.ecid = ECID()
-            identityProperties.saveToPersistence()
-            createSharedState(identityProperties.toEventData(), event)
-            createXDMSharedState(identityProperties.toXdmData(), event)
+            saveToPersistence(and: createXDMSharedState, using: event)
         }
 
     }
@@ -165,4 +220,32 @@ class IdentityState {
         dispatchEvent(event)
     }
 
+    /// Filter out any items contained in reserved namespaces from the given `identityMap`.
+    /// The list of reserved namespaces can be found at `IdentityState.reservedNamespaces`.
+    /// - Parameter identityMap: the `IdentityMap` to filter out items contained in reserved namespaces.
+    private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
+        // Filter out known identifiers to prevent modification of certain namespaces
+        let filterItems = IdentityMap()
+        for namespace in IdentityState.reservedNamespaces {
+            if let items = identityMap.getItems(withNamespace: namespace) {
+                Log.debug(label: LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                for item in items {
+                    filterItems.add(item: item, withNamespace: namespace)
+                }
+            }
+        }
+
+        if !filterItems.isEmpty {
+            identityMap.remove(map: filterItems)
+        }
+    }
+
+    /// Save `IdentityProperties` to persistence and create an XDM shared state.
+    /// - Parameters:
+    ///   - createXDMSharedState: function which creates an XDM shared state
+    ///   - event: the event used to share the XDM state
+    private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
+        identityProperties.saveToPersistence()
+        createXDMSharedState(identityProperties.toXdmData(), event)
+    }
 }
