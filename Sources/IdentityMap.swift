@@ -108,7 +108,7 @@ public class IdentityMap: NSObject, Codable {
     }
 
     /// Get the array of `IdentityItem`(s) for the given namespace.
-    /// - Parameter withNamesapce: the namespace of items to retrieve
+    /// - Parameter withNamespace: the namespace of items to retrieve
     /// - Returns: An array of `IdentityItem`s for the given `withNamespace` or nil if this `IdentityMap` does not contain the `withNamespace`.
     @objc(getItemsWithNamespace:)
     public func getItems(withNamespace: String) -> [IdentityItem]? {

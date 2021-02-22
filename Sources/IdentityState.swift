@@ -25,7 +25,7 @@ class IdentityState {
     #endif
 
     /// List of namespaces which are not allowed to be modified from customer identifier
-    private static let reservedNamspaces = [
+    private static let reservedNamespaces = [
         IdentityConstants.Namespaces.ECID,
         IdentityConstants.Namespaces.IDFA
     ]
@@ -226,7 +226,7 @@ class IdentityState {
     private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
         // Filter out known identifiers to prevent modification of certain namespaces
         let filterItems = IdentityMap()
-        for namespace in IdentityState.reservedNamspaces {
+        for namespace in IdentityState.reservedNamespaces {
             if let items = identityMap.getItems(withNamespace: namespace) {
                 Log.debug(label: LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                 for item in items {
