@@ -120,6 +120,14 @@ struct ContentView: View {
 
         VStack {
             Button(action: {
+                Identity.resetIdentities()
+            }) {
+                Text("Reset Identities")
+            }
+        }
+
+        VStack {
+            Button(action: {
                 self.identityMapText = ""
                 Identity.getIdentities { identityMap, _ in
                     if let identityMap = identityMap {
