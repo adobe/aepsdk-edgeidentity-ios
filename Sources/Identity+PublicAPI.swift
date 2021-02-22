@@ -118,6 +118,7 @@ import Foundation
     }
 
     /// Clears all identifiers and generates a new Experience Cloud ID (ECID).
+    @objc(resetIdentities)
     static func resetIdentities() {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_RESET,
                           type: EventType.identityEdge,
