@@ -245,6 +245,34 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
+    // MARK: resetIdentities(...)
+
+    func testResetIdentities() {
+        let currentIdentities = IdentityMap()
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        var props = IdentityProperties()
+        props.customerIdentifiers = currentIdentities
+        props.advertisingIdentifier = "adid"
+        props.ecid = ECID()
+
+        state = IdentityState(identityProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.resetIdentifiers(event: event, createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityProperties.advertisingIdentifier)
+        XCTAssertNil(state.identityProperties.customerIdentifiers)
+        XCTAssertNotNil(state.identityProperties.ecid)
+        XCTAssertNotEqual(props.ecid?.ecidString, state.identityProperties.ecid?.ecidString)
+    }
+
     // MARK: updateAdvertisingIdentifier(...)
 
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
