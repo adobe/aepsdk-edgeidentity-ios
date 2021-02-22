@@ -35,6 +35,7 @@ import Foundation
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
+        registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
     }
 
     public func onUnregistered() {
@@ -95,5 +96,11 @@ import Foundation
     /// - Parameter event: the identity request event
     private func handleRemoveIdentity(event: Event) {
         state?.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+    }
+
+    /// Handles IdentityEdge request reset events.
+    /// - Parameter event: the identity request reset event
+    private func handleRequestReset(event: Event) {
+        state?.resetIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
     }
 }

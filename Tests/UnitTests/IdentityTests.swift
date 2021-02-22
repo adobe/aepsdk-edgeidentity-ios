@@ -181,4 +181,30 @@ class IdentityTests: XCTestCase {
         XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
     }
 
+    // MARK: handleRequestReset
+
+    /// Tests when Identity receives a request reset event that identifiers are cleared and ECID is regenerated
+    func testIdentityRequestReset() {
+        // setup
+        let originalEcid = ECID()
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
+        identity.state?.identityProperties.customerIdentifiers = identityMap
+        identity.state?.identityProperties.advertisingIdentifier = "adid"
+        identity.state?.identityProperties.ecid = originalEcid
+
+        let event = Event(name: "Test Request Event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state?.identityProperties.customerIdentifiers)
+        XCTAssertNil(identity.state?.identityProperties.advertisingIdentifier)
+        XCTAssertNotNil(identity.state?.identityProperties.ecid)
+        XCTAssertNotEqual(originalEcid.ecidString, identity.state?.identityProperties.ecid?.ecidString)
+    }
+
 }
