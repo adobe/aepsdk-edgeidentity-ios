@@ -14,7 +14,7 @@
 @testable import AEPIdentityEdge
 import XCTest
 
-class IdentityAPITests: XCTestCase {
+class IdentityEdgeAPITests: XCTestCase {
 
     override func setUp() {
         MockExtension.reset()
@@ -54,7 +54,7 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.getExperienceCloudId { _, _ in }
+        IdentityEdge.getExperienceCloudId { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)
@@ -70,7 +70,7 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.getIdentities { _, _ in }
+        IdentityEdge.getIdentities { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)

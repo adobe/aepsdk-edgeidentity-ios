@@ -13,21 +13,21 @@
 import AEPCore
 import Foundation
 
-@objc(AEPMobileIdentity) public class Identity: NSObject, Extension {
+@objc(AEPMobileIdentityEdge) public class IdentityEdge: NSObject, Extension {
 
     // MARK: Extension
-    public let name = IdentityConstants.EXTENSION_NAME
-    public let friendlyName = IdentityConstants.FRIENDLY_NAME
-    public static let extensionVersion = IdentityConstants.EXTENSION_VERSION
+    public let name = IdentityEdgeConstants.EXTENSION_NAME
+    public let friendlyName = IdentityEdgeConstants.FRIENDLY_NAME
+    public static let extensionVersion = IdentityEdgeConstants.EXTENSION_VERSION
     public let metadata: [String: String]? = nil
-    private(set) var state: IdentityState?
+    private(set) var state: IdentityEdgeState?
 
     public let runtime: ExtensionRuntime
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         super.init()
-        state = IdentityState(identityProperties: IdentityProperties())
+        state = IdentityEdgeState(identityEdgeProperties: IdentityEdgeProperties())
     }
 
     public func onRegistered() {
@@ -44,18 +44,18 @@ import Foundation
         return true
     }
 
-    /// Determines if Identity is ready to handle events, this is determined by if the Identity extension has booted up
+    /// Determines if Identity Edge is ready to handle events, this is determined by if the Identity Edge extension has booted up
     /// - Parameter event: An `Event`
     /// - Returns: True if we can process events, false otherwise
     private func canProcessEvents(event: Event) -> Bool {
         guard let state = state else { return false }
         guard !state.hasBooted else { return true } // we have booted, return true
 
-        guard let configSharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
+        guard let configSharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
-            createSharedState(data: state.identityProperties.toEventData(), event: nil)
-            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
+            createSharedState(data: state.identityEdgeProperties.toEventData(), event: nil)
+            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
         }
 
         return false // cannot handle any events until we have booted
@@ -82,8 +82,8 @@ import Foundation
     /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
     /// - Parameter event: the identity request event
     private func processIdentifiersRequest(event: Event) {
-        let xdmData = state?.identityProperties.toXdmData(true)
-        let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+        let xdmData = state?.identityEdgeProperties.toXdmData(true)
+        let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identity,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)
@@ -95,7 +95,7 @@ import Foundation
     /// Handles the configuration response event
     /// - Parameter event: the configuration response event
     private func handleConfigurationResponse(event: Event) {
-        if event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
+        if event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
             // if config contains new global privacy status, process the request
             state?.processPrivacyChange(event: event,
                                         createSharedState: createSharedState(data:event:),

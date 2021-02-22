@@ -13,8 +13,8 @@
 import AEPCore
 import Foundation
 
-enum IdentityConstants {
-    static let EXTENSION_NAME = "com.adobe.module.identity"
+enum IdentityEdgeConstants {
+    static let EXTENSION_NAME = "com.adobe.identityedge"
     static let FRIENDLY_NAME = "IdentityEdge"
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
@@ -60,7 +60,7 @@ enum IdentityConstants {
     }
 
     enum XDMKeys {
-        static let IDENTITY_MAP = "identityMap"
+        static let IDENTITY_MAP = "identityEdgeMap"
 
         enum Consent {
             static let CONSENTS = "consents"

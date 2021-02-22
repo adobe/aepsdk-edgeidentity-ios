@@ -28,21 +28,21 @@ public enum AuthenticationState: Int, RawRepresentable, Codable {
     public var rawValue: RawValue {
         switch self {
         case .ambiguous:
-            return IdentityConstants.AuthenticationStates.AMBIGUOUS
+            return IdentityEdgeConstants.AuthenticationStates.AMBIGUOUS
         case .authenticated:
-            return IdentityConstants.AuthenticationStates.AUTHENTICATED
+            return IdentityEdgeConstants.AuthenticationStates.AUTHENTICATED
         case .loggedOut:
-            return IdentityConstants.AuthenticationStates.LOGGED_OUT
+            return IdentityEdgeConstants.AuthenticationStates.LOGGED_OUT
         }
     }
 
     public init?(rawValue: RawValue) {
         switch rawValue {
-        case IdentityConstants.AuthenticationStates.AMBIGUOUS:
+        case IdentityEdgeConstants.AuthenticationStates.AMBIGUOUS:
             self = .ambiguous
-        case IdentityConstants.AuthenticationStates.AUTHENTICATED:
+        case IdentityEdgeConstants.AuthenticationStates.AUTHENTICATED:
             self = .authenticated
-        case IdentityConstants.AuthenticationStates.LOGGED_OUT:
+        case IdentityEdgeConstants.AuthenticationStates.LOGGED_OUT:
             self = .loggedOut
         default:
             self = .ambiguous
@@ -52,12 +52,12 @@ public enum AuthenticationState: Int, RawRepresentable, Codable {
 
 /// Defines a map containing a set of end user identities, keyed on either namespace integration code or the namespace ID of the identity.
 /// Within each namespace, the identity is unique. The values of the map are an array, meaning that more than one identity of each namespace may be carried.
-@objc(AEPIdentityMap)
-public class IdentityMap: NSObject, Codable {
-    private static let LOG_TAG = "IdentityMap"
+@objc(AEPIdentityEdgeMap)
+public class IdentityEdgeMap: NSObject, Codable {
+    private static let LOG_TAG = "IdentityEdgeMap"
     private var items: [String: [IdentityItem]] = [:]
 
-    /// Determine if this `IdentityMap` is empty.
+    /// Determine if this `IdentityEdgeMap` is empty.
     public var isEmpty: Bool {
         return items.isEmpty
     }
@@ -72,7 +72,7 @@ public class IdentityMap: NSObject, Codable {
     @objc(addItem:withNamespace:)
     public func add(item: IdentityItem, withNamespace: String) {
         if item.id.isEmpty || withNamespace.isEmpty {
-            Log.debug(label: IdentityMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
+            Log.debug(label: IdentityEdgeMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
             return
         }
 
@@ -90,7 +90,7 @@ public class IdentityMap: NSObject, Codable {
 
     /// Get the array of `IdentityItem`(s) for the given namespace.
     /// - Parameter namespace: the namespace of items to retrieve
-    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
+    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityEdgeMap` does not contain the `namespace`.
     @objc(getItemsWithNamespace:)
     public func getItems(withNamespace: String) -> [IdentityItem]? {
         return items[withNamespace]
@@ -113,26 +113,26 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Decodes a [String: Any] dictionary into an `IdentityMap`
-    /// - Parameter eventData: the event data representing `IdentityMap`
-    /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
-    static func from(eventData: [String: Any]) -> IdentityMap? {
+    /// Decodes a [String: Any] dictionary into an `IdentityEdgeMap`
+    /// - Parameter eventData: the event data representing `IdentityEdgeMap`
+    /// - Returns: an `IdentityEdgeMap` that is represented in the event data, nil if data is not in the correct format
+    static func from(eventData: [String: Any]) -> IdentityEdgeMap? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: eventData) else {
             Log.debug(label: LOG_TAG, "Unable to serialize identity event data.")
             return nil
         }
 
-        guard let identityMap = try? JSONDecoder().decode(IdentityMap.self, from: jsonData) else {
-            Log.debug(label: LOG_TAG, "Unable to decode identity data into an IdentityMap.")
+        guard let identityEdgeMap = try? JSONDecoder().decode(IdentityEdgeMap.self, from: jsonData) else {
+            Log.debug(label: LOG_TAG, "Unable to decode identity data into an IdentityEdgeMap.")
             return nil
         }
 
-        return identityMap
+        return identityEdgeMap
     }
 
 }
 
-/// Identity is used to clearly distinguish people that are interacting with digital experiences.
+/// Identity Edge is used to clearly distinguish people that are interacting with digital experiences.
 @objc(AEPIdentityItem)
 @objcMembers
 public class IdentityItem: NSObject, Codable {

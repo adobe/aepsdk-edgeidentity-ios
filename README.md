@@ -37,7 +37,7 @@ To add the AEPIdentityEdge Package to your application, from the Xcode menu sele
 
 `File > Swift Packages > Add Package Dependency...`
 
-Enter the URL for the AEPIdentityEdge package repository: `https://github.com/adobe/aepsdk-edge-ios.git`.
+Enter the URL for the AEPIdentityEdge package repository: `https://github.com/adobe/aepsdk-identityedge-ios.git`.
 
 When prompted, make sure you change the branch to `main`. (Once the repo is public, we will reference specific tags/versions instead of a branch)
 
@@ -45,7 +45,7 @@ Alternatively, if your project has a `Package.swift` file, you can add AEPIdenti
 
 ```
 dependencies: [
-	.package(url: "https://github.com/adobe/aepsdk-edge-ios.git", .branch: "main"),
+	.package(url: "https://github.com/adobe/aepsdk-identityedge-ios.git", .branch: "main"),
 targets: [
    	.target(name: "YourTarget",
     				dependencies: ["AEPIdentityEdge"],

@@ -17,7 +17,7 @@ import SwiftUI
 struct ContentView: View {
     @State var ecidText: String
     @State var adIdText: String
-    @State var identityMapText: String
+    @State var identityEdgeMapText: String
 
     var body: some View {
         HStack {
@@ -87,25 +87,25 @@ struct ContentView: View {
 
         VStack {
             Button(action: {
-                self.identityMapText = ""
-                Identity.getIdentities { identityMap, _ in
-                    if let identityMap = identityMap {
+                self.identityEdgeMapText = ""
+                Identity.getIdentities { identityEdgeMap, _ in
+                    if let identityEdgeMap = identityEdgeMap {
                         let encoder = JSONEncoder()
                         encoder.outputFormatting = .prettyPrinted
-                        guard let data = try? encoder.encode(identityMap) else {
-                            self.identityMapText = "failed to encode IdentityMap"
+                        guard let data = try? encoder.encode(identityEdgeMap) else {
+                            self.identityEdgeMapText = "failed to encode IdentityEdgeMap"
                             return
                         }
-                        self.identityMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
+                        self.identityEdgeMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
                     } else {
-                        self.identityMapText = "IdentityMap was nil"
+                        self.identityEdgeMapText = "IdentityEdgeMap was nil"
                     }
                 }
             }) {
                 Text("Get Identities")
             }.padding()
 
-            Text(identityMapText)
+            Text(identityEdgeMapText)
                 .font(.system(size: 12))
                 .padding()
                 .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
@@ -116,6 +116,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(ecidText: "", adIdText: "", identityMapText: "")
+        ContentView(ecidText: "", adIdText: "", identityEdgeMapText: "")
     }
 }

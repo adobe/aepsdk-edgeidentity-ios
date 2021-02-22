@@ -15,25 +15,25 @@
 import AEPServices
 import XCTest
 
-class IdentityTests: XCTestCase {
-    var identity: Identity!
+class IdentityEdgeTests: XCTestCase {
+    var identityEdge: IdentityEdge!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
+        identityEdge = IdentityEdge(runtime: mockRuntime)
+        identityEdge.onRegistered()
     }
 
     // MARK: processIdentifiersRequest
 
-    /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
-    func testIdentityRequestIdentifiersHappy() {
+    /// Tests that when identity edge receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
+    func testIdentityEdgeRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
+        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event, data: (["testKey": "testVal"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -44,8 +44,8 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
-    func testIdentityRequestIdentifiersNoConfig() {
+    /// Tests that when identity edge receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
+    func testIdentityEdgeRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers", type: EventType.identity, source: EventSource.requestIdentity, data: nil)
 
@@ -62,26 +62,26 @@ class IdentityTests: XCTestCase {
 
     /// Tests that when a configuration request content event contains opt-out that we update privacy status
     func testConfigurationResponseEventOptOut() {
-        let data = [IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
+        let data = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: data)
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual(PrivacyStatus.optedOut, identity.state?.identityProperties.privacyStatus) // identity state should have updated to opt-out
+        XCTAssertEqual(PrivacyStatus.optedOut, identityEdge.state?.identityEdgeProperties.privacyStatus) // identity state should have updated to opt-out
     }
 
     /// Tests that when no privacy status is in the configuration event that we do not update the privacy status
     func testConfigurationResponseEventNoPrivacyStatus() {
         let event = Event(name: "Test Configuration response", type: EventType.configuration, source: EventSource.responseContent, data: ["key": "value"])
-        _ = identity.readyForEvent(event) // sets default privacy of unknown
+        _ = identityEdge.readyForEvent(event) // sets default privacy of unknown
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual(PrivacyStatus.unknown, identity.state?.identityProperties.privacyStatus) // identity state should have remained unknown
+        XCTAssertEqual(PrivacyStatus.unknown, identityEdge.state?.identityEdgeProperties.privacyStatus) // identity state should have remained unknown
     }
 
 }

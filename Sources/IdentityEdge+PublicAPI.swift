@@ -13,14 +13,14 @@
 import AEPCore
 import Foundation
 
-/// Defines the public interface for the Identity extension
-@objc public extension Identity {
+/// Defines the public interface for the Identity Edge extension
+@objc public extension IdentityEdge {
 
     /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
     /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
+        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITY_ECID,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -31,14 +31,14 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
+            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+                  let identityEdgeMap = IdentityEdgeMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
-                completion("", .none) // IdentityMap exists but ECID has no value, return an empty string
+            guard let items = identityEdgeMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID), let ecidItem = items.first else {
+                completion("", .none) // IdentityEdgeMap exists but ECID has no value, return an empty string
                 return
             }
 
@@ -47,11 +47,11 @@ import Foundation
     }
 
     /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
-    /// in the `IdentityEdge` extension, then an empty `IdentityMap` is returned.
+    /// in the `IdentityEdge` extension, then an empty `IdentityEdgeMap` is returned.
     /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
-    static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
+    static func getIdentities(completion: @escaping (IdentityEdgeMap?, Error?) -> Void) {
+        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -62,13 +62,13 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
+            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+                  let identityEdgeMap = IdentityEdgeMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            completion(identityMap, .none)
+            completion(identityEdgeMap, .none)
         }
     }
 }

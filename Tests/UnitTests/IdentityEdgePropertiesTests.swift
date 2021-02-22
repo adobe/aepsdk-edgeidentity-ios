@@ -14,7 +14,7 @@
 import AEPServices
 import XCTest
 
-class IdentityPropertiesTests: XCTestCase {
+class IdentityEdgePropertiesTests: XCTestCase {
 
     var mockDataStore: MockDataStore {
         return ServiceProvider.shared.namedKeyValueService as! MockDataStore
@@ -27,7 +27,7 @@ class IdentityPropertiesTests: XCTestCase {
     /// When all properties all nil, the event data should be empty
     func testToEventDataEmpty() {
         // setup
-        let properties = IdentityProperties()
+        let properties = IdentityEdgeProperties()
 
         // test
         let eventData = properties.toEventData()
@@ -39,7 +39,7 @@ class IdentityPropertiesTests: XCTestCase {
     /// Test that event data is populated correctly when all properties are non-nil
     func testToEventDataFull() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 
@@ -48,13 +48,13 @@ class IdentityPropertiesTests: XCTestCase {
 
         // verify
         XCTAssertEqual(2, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
+        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
     }
 
     func testToEventDataDoesNotIncludeEmptyValues() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
 
@@ -63,13 +63,13 @@ class IdentityPropertiesTests: XCTestCase {
 
         // verify
         XCTAssertEqual(1, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
+        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
     }
 
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup
-        let properties = IdentityProperties()
+        let properties = IdentityEdgeProperties()
 
         // test
         let xdmData = properties.toXdmData()
@@ -81,7 +81,7 @@ class IdentityPropertiesTests: XCTestCase {
     /// Test that xdm data is populated correctly when all properties are non-nil
     func testToXdmDataFull() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 
@@ -95,7 +95,7 @@ class IdentityPropertiesTests: XCTestCase {
 
         // verify
         let expectedResult: [String: Any] =
-            [ "identityMap": [
+            [ "identityEdgeMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
                 "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ]
             ]
@@ -106,7 +106,7 @@ class IdentityPropertiesTests: XCTestCase {
 
     func testToXdmDataDoesNotIncludeEmptyValues() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
 
@@ -120,7 +120,7 @@ class IdentityPropertiesTests: XCTestCase {
 
         // verify
         let expectedResult: [String: Any] =
-            [ "identityMap": [
+            [ "identityEdgeMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ]
             ]
             ]
@@ -130,7 +130,7 @@ class IdentityPropertiesTests: XCTestCase {
 
     func testSaveToPersistenceLoadFromPersistence() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 

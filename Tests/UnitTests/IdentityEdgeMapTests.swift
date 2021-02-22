@@ -13,7 +13,7 @@
 @testable import AEPIdentityEdge
 import XCTest
 
-class IdentityMapTests: XCTestCase {
+class IdentityEdgeMapTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -23,27 +23,27 @@ class IdentityMapTests: XCTestCase {
     // MARK: getItemsWith tests
 
     func testGetItemsWith() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        let spaceItems = identityMap.getItems(withNamespace: "space")
+        let spaceItems = identityEdgeMap.getItems(withNamespace: "space")
         XCTAssertNotNil(spaceItems)
         XCTAssertEqual(1, spaceItems?.count)
         XCTAssertEqual("id", spaceItems?[0].id)
         XCTAssertEqual("ambiguous", spaceItems?[0].authenticationState.rawValue)
         XCTAssertFalse(spaceItems?[0].primary ?? true)
 
-        let unknown = identityMap.getItems(withNamespace: "unknown")
+        let unknown = identityEdgeMap.getItems(withNamespace: "unknown")
         XCTAssertNil(unknown)
     }
 
     func testAddItems() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
-        identityMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityEdgeMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
+        identityEdgeMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
+        guard let spaceItems = identityEdgeMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -56,7 +56,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(AuthenticationState.ambiguous, spaceItems[1].authenticationState)
         XCTAssertTrue(spaceItems[1].primary)
 
-        guard let emailItems = identityMap.getItems(withNamespace: "email") else {
+        guard let emailItems = identityEdgeMap.getItems(withNamespace: "email") else {
             XCTFail("Namespace 'email' is nil but expected not nil.")
             return
         }
@@ -66,11 +66,11 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testAddItems_overwrite() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
 
-        guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
+        guard let spaceItems = identityEdgeMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -82,28 +82,28 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testAddItems_withEmptyIdNotAllowed() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityEdgeMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
 
-        XCTAssertNil(identityMap.getItems(withNamespace: "space"))
+        XCTAssertNil(identityEdgeMap.getItems(withNamespace: "space"))
     }
 
     func testAddItems_withEmptyNamespaceNotAllowed() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "")
 
-        XCTAssertNil(identityMap.getItems(withNamespace: ""))
+        XCTAssertNil(identityEdgeMap.getItems(withNamespace: ""))
     }
 
     // MARK: encoder tests
 
     func testEncode_oneItem() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
-            XCTFail("IdentityMap.asDictionary returned nil!")
+        guard let actualResult: [String: Any] = identityEdgeMap.asDictionary() else {
+            XCTFail("IdentityEdgeMap.asDictionary returned nil!")
             return
         }
         let expectedResult: [String: Any] =
@@ -113,12 +113,12 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testEncode_twoItems() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "123"), withNamespace: "A")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityEdgeMap.add(item: IdentityItem(id: "123"), withNamespace: "A")
 
-        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
-            XCTFail("IdentityMap.asDictionary returned nil!")
+        guard let actualResult: [String: Any] = identityEdgeMap.asDictionary() else {
+            XCTFail("IdentityEdgeMap.asDictionary returned nil!")
             return
         }
         let expectedResult: [String: Any] =
@@ -131,12 +131,12 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testEncode_twoItemsSameNamespace() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "123"), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityEdgeMap.add(item: IdentityItem(id: "123"), withNamespace: "space")
 
-        guard let actualResult: [String: Any] = identityMap.asDictionary() else {
-            XCTFail("IdentityMap.asDictionary returned nil!")
+        guard let actualResult: [String: Any] = identityEdgeMap.asDictionary() else {
+            XCTFail("IdentityEdgeMap.asDictionary returned nil!")
             return
         }
         let expectedResult: [String: Any] =
@@ -150,10 +150,10 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testEncode_itemWithEmptyIdNotAllowed() {
-        let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        let identityEdgeMap = IdentityEdgeMap()
+        identityEdgeMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
 
-        XCTAssertEqual(true, identityMap.asDictionary()?.isEmpty)
+        XCTAssertEqual(true, identityEdgeMap.asDictionary()?.isEmpty)
     }
 
     // MARK: decoder tests
@@ -175,9 +175,9 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
-        guard let items = identityMap?.getItems(withNamespace: "space") else {
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
+        guard let items = identityEdgeMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -210,9 +210,9 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
-        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
+        guard let spaceItems = identityEdgeMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -222,7 +222,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual("loggedOut", spaceItems[0].authenticationState.rawValue)
         XCTAssertTrue(spaceItems[0].primary)
 
-        guard let aItems = identityMap?.getItems(withNamespace: "A") else {
+        guard let aItems = identityEdgeMap?.getItems(withNamespace: "A") else {
             XCTFail("Namespace 'A' is nil but expected not nil.")
             return
         }
@@ -252,10 +252,10 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
 
-        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
+        guard let spaceItems = identityEdgeMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -289,10 +289,10 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
 
-        guard let spaceItems = identityMap?.getItems(withNamespace: "space") else {
+        guard let spaceItems = identityEdgeMap?.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
             return
         }
@@ -318,9 +318,9 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
-        XCTAssertNil(identityMap?.getItems(withNamespace: "space"))
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
+        XCTAssertNil(identityEdgeMap?.getItems(withNamespace: "space"))
     }
 
     func testDecode_itemWithEmptyNamespace() {
@@ -338,9 +338,9 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
-        XCTAssertNil(identityMap?.getItems(withNamespace: ""))
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
+        XCTAssertNil(identityEdgeMap?.getItems(withNamespace: ""))
     }
 
     func testDecode_emptyJson() {
@@ -350,7 +350,7 @@ class IdentityMapTests: XCTestCase {
         }
         let decoder = JSONDecoder()
 
-        let identityMap = try? decoder.decode(IdentityMap.self, from: data)
-        XCTAssertNotNil(identityMap)
+        let identityEdgeMap = try? decoder.decode(IdentityEdgeMap.self, from: data)
+        XCTAssertNotNil(identityEdgeMap)
     }
 }
