@@ -180,4 +180,20 @@ class IdentityAPITests: XCTestCase {
         // verify
         wait(for: [expectation], timeout: 1)
     }
+
+    /// Tests that resetIdentities dispatches an identity edge reset request event
+    func testResetIdentities() {
+        // setup
+        let expectation = XCTestExpectation(description: "resetIdentities should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestReset) { _ in
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.resetIdentities()
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
 }

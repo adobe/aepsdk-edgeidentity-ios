@@ -34,6 +34,7 @@ enum IdentityConstants {
         static let REMOVE_IDENTITIES = "Idetity Remove Identities"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "IDENTITY_RESPONSE_CONTENT_ONE_TIME"
         static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
+        static let REQUEST_RESET = "Identity Request Reset"
     }
 
     enum EventDataKeys {

@@ -116,4 +116,14 @@ import Foundation
 
         MobileCore.dispatch(event: event)
     }
+
+    /// Clears all identifiers and generates a new Experience Cloud ID (ECID).
+    static func resetIdentities() {
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_RESET,
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        MobileCore.dispatch(event: event)
+    }
 }
