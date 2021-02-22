@@ -24,24 +24,6 @@ struct ContentView: View {
     @State var isPrimaryChecked: Bool = false
 
     var body: some View {
-        HStack {
-            Text("Privacy: ")
-            Button(action: {
-                MobileCore.setPrivacyStatus(PrivacyStatus.optedIn)
-            }) {
-                Text("in")
-            }
-            Button(action: {
-                MobileCore.setPrivacyStatus(PrivacyStatus.optedOut)
-            }) {
-                Text("out")
-            }
-            Button(action: {
-                MobileCore.setPrivacyStatus(PrivacyStatus.unknown)
-            }) {
-                Text("unknown")
-            }
-        }.padding()
 
         VStack {
             HStack {
