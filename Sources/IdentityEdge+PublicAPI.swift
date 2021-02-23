@@ -15,14 +15,14 @@ import AEPServices
 import Foundation
 
 /// Defines the public interface for the Identity extension
-@objc public extension Identity {
-    private static let LOG_TAG = "Identity"
+@objc public extension IdentityEdge {
+    private static let LOG_TAG = "IdentityEdge"
 
     /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
     /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
+        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITY_ECID,
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -33,13 +33,13 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
                   let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
+            guard let items = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID), let ecidItem = items.first else {
                 completion("", .none) // IdentityMap exists but ECID has no value, return an empty string
                 return
             }
@@ -53,7 +53,7 @@ import Foundation
     /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
+        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -64,7 +64,7 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
                   let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
@@ -85,7 +85,7 @@ import Foundation
             return
         }
 
-        let event = Event(name: IdentityConstants.EventNames.UPDATE_IDENTITIES,
+        let event = Event(name: IdentityEdgeConstants.EventNames.UPDATE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
                           data: identityDict)
@@ -109,7 +109,7 @@ import Foundation
             return
         }
 
-        let event = Event(name: IdentityConstants.EventNames.REMOVE_IDENTITIES,
+        let event = Event(name: IdentityEdgeConstants.EventNames.REMOVE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
                           data: identityDict)

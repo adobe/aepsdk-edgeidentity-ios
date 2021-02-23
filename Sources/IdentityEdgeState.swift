@@ -14,29 +14,29 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// Manages the business logic of the Identity extension
-class IdentityState {
-    private let LOG_TAG = "IdentityState"
+/// Manages the business logic of the Identity Edge extension
+class IdentityEdgeState {
+    private let LOG_TAG = "IdentityEdgeState"
     private(set) var hasBooted = false
     #if DEBUG
-    var identityProperties: IdentityProperties
+    var identityEdgeProperties: IdentityEdgeProperties
     #else
-    private(set) var identityProperties: IdentityProperties
+    private(set) var identityEdgeProperties: IdentityEdgeProperties
     #endif
 
     /// List of namespaces which are not allowed to be modified from customer identifier
     private static let reservedNamespaces = [
-        IdentityConstants.Namespaces.ECID,
-        IdentityConstants.Namespaces.IDFA
+        IdentityEdgeConstants.Namespaces.ECID,
+        IdentityEdgeConstants.Namespaces.IDFA
     ]
 
-    /// Creates a new `IdentityState` with the given identity properties
-    /// - Parameter identityProperties: identity properties
-    init(identityProperties: IdentityProperties) {
-        self.identityProperties = identityProperties
+    /// Creates a new `IdentityEdgeState` with the given identity edge properties
+    /// - Parameter identityEdgeProperties: identity edge properties
+    init(identityEdgeProperties: IdentityEdgeProperties) {
+        self.identityEdgeProperties = identityEdgeProperties
     }
 
-    /// Completes init for the Identity extension.
+    /// Completes init for the Identity Edge extension.
     /// - Parameters:
     ///   - configSharedState: the current configuration shared state available at registration time
     ///   - event: The `Event` triggering the bootup
@@ -44,19 +44,19 @@ class IdentityState {
     func bootupIfReady(configSharedState: [String: Any], event: Event) -> Bool {
 
         // load data from local storage
-        identityProperties.loadFromPersistence()
+        identityEdgeProperties.loadFromPersistence()
 
         // Load privacy status
-        let privacyStatusString = configSharedState[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
-        identityProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityConstants.Default.PRIVACY_STATUS
+        let privacyStatusString = configSharedState[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        identityEdgeProperties.privacyStatus = PrivacyStatus(rawValue: privacyStatusString) ?? IdentityEdgeConstants.Default.PRIVACY_STATUS
 
         // Generate new ECID if privacy status allows
-        if identityProperties.privacyStatus != .optedOut && identityProperties.ecid == nil {
-            identityProperties.ecid = ECID()
+        if identityEdgeProperties.privacyStatus != .optedOut && identityEdgeProperties.ecid == nil {
+            identityEdgeProperties.ecid = ECID()
         }
 
         hasBooted = true
-        Log.debug(label: LOG_TAG, "Identity has successfully booted up")
+        Log.debug(label: LOG_TAG, "Identity Edge has successfully booted up")
         return true
     }
 
@@ -72,7 +72,7 @@ class IdentityState {
                                      dispatchEvent: (Event) -> Void) {
 
         // Early exit if privacy is opt-out
-        if identityProperties.privacyStatus == .optedOut {
+        if identityEdgeProperties.privacyStatus == .optedOut {
             Log.debug(label: LOG_TAG, "Ignoring sync advertising identifiers request as privacy is opted-out")
             return
         }
@@ -80,10 +80,10 @@ class IdentityState {
         // update adid if changed and extract the new adid value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
         if adIdChanged, let adId = event.adId {
-            identityProperties.advertisingIdentifier = adId
+            identityEdgeProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
+                let val = adId.isEmpty ? IdentityEdgeConstants.XDMKeys.Consent.NO : IdentityEdgeConstants.XDMKeys.Consent.YES
                 dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
             }
 
@@ -116,10 +116,10 @@ class IdentityState {
         // Filter out known identifiers to prevent modification of certain namespaces
         removeIdentitiesWithReservedNamespaces(from: updateIdentityMap)
 
-        if identityProperties.customerIdentifiers == nil {
-            identityProperties.customerIdentifiers = updateIdentityMap
+        if identityEdgeProperties.customerIdentifiers == nil {
+            identityEdgeProperties.customerIdentifiers = updateIdentityMap
         } else {
-            identityProperties.customerIdentifiers?.merge(map: updateIdentityMap)
+            identityEdgeProperties.customerIdentifiers?.merge(map: updateIdentityMap)
         }
 
         saveToPersistence(and: createXDMSharedState, using: event)
@@ -140,7 +140,7 @@ class IdentityState {
             return
         }
 
-        guard let customerIdentityMap = identityProperties.customerIdentifiers else {
+        guard let customerIdentityMap = identityEdgeProperties.customerIdentifiers else {
             return
         }
 
@@ -154,23 +154,23 @@ class IdentityState {
     ///   - event: the event triggering the privacy change
     ///   - createXDMSharedState: a function which can create XDM formatted Identity shared states
     func processPrivacyChange(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
-        let privacyStatusStr = event.data?[IdentityConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
+        let privacyStatusStr = event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] as? String ?? ""
         let newPrivacyStatus = PrivacyStatus(rawValue: privacyStatusStr) ?? PrivacyStatus.unknown
 
-        if newPrivacyStatus == identityProperties.privacyStatus {
+        if newPrivacyStatus == identityEdgeProperties.privacyStatus {
             return
         }
 
-        identityProperties.privacyStatus = newPrivacyStatus
+        identityEdgeProperties.privacyStatus = newPrivacyStatus
 
         if newPrivacyStatus == .optedOut {
-            identityProperties.ecid = nil
-            identityProperties.advertisingIdentifier = nil
-            identityProperties.customerIdentifiers = nil
+            identityEdgeProperties.ecid = nil
+            identityEdgeProperties.advertisingIdentifier = nil
+            identityEdgeProperties.customerIdentifiers = nil
             saveToPersistence(and: createXDMSharedState, using: event)
-        } else if identityProperties.ecid == nil {
+        } else if identityEdgeProperties.ecid == nil {
             // When changing privacy status from optedout, need to generate a new Experience Cloud ID for the user
-            identityProperties.ecid = ECID()
+            identityEdgeProperties.ecid = ECID()
             saveToPersistence(and: createXDMSharedState, using: event)
         }
 
@@ -182,7 +182,7 @@ class IdentityState {
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
         guard let newAdID = newAdID else { return (false, false) }
 
-        guard let existingAdId = identityProperties.advertisingIdentifier else {
+        guard let existingAdId = identityEdgeProperties.advertisingIdentifier else {
             // existing is nil but new is not, update with new and update consent
             // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
             return (true, true)
@@ -193,7 +193,7 @@ class IdentityState {
             || (newAdID.isEmpty && !existingAdId.isEmpty) {
             // Now we know the value changed, but did it change to/from null?
             // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
-            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
                 return (true, true)
             }
 
@@ -209,12 +209,12 @@ class IdentityState {
     ///   -  val: The new adId consent value, either "y" or "n"
     ///   - dispatchEvent: a function which sends an event to the event hub
     private func dispatchAdIdConsentRequestEvent(val: String, dispatchEvent: (Event) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
+        let event = Event(name: IdentityEdgeConstants.EventNames.CONSENT_REQUEST_AD_ID,
                           type: EventType.consent,
                           source: EventSource.requestContent,
-                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
-                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
-                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
+                          data: [IdentityEdgeConstants.XDMKeys.Consent.CONSENTS:
+                                    [IdentityEdgeConstants.XDMKeys.Consent.AD_ID:
+                                        [IdentityEdgeConstants.XDMKeys.Consent.VAL: val]
                                     ]
                           ])
         dispatchEvent(event)
@@ -226,7 +226,7 @@ class IdentityState {
     private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
         // Filter out known identifiers to prevent modification of certain namespaces
         let filterItems = IdentityMap()
-        for namespace in IdentityState.reservedNamespaces {
+        for namespace in IdentityEdgeState.reservedNamespaces {
             if let items = identityMap.getItems(withNamespace: namespace) {
                 Log.debug(label: LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                 for item in items {
@@ -240,12 +240,12 @@ class IdentityState {
         }
     }
 
-    /// Save `IdentityProperties` to persistence and create an XDM shared state.
+    /// Save `identityEdgeProperties` to persistence and create an XDM shared state.
     /// - Parameters:
     ///   - createXDMSharedState: function which creates an XDM shared state
     ///   - event: the event used to share the XDM state
     private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
-        identityProperties.saveToPersistence()
-        createXDMSharedState(identityProperties.toXdmData(), event)
+        identityEdgeProperties.saveToPersistence()
+        createXDMSharedState(identityEdgeProperties.toXdmData(), event)
     }
 }

@@ -14,7 +14,7 @@
 import AEPServices
 import XCTest
 
-class IdentityPropertiesTests: XCTestCase {
+class IdentityEdgePropertiesTests: XCTestCase {
 
     var mockDataStore: MockDataStore {
         return ServiceProvider.shared.namedKeyValueService as! MockDataStore
@@ -27,7 +27,7 @@ class IdentityPropertiesTests: XCTestCase {
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup
-        let properties = IdentityProperties()
+        let properties = IdentityEdgeProperties()
 
         // test
         let xdmData = properties.toXdmData()
@@ -39,7 +39,7 @@ class IdentityPropertiesTests: XCTestCase {
     /// Test that xdm data is populated correctly when all properties are non-nil
     func testToXdmDataFull() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 
@@ -69,7 +69,7 @@ class IdentityPropertiesTests: XCTestCase {
 
     func testToXdmDataDoesNotIncludeEmptyValues() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
         properties.customerIdentifiers = IdentityMap()
@@ -94,7 +94,7 @@ class IdentityPropertiesTests: XCTestCase {
 
     func testSaveToPersistenceLoadFromPersistence() {
         // setup
-        var properties = IdentityProperties()
+        var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
@@ -105,7 +105,7 @@ class IdentityPropertiesTests: XCTestCase {
         properties.saveToPersistence()
 
         // test
-        var props = IdentityProperties()
+        var props = IdentityEdgeProperties()
         props.loadFromPersistence()
 
         //verify
