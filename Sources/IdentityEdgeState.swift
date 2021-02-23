@@ -137,7 +137,7 @@ class IdentityEdgeState {
     }
 
     /// Clears all identities and regenerates a new ECID value. Saves identites to persistance and creates a new XDM shared state after operation completes.
-    /// Dispatches Consent request event with adId = no if previous advertising identifier was not
+    /// Dispatches Consent request event setting `adId` to 'no' if previous advertising identifier is nil or empty
     /// - Parameters:
     ///   - event: event which triggered the reset call
     ///   - createXDMSharedState: function which creates new XDM shared states
