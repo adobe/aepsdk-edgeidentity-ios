@@ -37,24 +37,24 @@ struct IdentityEdgeProperties: Codable {
     }
 
     /// Converts `IdentityProperties` into an event data representation in XDM format
-    /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityEdgeMap` key
-    /// to represent an empty IdentityEdgeMap when `allowEmpty` is true
+    /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityMap` key
+    /// to represent an empty IdentityMap when `allowEmpty` is true
     /// - Returns: A dictionary representing this `IdentityProperties` in XDM format
     func toXdmData(_ allowEmpty: Bool = false) -> [String: Any] {
         var map: [String: Any] = [:]
 
-        let identityEdgeMap = IdentityEdgeMap()
+        let identityMap = IdentityMap()
         if let ecid = ecid {
-            identityEdgeMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
+            identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
                                 withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
 
         if let adId = advertisingIdentifier, !adId.isEmpty {
-            identityEdgeMap.add(item: IdentityItem(id: adId),
+            identityMap.add(item: IdentityItem(id: adId),
                                 withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
         }
 
-        if let dict = identityEdgeMap.asDictionary(), !dict.isEmpty || allowEmpty {
+        if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
             map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 

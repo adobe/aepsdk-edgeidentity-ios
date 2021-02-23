@@ -136,24 +136,24 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "getIdentities callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
-        IdentityEdge.getIdentities { identityEdgeMap, error in
+        IdentityEdge.getIdentities { identityMap, error in
             XCTAssertNil(error)
-            XCTAssertNotNil(identityEdgeMap)
-            XCTAssertEqual(1, identityEdgeMap?.getItems(withNamespace: "ECID")?.count)
-            XCTAssertNotNil(identityEdgeMap?.getItems(withNamespace: "ECID")?[0].id)
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(1, identityMap?.getItems(withNamespace: "ECID")?.count)
+            XCTAssertNotNil(identityMap?.getItems(withNamespace: "ECID")?[0].id)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetIdentitiesWhenPrivacyOptedOutReturnsEmptyIdentityEdgeMap() {
+    func testGetIdentitiesWhenPrivacyOptedOutReturnsEmptyIdentityMap() {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getIdentities callback")
         MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedout"])
-        IdentityEdge.getIdentities { identityEdgeMap, error in
-            XCTAssertNotNil(identityEdgeMap)
-            XCTAssertEqual(true, identityEdgeMap?.isEmpty)
+        IdentityEdge.getIdentities { identityMap, error in
+            XCTAssertNotNil(identityMap)
+            XCTAssertEqual(true, identityMap?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
         }

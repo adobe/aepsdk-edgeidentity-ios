@@ -20,8 +20,8 @@
 		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
 		BFF6499B25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */; };
 		BFF649A125C0D29D0012A4C5 /* IdentityEdgeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A025C0D29D0012A4C5 /* IdentityEdgeStateTests.swift */; };
-		BFF649AD25C0EFE10012A4C5 /* IdentityEdgeMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityEdgeMap.swift */; };
-		BFF649B725C0FC810012A4C5 /* IdentityEdgeMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityEdgeMapTests.swift */; };
+		BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */; };
+		BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */; };
 		BFF64A3225C3A60E0012A4C5 /* Event+IdentityEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A3125C3A60E0012A4C5 /* Event+IdentityEdge.swift */; };
 		BFF64A6025C4C63F0012A4C5 /* IdentityEdgeIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* IdentityEdgeIntegrationTests.swift */; };
 		BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */; };
@@ -88,8 +88,8 @@
 		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
 		BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgePropertiesTests.swift; sourceTree = "<group>"; };
 		BFF649A025C0D29D0012A4C5 /* IdentityEdgeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeStateTests.swift; sourceTree = "<group>"; };
-		BFF649AC25C0EFE10012A4C5 /* IdentityEdgeMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeMap.swift; sourceTree = "<group>"; };
-		BFF649B625C0FC810012A4C5 /* IdentityEdgeMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeMapTests.swift; sourceTree = "<group>"; };
+		BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMap.swift; sourceTree = "<group>"; };
+		BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMapTests.swift; sourceTree = "<group>"; };
 		BFF64A3125C3A60E0012A4C5 /* Event+IdentityEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+IdentityEdge.swift"; sourceTree = "<group>"; };
 		BFF64A5A25C4C5410012A4C5 /* IdentityEdgeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeIntegrationTests.swift; sourceTree = "<group>"; };
 		BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
@@ -171,7 +171,7 @@
 			children = (
 				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
 				BFF6492625BFD3160012A4C5 /* IdentityEdge+PublicAPI.swift */,
-				BFF649AC25C0EFE10012A4C5 /* IdentityEdgeMap.swift */,
+				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
 			);
 			name = Public;
 			sourceTree = "<group>";
@@ -248,7 +248,7 @@
 				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
 				BFF6497925C09ED80012A4C5 /* IdentityEdgePublicAPITests.swift */,
 				D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */,
-				BFF649B625C0FC810012A4C5 /* IdentityEdgeMapTests.swift */,
+				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
 				BFF6499A25C0ACC00012A4C5 /* IdentityEdgePropertiesTests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityEdgeStateTests.swift */,
 				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
@@ -688,7 +688,7 @@
 				BFF6492125BFD1CB0012A4C5 /* IdentityEdgeProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* IdentityEdge.swift in Sources */,
 				BFF64A3225C3A60E0012A4C5 /* Event+IdentityEdge.swift in Sources */,
-				BFF649AD25C0EFE10012A4C5 /* IdentityEdgeMap.swift in Sources */,
+				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,7 +704,7 @@
 				BFF649A125C0D29D0012A4C5 /* IdentityEdgeStateTests.swift in Sources */,
 				BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 				D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */,
-				BFF649B725C0FC810012A4C5 /* IdentityEdgeMapTests.swift in Sources */,
+				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

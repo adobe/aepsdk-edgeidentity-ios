@@ -52,12 +52,12 @@ public enum AuthenticationState: Int, RawRepresentable, Codable {
 
 /// Defines a map containing a set of end user identities, keyed on either namespace integration code or the namespace ID of the identity.
 /// Within each namespace, the identity is unique. The values of the map are an array, meaning that more than one identity of each namespace may be carried.
-@objc(AEPIdentityEdgeMap)
-public class IdentityEdgeMap: NSObject, Codable {
-    private static let LOG_TAG = "IdentityEdgeMap"
+@objc(AEPIdentityMap)
+public class IdentityMap: NSObject, Codable {
+    private static let LOG_TAG = "IdentityMap"
     private var items: [String: [IdentityItem]] = [:]
 
-    /// Determine if this `IdentityEdgeMap` is empty.
+    /// Determine if this `IdentityMap` is empty.
     public var isEmpty: Bool {
         return items.isEmpty
     }
@@ -72,7 +72,7 @@ public class IdentityEdgeMap: NSObject, Codable {
     @objc(addItem:withNamespace:)
     public func add(item: IdentityItem, withNamespace: String) {
         if item.id.isEmpty || withNamespace.isEmpty {
-            Log.debug(label: IdentityEdgeMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
+            Log.debug(label: IdentityMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
             return
         }
 
@@ -90,7 +90,7 @@ public class IdentityEdgeMap: NSObject, Codable {
 
     /// Get the array of `IdentityItem`(s) for the given namespace.
     /// - Parameter namespace: the namespace of items to retrieve
-    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityEdgeMap` does not contain the `namespace`.
+    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
     @objc(getItemsWithNamespace:)
     public func getItems(withNamespace: String) -> [IdentityItem]? {
         return items[withNamespace]
@@ -113,21 +113,21 @@ public class IdentityEdgeMap: NSObject, Codable {
         }
     }
 
-    /// Decodes a [String: Any] dictionary into an `IdentityEdgeMap`
-    /// - Parameter eventData: the event data representing `IdentityEdgeMap`
-    /// - Returns: an `IdentityEdgeMap` that is represented in the event data, nil if data is not in the correct format
-    static func from(eventData: [String: Any]) -> IdentityEdgeMap? {
+    /// Decodes a [String: Any] dictionary into an `IdentityMap`
+    /// - Parameter eventData: the event data representing `IdentityMap`
+    /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
+    static func from(eventData: [String: Any]) -> IdentityMap? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: eventData) else {
             Log.debug(label: LOG_TAG, "Unable to serialize identity event data.")
             return nil
         }
 
-        guard let identityEdgeMap = try? JSONDecoder().decode(IdentityEdgeMap.self, from: jsonData) else {
-            Log.debug(label: LOG_TAG, "Unable to decode identity data into an IdentityEdgeMap.")
+        guard let identityMap = try? JSONDecoder().decode(IdentityMap.self, from: jsonData) else {
+            Log.debug(label: LOG_TAG, "Unable to decode identity data into an IdentityMap.")
             return nil
         }
 
-        return identityEdgeMap
+        return identityMap
     }
 
 }

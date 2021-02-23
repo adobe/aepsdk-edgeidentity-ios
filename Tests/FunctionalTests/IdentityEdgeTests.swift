@@ -58,7 +58,7 @@ class IdentityEdgeTests: XCTestCase {
 
         let expectedIdentity: [String: Any] =
             [
-                "identityEdgeMap": [
+                "identityMap": [
                     "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]],
                     "IDFA": [["id": "adId", "authenticationState": "ambiguous", "primary": 0]]
                 ]
@@ -98,7 +98,7 @@ class IdentityEdgeTests: XCTestCase {
 
         let expectedIdentity: [String: Any] =
             [
-                "identityEdgeMap": [
+                "identityMap": [
                     "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]]
                 ]
             ]

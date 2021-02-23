@@ -32,13 +32,13 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityEdgeMap = IdentityEdgeMap.from(eventData: data) else {
+                  let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            guard let items = identityEdgeMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID), let ecidItem = items.first else {
-                completion("", .none) // IdentityEdgeMap exists but ECID has no value, return an empty string
+            guard let items = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID), let ecidItem = items.first else {
+                completion("", .none) // IdentityMap exists but ECID has no value, return an empty string
                 return
             }
 
@@ -47,10 +47,10 @@ import Foundation
     }
 
     /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
-    /// in the `IdentityEdge` extension, then an empty `IdentityEdgeMap` is returned.
+    /// in the `IdentityEdge` extension, then an empty `IdentityMap` is returned.
     /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
-    static func getIdentities(completion: @escaping (IdentityEdgeMap?, Error?) -> Void) {
+    static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.identity,
                           source: EventSource.requestIdentity,
@@ -63,12 +63,12 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityEdgeMap = IdentityEdgeMap.from(eventData: data) else {
+                  let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            completion(identityEdgeMap, .none)
+            completion(identityMap, .none)
         }
     }
 }
