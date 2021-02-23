@@ -31,7 +31,7 @@ class IdentityEdgeTests: XCTestCase {
 
     func testGenericIdentityRequestSetsAdId() {
         var props = IdentityEdgeProperties()
-        props.ecid = ECID()
+        props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -51,7 +51,7 @@ class IdentityEdgeTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]],
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticationState": "ambiguous", "primary": 1]],
                     "IDFA": [["id": "adId", "authenticationState": "ambiguous", "primary": 0]]
                 ]
             ]
@@ -63,7 +63,7 @@ class IdentityEdgeTests: XCTestCase {
 
     func testGenericIdentityRequestClearsAdId() {
         var props = IdentityEdgeProperties()
-        props.ecid = ECID()
+        props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -78,12 +78,12 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid?.ecidString ?? "")", "authenticationState": "ambiguous", "primary": 1]]
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticationState": "ambiguous", "primary": 1]]
                 ]
             ]
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event

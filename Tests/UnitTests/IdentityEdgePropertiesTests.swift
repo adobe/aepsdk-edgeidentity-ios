@@ -40,17 +40,17 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testToXdmDataFull() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
 
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
-        properties.customerIdentifiers = identityMap
+        properties.updateCustomerIdentifiers(identityMap)
 
         // test
         let xdmData = properties.toXdmData()
 
-        guard let ecidString = properties.ecid?.ecidString else {
+        guard let ecidString = properties.ecid else {
             XCTFail("properties.ecid is nil, which is unexpected.")
             return
         }
@@ -70,14 +70,13 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testToXdmDataDoesNotIncludeEmptyValues() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = ""
-        properties.customerIdentifiers = IdentityMap()
 
         // test
         let xdmData = properties.toXdmData()
 
-        guard let ecidString = properties.ecid?.ecidString else {
+        guard let ecidString = properties.ecid else {
             XCTFail("properties.ecid is nil, which is unexpected.")
             return
         }
@@ -95,11 +94,11 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testSaveToPersistenceLoadFromPersistence() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
-        properties.customerIdentifiers = identityMap
+        properties.updateCustomerIdentifiers(identityMap)
 
         // test
         properties.saveToPersistence()
@@ -111,12 +110,11 @@ class IdentityEdgePropertiesTests: XCTestCase {
         //verify
         XCTAssertEqual(1, mockDataStore.dict.count)
         XCTAssertNotNil(props.ecid)
-        XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
+        XCTAssertEqual(properties.ecid, props.ecid)
         XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
-        XCTAssertNotNil(props.customerIdentifiers)
-        XCTAssertEqual("identifier", props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].authenticationState)
-        XCTAssertEqual(false, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].primary)
+        XCTAssertEqual("identifier", props.propertyMap.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.propertyMap.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.propertyMap.getItems(withNamespace: "custom")?[0].primary)
     }
 
 }
