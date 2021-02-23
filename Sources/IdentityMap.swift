@@ -57,8 +57,8 @@ public class IdentityMap: NSObject, Codable {
     private static let LOG_TAG = "IdentityMap"
     private var items: [String: [IdentityItem]] = [:]
 
-    /// Determine if this `IdentityMap` is empty.
-    public var isEmpty: Bool {
+    /// Determines if this `IdentityMap` has no identities.
+    @objc public var isEmpty: Bool {
         return items.isEmpty
     }
 
@@ -88,9 +88,28 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
+    /// Remove a single `IdentityItem` from this map.
+    /// - Parameters:
+    ///   - item: The identity to remove from the given `withNamespace`
+    ///   - withNamespace: The namespace for the identity to remove
+    @objc(removeItem:withNamespace:)
+    public func remove(item: IdentityItem, withNamespace: String) {
+        guard var namespaceItems = items[withNamespace], let index = namespaceItems.firstIndex(of: item) else {
+            return
+        }
+
+        namespaceItems.remove(at: index)
+
+        if namespaceItems.isEmpty {
+            items.removeValue(forKey: withNamespace)
+        } else {
+            items[withNamespace] = namespaceItems
+        }
+    }
+
     /// Get the array of `IdentityItem`(s) for the given namespace.
-    /// - Parameter namespace: the namespace of items to retrieve
-    /// - Returns: An array of `IdentityItem` for the given `namespace` or nil if this `IdentityMap` does not contain the `namespace`.
+    /// - Parameter withNamespace: the namespace of items to retrieve
+    /// - Returns: An array of `IdentityItem`s for the given `withNamespace` or nil if this `IdentityMap` does not contain the `withNamespace`.
     @objc(getItemsWithNamespace:)
     public func getItems(withNamespace: String) -> [IdentityItem]? {
         return items[withNamespace]
@@ -109,6 +128,27 @@ public class IdentityMap: NSObject, Codable {
                 for item in items {
                     self.add(item: item, withNamespace: namespace)
                 }
+            }
+        }
+    }
+
+    /// Merge `map` on to this `IdentityMap`. Any `IdentityItem` in `map` which shares the same
+    /// namespace and id as an item in this `IdentityMap` will replace that `IdentityItem`.
+    /// - Parameter map: an `IdentityMap` to add onto this `IdentityMap`
+    func merge(map: IdentityMap) {
+        for (namespace, items) in map.items {
+            for item in items {
+                self.add(item: item, withNamespace: namespace)
+            }
+        }
+    }
+
+    /// Remove identites in `map` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
+    /// - Parameter map: Identities to remove from this `IdentityMap`
+    func remove(map: IdentityMap) {
+        for (namespace, items) in map.items {
+            for item in items {
+                self.remove(item: item, withNamespace: namespace)
             }
         }
     }

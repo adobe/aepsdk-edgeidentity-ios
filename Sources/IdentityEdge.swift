@@ -31,9 +31,11 @@ import Foundation
     }
 
     public func onRegistered() {
-        registerListener(type: EventType.identity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
+        registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
+        registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
+        registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
     }
 
     public func onUnregistered() {
@@ -54,7 +56,6 @@ import Foundation
         guard let configSharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
         if state.bootupIfReady(configSharedState: configSharedState, event: event) {
-            createSharedState(data: state.identityEdgeProperties.toEventData(), event: nil)
             createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
         }
 
@@ -68,23 +69,16 @@ import Foundation
     /// - Parameter event: event containing `advertisingIdentifier` data
     private func handleRequestContent(event: Event) {
         state?.updateAdvertisingIdentifier(event: event,
-                                           createSharedState: createSharedState(data:event:),
                                            createXDMSharedState: createXDMSharedState(data:event:),
                                            dispatchEvent: dispatch(event:))
     }
 
-    /// Handles events requesting for identifiers. Called by listener registered with event hub.
+    /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
-        processIdentifiersRequest(event: event)
-    }
-
-    /// Handles events requesting identifiers. Dispatches response event containing the identifiers.
-    /// - Parameter event: the identity request event
-    private func processIdentifiersRequest(event: Event) {
         let xdmData = state?.identityEdgeProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                      type: EventType.identity,
+                                                      type: EventType.identityEdge,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)
 
@@ -97,9 +91,19 @@ import Foundation
     private func handleConfigurationResponse(event: Event) {
         if event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
             // if config contains new global privacy status, process the request
-            state?.processPrivacyChange(event: event,
-                                        createSharedState: createSharedState(data:event:),
-                                        createXDMSharedState: createXDMSharedState(data:event:))
+            state?.processPrivacyChange(event: event, createXDMSharedState: createXDMSharedState(data:event:))
         }
+    }
+
+    /// Handles update identity requests to add/update customer identifiers.
+    /// - Parameter event: the identity request event
+    private func handleUpdateIdentity(event: Event) {
+        state?.updateCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+    }
+
+    /// Handles remove identity requests to remove customer identififers.
+    /// - Parameter event: the identity request event
+    private func handleRemoveIdentity(event: Event) {
+        state?.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
     }
 }

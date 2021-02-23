@@ -24,48 +24,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
     }
 
-    /// When all properties all nil, the event data should be empty
-    func testToEventDataEmpty() {
-        // setup
-        let properties = IdentityEdgeProperties()
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertTrue(eventData.isEmpty)
-    }
-
-    /// Test that event data is populated correctly when all properties are non-nil
-    func testToEventDataFull() {
-        // setup
-        var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
-        properties.advertisingIdentifier = "test-ad-id"
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertEqual(2, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-        XCTAssertEqual(properties.advertisingIdentifier, eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String)
-    }
-
-    func testToEventDataDoesNotIncludeEmptyValues() {
-        // setup
-        var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
-        properties.advertisingIdentifier = ""
-
-        // test
-        let eventData = properties.toEventData()
-
-        // verify
-        XCTAssertEqual(1, eventData.count)
-        XCTAssertEqual(properties.ecid?.ecidString, eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String)
-    }
-
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup
@@ -85,6 +43,10 @@ class IdentityEdgePropertiesTests: XCTestCase {
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
 
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
+        properties.customerIdentifiers = identityMap
+
         // test
         let xdmData = properties.toXdmData()
 
@@ -97,7 +59,8 @@ class IdentityEdgePropertiesTests: XCTestCase {
         let expectedResult: [String: Any] =
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
-                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ]
+                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ],
+                "custom": [ ["id": "identifier", "authenticationState": "ambiguous", "primary": 0] ]
             ]
             ]
 
@@ -109,6 +72,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = ""
+        properties.customerIdentifiers = IdentityMap()
 
         // test
         let xdmData = properties.toXdmData()
@@ -133,24 +97,26 @@ class IdentityEdgePropertiesTests: XCTestCase {
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID()
         properties.advertisingIdentifier = "test-ad-id"
-
-        let ecidString = properties.ecid?.ecidString
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
+        properties.customerIdentifiers = identityMap
 
         // test
         properties.saveToPersistence()
 
-        // reset
-        properties.ecid = nil
-        properties.advertisingIdentifier = nil
-
         // test
-        properties.loadFromPersistence()
+        var props = IdentityEdgeProperties()
+        props.loadFromPersistence()
 
         //verify
         XCTAssertEqual(1, mockDataStore.dict.count)
-        XCTAssertNotNil(properties.ecid)
-        XCTAssertEqual(ecidString, properties.ecid?.ecidString)
-        XCTAssertEqual("test-ad-id", properties.advertisingIdentifier)
+        XCTAssertNotNil(props.ecid)
+        XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
+        XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
+        XCTAssertNotNil(props.customerIdentifiers)
+        XCTAssertEqual("identifier", props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].primary)
     }
 
 }

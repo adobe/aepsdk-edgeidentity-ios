@@ -22,38 +22,39 @@ struct IdentityEdgeProperties: Codable {
     /// The IDFA from retrieved Apple APIs
     var advertisingIdentifier: String?
 
+    /// Customer Identifiers.
+    var customerIdentifiers: IdentityMap?
+
     /// The current privacy status provided by the Configuration extension, defaults to `unknown`
     var privacyStatus = IdentityEdgeConstants.Default.PRIVACY_STATUS
 
-    /// Converts `IdentityProperties` into an event data representation
-    /// - Returns: A dictionary representing this `IdentityProperties`
-    func toEventData() -> [String: Any] {
-        var eventData = [String: Any]()
-        eventData[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] = ecid?.ecidString
-        if let adId = advertisingIdentifier, !adId.isEmpty {
-            eventData[IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER] = advertisingIdentifier
-        }
-        return eventData
-    }
-
-    /// Converts `IdentityProperties` into an event data representation in XDM format
-    /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityMap` key
+    /// Converts `identityEdgeProperties` into an event data representation in XDM format
+    /// - Parameter allowEmpty: If this `identityEdgeProperties` contains no data, return a dictionary with a single `identityMap` key
     /// to represent an empty IdentityMap when `allowEmpty` is true
-    /// - Returns: A dictionary representing this `IdentityProperties` in XDM format
+    /// - Returns: A dictionary representing this `identityEdgeProperties` in XDM format
     func toXdmData(_ allowEmpty: Bool = false) -> [String: Any] {
         var map: [String: Any] = [:]
 
         let identityMap = IdentityMap()
+
+        // add ECID
         if let ecid = ecid {
             identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
-                                withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                            withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
 
+        // add IDFA
         if let adId = advertisingIdentifier, !adId.isEmpty {
             identityMap.add(item: IdentityItem(id: adId),
-                                withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+                            withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
         }
 
+        // add identifiers
+        if let customerIdentifiers = customerIdentifiers, !customerIdentifiers.isEmpty {
+            identityMap.merge(map: customerIdentifiers)
+        }
+
+        // encode to event data
         if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
             map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
         }

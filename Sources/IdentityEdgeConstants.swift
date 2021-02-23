@@ -35,6 +35,8 @@ enum IdentityEdgeConstants {
     enum EventNames {
         static let REQUEST_IDENTITY_ECID = "Identity Request ECID"
         static let REQUEST_IDENTITIES = "Identity Request Identities"
+        static let UPDATE_IDENTITIES = "Identity Update Identities"
+        static let REMOVE_IDENTITIES = "Idetity Remove Identities"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "IDENTITY_RESPONSE_CONTENT_ONE_TIME"
         static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
     }
