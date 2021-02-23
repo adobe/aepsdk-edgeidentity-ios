@@ -15,7 +15,7 @@ import AEPIdentityEdge
 @testable import AEPServices
 import XCTest
 
-class IdentityIntegrationTests: XCTestCase {
+class IdentityEdgeIntegrationTests: XCTestCase {
 
     override func setUp() {
         UserDefaults.clear()
@@ -28,7 +28,7 @@ class IdentityIntegrationTests: XCTestCase {
 
         let unregisterExpectation = XCTestExpectation(description: "unregister extensions")
         unregisterExpectation.expectedFulfillmentCount = 1
-        MobileCore.unregisterExtension(Identity.self) {
+        MobileCore.unregisterExtension(IdentityEdge.self) {
             unregisterExpectation.fulfill()
         }
 
@@ -39,7 +39,7 @@ class IdentityIntegrationTests: XCTestCase {
     func initExtensionsAndWait() {
         let initExpectation = XCTestExpectation(description: "init extensions")
         MobileCore.setLogLevel(.trace)
-        MobileCore.registerExtensions([Identity.self]) {
+        MobileCore.registerExtensions([IdentityEdge.self]) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
@@ -49,7 +49,7 @@ class IdentityIntegrationTests: XCTestCase {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
-        Identity.getExperienceCloudId { ecid, error in
+        IdentityEdge.getExperienceCloudId { ecid, error in
             XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
@@ -61,7 +61,7 @@ class IdentityIntegrationTests: XCTestCase {
         initExtensionsAndWait()
 
         let expectation = XCTestExpectation(description: "getIdentities callback")
-        Identity.getIdentities { identityMap, error in
+        IdentityEdge.getIdentities { identityMap, error in
             XCTAssertNil(error)
             XCTAssertNotNil(identityMap)
             XCTAssertEqual(1, identityMap?.getItems(withNamespace: "ECID")?.count)

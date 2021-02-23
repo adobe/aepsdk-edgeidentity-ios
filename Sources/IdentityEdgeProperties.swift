@@ -14,8 +14,8 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// Represents a type which contains instances variables for the Identity extension
-struct IdentityProperties: Codable {
+/// Represents a type which contains instances variables for the Identity Edge extension
+struct IdentityEdgeProperties: Codable {
     /// The current Experience Cloud ID
     var ecid: ECID?
 
@@ -25,10 +25,10 @@ struct IdentityProperties: Codable {
     /// Customer Identifiers.
     var customerIdentifiers: IdentityMap?
 
-    /// Converts `IdentityProperties` into an event data representation in XDM format
-    /// - Parameter allowEmpty: If this `IdentityProperties` contains no data, return a dictionary with a single `identityMap` key
+    /// Converts `identityEdgeProperties` into an event data representation in XDM format
+    /// - Parameter allowEmpty: If this `identityEdgeProperties` contains no data, return a dictionary with a single `identityMap` key
     /// to represent an empty IdentityMap when `allowEmpty` is true
-    /// - Returns: A dictionary representing this `IdentityProperties` in XDM format
+    /// - Returns: A dictionary representing this `identityEdgeProperties` in XDM format
     func toXdmData(_ allowEmpty: Bool = false) -> [String: Any] {
         var map: [String: Any] = [:]
 
@@ -37,13 +37,13 @@ struct IdentityProperties: Codable {
         // add ECID
         if let ecid = ecid {
             identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
-                            withNamespace: IdentityConstants.Namespaces.ECID)
+                            withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
 
         // add IDFA
         if let adId = advertisingIdentifier, !adId.isEmpty {
             identityMap.add(item: IdentityItem(id: adId),
-                            withNamespace: IdentityConstants.Namespaces.IDFA)
+                            withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
         }
 
         // add identifiers
@@ -53,26 +53,26 @@ struct IdentityProperties: Codable {
 
         // encode to event data
         if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
-            map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
+            map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 
         return map
     }
 
-    /// Populates the fields with values stored in the Identity data store
+    /// Populates the fields with values stored in the Identity Edge data store
     mutating func loadFromPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
-        let savedProperties: IdentityProperties? = dataStore.getObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
+        let savedProperties: IdentityEdgeProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
 
         if let savedProperties = savedProperties {
             self = savedProperties
         }
     }
 
-    /// Saves this instance of `IdentityProperties` to the Identity data store
+    /// Saves this instance of `IdentityEdgeProperties` to the Identity data store
     func saveToPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
-        dataStore.setObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
+        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
+        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
 }

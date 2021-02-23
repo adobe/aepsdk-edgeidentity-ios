@@ -13,21 +13,21 @@
 import AEPCore
 import Foundation
 
-@objc(AEPMobileIdentity) public class Identity: NSObject, Extension {
+@objc(AEPMobileIdentityEdge) public class IdentityEdge: NSObject, Extension {
 
     // MARK: Extension
-    public let name = IdentityConstants.EXTENSION_NAME
-    public let friendlyName = IdentityConstants.FRIENDLY_NAME
-    public static let extensionVersion = IdentityConstants.EXTENSION_VERSION
+    public let name = IdentityEdgeConstants.EXTENSION_NAME
+    public let friendlyName = IdentityEdgeConstants.FRIENDLY_NAME
+    public static let extensionVersion = IdentityEdgeConstants.EXTENSION_VERSION
     public let metadata: [String: String]? = nil
-    private(set) var state: IdentityState?
+    private(set) var state: IdentityEdgeState?
 
     public let runtime: ExtensionRuntime
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         super.init()
-        state = IdentityState(identityProperties: IdentityProperties())
+        state = IdentityEdgeState(identityEdgeProperties: IdentityEdgeProperties())
     }
 
     public func onRegistered() {
@@ -46,7 +46,7 @@ import Foundation
         return true
     }
 
-    /// Determines if Identity is ready to handle events, this is determined by if the Identity extension has booted up
+    /// Determines if Identity Edge is ready to handle events, this is determined by if the Identity Edge extension has booted up
     /// - Parameter event: An `Event`
     /// - Returns: True if we can process events, false otherwise
     private func canProcessEvents(event: Event) -> Bool {
@@ -55,7 +55,7 @@ import Foundation
 
         // attempt to bootup
         if state.bootupIfReady() {
-            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
+            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
             return true
         }
 
@@ -76,8 +76,8 @@ import Foundation
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
-        let xdmData = state?.identityProperties.toXdmData(true)
-        let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+        let xdmData = state?.identityEdgeProperties.toXdmData(true)
+        let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identityEdge,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)

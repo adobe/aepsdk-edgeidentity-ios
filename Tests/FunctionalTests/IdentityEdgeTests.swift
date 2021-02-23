@@ -15,22 +15,22 @@
 import AEPServices
 import XCTest
 
-class IdentityTests: XCTestCase {
-    var identity: Identity!
+class IdentityEdgeTests: XCTestCase {
+    var identityEdge: IdentityEdge!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
+        identityEdge = IdentityEdge(runtime: mockRuntime)
+        identityEdge.onRegistered()
     }
 
     // MARK: handleIdentityRequest
 
     func testGenericIdentityRequestSetsAdId() {
-        var props = IdentityProperties()
+        var props = IdentityEdgeProperties()
         props.ecid = ECID()
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
@@ -38,15 +38,15 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
+                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
 
-        _ = identity.readyForEvent(event) // trigger boot sequence
+        _ = identityEdge.readyForEvent(event) // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("adId", identity.state?.identityProperties.advertisingIdentifier)
+        XCTAssertEqual("adId", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
@@ -62,7 +62,7 @@ class IdentityTests: XCTestCase {
     }
 
     func testGenericIdentityRequestClearsAdId() {
-        var props = IdentityProperties()
+        var props = IdentityEdgeProperties()
         props.ecid = ECID()
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
@@ -70,15 +70,15 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
+                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
-        _ = identity.readyForEvent(event) // trigger boot sequence
+        _ = identityEdge.readyForEvent(event) // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("", identity.state?.identityProperties.advertisingIdentifier)
+        XCTAssertEqual("", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [

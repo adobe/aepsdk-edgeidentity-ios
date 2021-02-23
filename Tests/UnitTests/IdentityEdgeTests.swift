@@ -15,28 +15,28 @@
 import AEPServices
 import XCTest
 
-class IdentityTests: XCTestCase {
-    var identity: Identity!
+class IdentityEdgeTests: XCTestCase {
+    var identityEdge: IdentityEdge!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
+        identityEdge = IdentityEdge(runtime: mockRuntime)
+        identityEdge.onRegistered()
     }
 
     // MARK: handleIdentifiersRequest
 
-    /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
-    func testIdentityRequestIdentifiersHappy() {
+    /// Tests that when identity edge receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
+    func testIdentityEdgeRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers",
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
+        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION,
                                         event: event,
                                         data: (["testKey": "testVal"], .set))
 
@@ -49,8 +49,8 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
-    func testIdentityRequestIdentifiersNoConfig() {
+    /// Tests that when identity edge receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
+    func testIdentityEdgeRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers",
                           type: EventType.identityEdge,
@@ -74,12 +74,12 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Request Content",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
+                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("newAdId", identity.state?.identityProperties.advertisingIdentifier)
+        XCTAssertEqual("newAdId", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
     }
 
     /// Tests that when identity receives a generic identity request content event without an advertising ID, that the ID is not changed
@@ -93,7 +93,7 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identity.state?.identityProperties.advertisingIdentifier)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
     }
 
     // MARK: handleUpdateIdentity
@@ -112,8 +112,8 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
     }
 
     /// Tests when Identity receives an update identity event without valid data the customer identifiers are not updated
@@ -127,20 +127,20 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identity.state?.identityProperties.customerIdentifiers)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
     }
 
     // MARK: handleRemoveIdentity
 
     /// Tests when Identity receives a remove identity event with valid data the customer identifiers are removed
     func testIdentityRemoveIdentityWithValidData() {
-        // set default identites
+        // set default identities
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
-        identity.state?.identityProperties.customerIdentifiers = defaultIdentities
+        identityEdge.state?.identityEdgeProperties.customerIdentifiers = defaultIdentities
         // verify setup
-        XCTAssertNotNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let identityMap = IdentityMap()
@@ -154,19 +154,19 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertEqual(true, identity.state?.identityProperties.customerIdentifiers?.isEmpty)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.customerIdentifiers?.isEmpty)
     }
 
     /// Tests when Identity receives a remove identity event without valid data the customer identifiers are not modified
     func testIdentityRemoveIdentityWithNilData() {
-        // set default identites
+        // set default identities
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
-        identity.state?.identityProperties.customerIdentifiers = defaultIdentities
+        identityEdge.state?.identityEdgeProperties.customerIdentifiers = defaultIdentities
         // verify setup
-        XCTAssertNotNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let event = Event(name: "Test Remove Identity",
@@ -177,8 +177,8 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify data is the same
-        XCTAssertNotNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertEqual("id", identity.state?.identityProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
     }
 
     // MARK: handleRequestReset
@@ -189,9 +189,9 @@ class IdentityTests: XCTestCase {
         let originalEcid = ECID()
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
-        identity.state?.identityProperties.customerIdentifiers = identityMap
-        identity.state?.identityProperties.advertisingIdentifier = "adid"
-        identity.state?.identityProperties.ecid = originalEcid
+        identityEdge.state?.identityEdgeProperties.customerIdentifiers = identityMap
+        identityEdge.state?.identityEdgeProperties.advertisingIdentifier = "adid"
+        identityEdge.state?.identityEdgeProperties.ecid = originalEcid
 
         let event = Event(name: "Test Request Event",
                           type: EventType.identityEdge,
@@ -201,10 +201,10 @@ class IdentityTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identity.state?.identityProperties.customerIdentifiers)
-        XCTAssertNil(identity.state?.identityProperties.advertisingIdentifier)
-        XCTAssertNotNil(identity.state?.identityProperties.ecid)
-        XCTAssertNotEqual(originalEcid.ecidString, identity.state?.identityProperties.ecid?.ecidString)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.ecid)
+        XCTAssertNotEqual(originalEcid.ecidString, identityEdge.state?.identityEdgeProperties.ecid?.ecidString)
     }
 
 }
