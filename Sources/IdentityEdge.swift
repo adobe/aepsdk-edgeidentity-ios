@@ -33,9 +33,9 @@ import Foundation
     public func onRegistered() {
         registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
-        registerListener(type: EventType.configuration, source: EventSource.responseContent, listener: handleConfigurationResponse)
         registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
+        registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
     }
 
     public func onUnregistered() {
@@ -53,10 +53,10 @@ import Foundation
         guard let state = state else { return false }
         guard !state.hasBooted else { return true } // we have booted, return true
 
-        guard let configSharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION, event: event)?.value else { return false }
         // attempt to bootup
-        if state.bootupIfReady(configSharedState: configSharedState, event: event) {
+        if state.bootupIfReady() {
             createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
+            return true
         }
 
         return false // cannot handle any events until we have booted
@@ -86,15 +86,6 @@ import Foundation
         dispatch(event: responseEvent)
     }
 
-    /// Handles the configuration response event
-    /// - Parameter event: the configuration response event
-    private func handleConfigurationResponse(event: Event) {
-        if event.data?[IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY] != nil {
-            // if config contains new global privacy status, process the request
-            state?.processPrivacyChange(event: event, createXDMSharedState: createXDMSharedState(data:event:))
-        }
-    }
-
     /// Handles update identity requests to add/update customer identifiers.
     /// - Parameter event: the identity request event
     private func handleUpdateIdentity(event: Event) {
@@ -105,5 +96,13 @@ import Foundation
     /// - Parameter event: the identity request event
     private func handleRemoveIdentity(event: Event) {
         state?.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+    }
+
+    /// Handles IdentityEdge request reset events.
+    /// - Parameter event: the identity request reset event
+    private func handleRequestReset(event: Event) {
+        state?.resetIdentifiers(event: event,
+                                createXDMSharedState: createXDMSharedState(data:event:),
+                                dispatchEvent: dispatch(event:))
     }
 }

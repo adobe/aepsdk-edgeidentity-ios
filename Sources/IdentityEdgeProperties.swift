@@ -25,9 +25,6 @@ struct IdentityEdgeProperties: Codable {
     /// Customer Identifiers.
     var customerIdentifiers: IdentityMap?
 
-    /// The current privacy status provided by the Configuration extension, defaults to `unknown`
-    var privacyStatus = IdentityEdgeConstants.Default.PRIVACY_STATUS
-
     /// Converts `identityEdgeProperties` into an event data representation in XDM format
     /// - Parameter allowEmpty: If this `identityEdgeProperties` contains no data, return a dictionary with a single `identityMap` key
     /// to represent an empty IdentityMap when `allowEmpty` is true

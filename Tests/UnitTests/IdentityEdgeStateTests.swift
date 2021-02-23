@@ -29,53 +29,29 @@ class IdentityEdgeStateTests: XCTestCase {
 
     // MARK: bootupIfReady(...) tests
 
-    /// Tests that the default privacy status is set
-    func testBootupIfReadyEmptyConfigSharedState() {
+    /// Tests bootup generates ECID
+    func testBootupIfReadyGeneratesECID() {
+        XCTAssertNil(state.identityEdgeProperties.ecid)
+
         // test
-        let result = state.bootupIfReady(configSharedState: [:], event: Event.fakeIdentityEvent())
+        let result = state.bootupIfReady()
 
         // verify
         XCTAssertTrue(result)
-        XCTAssertEqual(PrivacyStatus.unknown, state.identityEdgeProperties.privacyStatus)
+        XCTAssertNotNil(state.identityEdgeProperties.ecid?.ecidString)
     }
 
-    /// Tests that the properties are updated
-    func testBootupIfReadyWithOptInPrivacyReturnsTrue() {
-        // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue]
+    /// Tests bootup does not generates ECID if already exists
+    func testBootupIfReadyDoesNotGeneratesECIDIfSet() {
+        let ecid = ECID()
+        state.identityEdgeProperties.ecid = ecid
 
         // test
-        let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
+        let result = state.bootupIfReady()
 
         // verify
         XCTAssertTrue(result)
-        XCTAssertEqual(PrivacyStatus.optedIn, state.identityEdgeProperties.privacyStatus) // privacy status should have been updated
-    }
-
-    /// Tests that the properties are updated
-    func testBootupIfReadyWithOptOutPrivacyReturnsTrue() {
-        // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any]
-
-        // test
-        let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
-
-        // verify
-        XCTAssertTrue(result)
-        XCTAssertEqual(PrivacyStatus.optedOut, state.identityEdgeProperties.privacyStatus) // privacy status should have been updated
-    }
-
-    /// Tests that the properties are updated
-    func testBootupIfReadyWithUnknownPrivacyReturnsFalse() {
-        // setup
-        let configSharedState = [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue] as [String: Any]
-
-        // test
-        let result = state.bootupIfReady(configSharedState: configSharedState, event: Event.fakeIdentityEvent())
-
-        // verify
-        XCTAssertTrue(result)
-        XCTAssertEqual(PrivacyStatus.unknown, state.identityEdgeProperties.privacyStatus) // privacy status should have been updated
+        XCTAssertEqual(ecid.ecidString, state.identityEdgeProperties.ecid?.ecidString)
     }
 
     /// Test that bootup loads properties from persistence
@@ -86,162 +62,12 @@ class IdentityEdgeStateTests: XCTestCase {
         properties.saveToPersistence() // save to shared data store
 
         // test
-        let result = state.bootupIfReady(configSharedState: [:], event: Event.fakeIdentityEvent())
+        let result = state.bootupIfReady()
 
         //verify
         XCTAssertTrue(result)
         XCTAssertNotNil(state.identityEdgeProperties.ecid)
         XCTAssertEqual(properties.ecid?.ecidString, state.identityEdgeProperties.ecid?.ecidString)
-    }
-
-    // MARK: processPrivacyChange(...)
-
-    /// Tests that when the event data is empty update to unknown
-    func testProcessPrivacyChangeNoPrivacyInEventData() {
-        // setup
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedIn
-        props.ecid = ECID()
-        props.advertisingIdentifier = "adId"
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event", type: EventType.identityEdge, source: EventSource.requestIdentity, data: nil)
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
-
-        // verify
-        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have not been saved to persistence
-        XCTAssertEqual(PrivacyStatus.unknown, state.identityEdgeProperties.privacyStatus) // privacy status set to unknown
-    }
-
-    /// Tests that when we get an opt-in privacy status that we update the privacy status
-    func testProcessPrivacyChangeToOptIn() {
-        // setup
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .unknown
-        props.ecid = ECID()
-        props.advertisingIdentifier = "adId"
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
-                          source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
-
-        // verify
-        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have not been saved to persistence
-        XCTAssertEqual(PrivacyStatus.optedIn, state.identityEdgeProperties.privacyStatus) // privacy status should change to opt in
-    }
-
-    /// Tests that when we update privacy to opt-out
-    func testProcessPrivacyChangeToOptOut() {
-        // setup
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .unknown
-        props.ecid = ECID()
-        props.advertisingIdentifier = "adId"
-        props.customerIdentifiers = IdentityMap()
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
-                          source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue])
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
-
-        // verify
-        wait(for: [xdmSharedStateExpectation], timeout: 1)
-        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(PrivacyStatus.optedOut, state.identityEdgeProperties.privacyStatus) // privacy status should change to opt out
-        XCTAssertNil(state.identityEdgeProperties.ecid) // ecid is cleared
-        XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier) // ad id is cleared
-        XCTAssertNil(state.identityEdgeProperties.customerIdentifiers) // customer identifiers are cleared
-    }
-
-    /// Tests that when we got from opt out to opt in
-    func testProcessPrivacyChangeFromOptOutToOptIn() {
-        // setup
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedOut
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
-                          source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
-
-        // verify
-        wait(for: [xdmSharedStateExpectation], timeout: 1)
-        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(PrivacyStatus.optedIn, state.identityEdgeProperties.privacyStatus) // privacy status should change to opt in
-        XCTAssertNotNil(state.identityEdgeProperties.ecid) // ecid is set
-    }
-
-    /// When we go from opt-out to unknown
-    func testProcessPrivacyChangeFromOptOutToUnknown() {
-        // setup
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedOut
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
-                          source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.unknown.rawValue])
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
-
-        // verify
-        wait(for: [xdmSharedStateExpectation], timeout: 1)
-        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(PrivacyStatus.unknown, state.identityEdgeProperties.privacyStatus) // privacy status should change to opt in
-        XCTAssertNotNil(state.identityEdgeProperties.ecid) // ecid is set
-    }
-
-    /// When privacy status is the same, no updates
-    func testProcessPrivacyChangeToSame() {
-        // setup
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedIn
-        props.ecid = ECID()
-        props.advertisingIdentifier = "adId"
-        props.customerIdentifiers = IdentityMap()
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
-                          source: EventSource.requestIdentity,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedIn.rawValue])
-
-        // test
-        state.processPrivacyChange(event: event,
-                                   createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
-
-        // verify
-        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(PrivacyStatus.optedIn, state.identityEdgeProperties.privacyStatus) // privacy status should stay at optin
-        XCTAssertNotNil(state.identityEdgeProperties.ecid)
-        XCTAssertEqual(props.ecid?.ecidString, state.identityEdgeProperties.ecid?.ecidString)
-        XCTAssertEqual(props.advertisingIdentifier, state.identityEdgeProperties.advertisingIdentifier)
-        XCTAssertNotNil(state.identityEdgeProperties.customerIdentifiers)
     }
 
     // MARK: updateCustomerIdentifiers(...)
@@ -419,6 +245,88 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "space")?[0].id)
     }
 
+    // MARK: resetIdentities(...)
+
+    func testResetIdentities() {
+        let currentIdentities = IdentityMap()
+        currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        var props = IdentityEdgeProperties()
+        props.customerIdentifiers = currentIdentities
+        props.advertisingIdentifier = "adid"
+        props.ecid = ECID()
+
+        state = IdentityEdgeState(identityEdgeProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let dispatchConsentExpectation = XCTestExpectation(description: "Consent request event should be dispatched")
+        var consentEvent: Event?
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { event in
+                                consentEvent = event
+                                dispatchConsentExpectation.fulfill()
+                               })
+
+        wait(for: [xdmSharedStateExpectation, dispatchConsentExpectation], timeout: 2)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(state.identityEdgeProperties.customerIdentifiers)
+        XCTAssertNotNil(state.identityEdgeProperties.ecid)
+        XCTAssertNotEqual(props.ecid?.ecidString, state.identityEdgeProperties.ecid?.ecidString)
+
+        XCTAssertNotNil(consentEvent)
+        XCTAssertEqual("n", ((consentEvent?.data?["consents"] as? [String: Any])?["adId"] as? [String: Any])?["val"] as? String)
+    }
+
+    func testResetIdentitiesAdIdIsEmptyDoesNotDispatchConsentEvent() {
+        var props = IdentityEdgeProperties()
+        props.advertisingIdentifier = ""
+        props.ecid = ECID()
+
+        state = IdentityEdgeState(identityEdgeProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { _ in XCTFail("Consent request event should not be dispatched")})
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
+    }
+
+    func testResetIdentitiesAdIdIsNilDoesNotDispatchConsentEvent() {
+        var props = IdentityEdgeProperties()
+        props.advertisingIdentifier = nil
+        props.ecid = ECID()
+
+        state = IdentityEdgeState(identityEdgeProperties: props)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.resetIdentifiers(event: event,
+                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               dispatchEvent: { _ in XCTFail("Consent request event should not be dispatched")})
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
+    }
+
     // MARK: updateAdvertisingIdentifier(...)
 
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
@@ -491,33 +399,12 @@ class IdentityEdgeStateTests: XCTestCase {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "oldAdId", newAdId: nil, expectedAdId: "oldAdId")
     }
 
-    /// Tests that ad ID call is ignored when privacy is opted out
-    func testUpdateAdvertisingIdentifierIgnoresWhenPrivacyOptedOut() {
-        // setup
-        var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedOut
-        props.ecid = ECID()
-        props.advertisingIdentifier = "oldAdId"
-
-        state = IdentityEdgeState(identityEdgeProperties: props)
-        let event = Event.fakeGenericIdentityEvent(adId: "adId")
-
-        state.updateAdvertisingIdentifier(event: event,
-                                          createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") },
-                                          dispatchEvent: { _ in XCTFail("Consent event should not be dispatched") })
-
-        // verify
-        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
-        XCTAssertEqual("oldAdId", state.identityEdgeProperties.advertisingIdentifier) // no change
-    }
-
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
         // setup
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         let consentExpectation = XCTestExpectation(description: "Consent event should be dispatched once")
 
         var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedIn
         props.ecid = ECID()
         props.advertisingIdentifier = persistedAdId
 
@@ -546,7 +433,6 @@ class IdentityEdgeStateTests: XCTestCase {
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
 
         var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedIn
         props.ecid = ECID()
         props.advertisingIdentifier = persistedAdId
 
@@ -566,7 +452,6 @@ class IdentityEdgeStateTests: XCTestCase {
     private func assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: String?, newAdId: String?, expectedAdId: String?) {
         // setup
         var props = IdentityEdgeProperties()
-        props.privacyStatus = .optedIn
         props.ecid = ECID()
         props.advertisingIdentifier = persistedAdId
 

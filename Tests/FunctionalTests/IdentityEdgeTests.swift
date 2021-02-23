@@ -32,7 +32,6 @@ class IdentityEdgeTests: XCTestCase {
     func testGenericIdentityRequestSetsAdId() {
         var props = IdentityEdgeProperties()
         props.ecid = ECID()
-        props.privacyStatus = .optedIn
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -40,10 +39,6 @@ class IdentityEdgeTests: XCTestCase {
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
-
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION,
-                                        event: event,
-                                        data: ([IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
 
         _ = identityEdge.readyForEvent(event) // trigger boot sequence
 
@@ -69,7 +64,6 @@ class IdentityEdgeTests: XCTestCase {
     func testGenericIdentityRequestClearsAdId() {
         var props = IdentityEdgeProperties()
         props.ecid = ECID()
-        props.privacyStatus = .optedIn
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
 
@@ -77,10 +71,6 @@ class IdentityEdgeTests: XCTestCase {
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
-
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION,
-                                        event: event,
-                                        data: ([IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: "optedin"], .set))
 
         _ = identityEdge.readyForEvent(event) // trigger boot sequence
 

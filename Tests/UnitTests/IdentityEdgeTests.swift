@@ -96,37 +96,6 @@ class IdentityEdgeTests: XCTestCase {
         XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
     }
 
-    // MARK: handleConfigurationRequest
-
-    /// Tests that when a configuration request content event contains opt-out that we update privacy status
-    func testConfigurationResponseEventOptOut() {
-        let event = Event(name: "Test Configuration response",
-                          type: EventType.configuration,
-                          source: EventSource.responseContent,
-                          data: [IdentityEdgeConstants.Configuration.GLOBAL_CONFIG_PRIVACY: PrivacyStatus.optedOut.rawValue] as [String: Any])
-
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertEqual(PrivacyStatus.optedOut, identityEdge.state?.identityEdgeProperties.privacyStatus) // identity state should have updated to opt-out
-    }
-
-    /// Tests that when no privacy status is in the configuration event that we do not update the privacy status
-    func testConfigurationResponseEventNoPrivacyStatus() {
-        let event = Event(name: "Test Configuration response",
-                          type: EventType.configuration,
-                          source: EventSource.responseContent,
-                          data: ["key": "value"])
-        _ = identityEdge.readyForEvent(event) // sets default privacy of unknown
-
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertEqual(PrivacyStatus.unknown, identityEdge.state?.identityEdgeProperties.privacyStatus) // identity state should have remained unknown
-    }
-
     // MARK: handleUpdateIdentity
 
     /// Tests when Identity receives an update identity event with valid data the customer identifiers are updated
@@ -210,6 +179,32 @@ class IdentityEdgeTests: XCTestCase {
         // verify data is the same
         XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
         XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.customerIdentifiers?.getItems(withNamespace: "customer")?[0].id)
+    }
+
+    // MARK: handleRequestReset
+
+    /// Tests when Identity receives a request reset event that identifiers are cleared and ECID is regenerated
+    func testIdentityRequestReset() {
+        // setup
+        let originalEcid = ECID()
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
+        identityEdge.state?.identityEdgeProperties.customerIdentifiers = identityMap
+        identityEdge.state?.identityEdgeProperties.advertisingIdentifier = "adid"
+        identityEdge.state?.identityEdgeProperties.ecid = originalEcid
+
+        let event = Event(name: "Test Request Event",
+                          type: EventType.identityEdge,
+                          source: EventSource.requestReset,
+                          data: nil)
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.customerIdentifiers)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.ecid)
+        XCTAssertNotEqual(originalEcid.ecidString, identityEdge.state?.identityEdgeProperties.ecid?.ecidString)
     }
 
 }
