@@ -28,13 +28,13 @@ enum IdentityEdgeConstants {
     }
 
     enum EventNames {
-        static let REQUEST_IDENTITY_ECID = "Identity Request ECID"
-        static let REQUEST_IDENTITIES = "Identity Request Identities"
-        static let UPDATE_IDENTITIES = "Identity Update Identities"
-        static let REMOVE_IDENTITIES = "Idetity Remove Identities"
-        static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "IDENTITY_RESPONSE_CONTENT_ONE_TIME"
+        static let REQUEST_IDENTITY_ECID = "Identity Edge Request ECID"
+        static let REQUEST_IDENTITIES = "Identity Edge Request Identities"
+        static let UPDATE_IDENTITIES = "Identity Edge Update Identities"
+        static let REMOVE_IDENTITIES = "Idetity Edge Remove Identities"
+        static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Identity Edge Response Content One Time"
         static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
-        static let REQUEST_RESET = "Identity Request Reset"
+        static let REQUEST_RESET = "Identity Edge Request Reset"
     }
 
     enum EventDataKeys {
