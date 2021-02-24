@@ -54,7 +54,7 @@ struct ContentView: View {
         VStack {
             Button(action: {
                 self.ecidText = ""
-                Identity.getExperienceCloudId { ecid, _ in
+                IdentityEdge.getExperienceCloudId { ecid, _ in
                     if let ecid = ecid {
                         self.ecidText = ecid
                     } else {
@@ -104,13 +104,13 @@ struct ContentView: View {
                     let map = IdentityMap()
                     map.add(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
                             withNamespace: identityNamespaceText)
-                    Identity.updateIdentities(with: map)
+                    IdentityEdge.updateIdentities(with: map)
                 }) {
                     Text("Update Identity")
                 }.padding()
                 Button(action: {
-                    Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
-                                            withNamespace: identityNamespaceText)
+                    IdentityEdge.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                                                withNamespace: identityNamespaceText)
                 }) {
                     Text("Remove Identity")
                 }.padding()
@@ -120,7 +120,7 @@ struct ContentView: View {
 
         VStack {
             Button(action: {
-                Identity.resetIdentities()
+                IdentityEdge.resetIdentities()
             }) {
                 Text("Reset Identities")
             }
@@ -129,7 +129,7 @@ struct ContentView: View {
         VStack {
             Button(action: {
                 self.identityMapText = ""
-                Identity.getIdentities { identityMap, _ in
+                IdentityEdge.getIdentities { identityMap, _ in
                     if let identityMap = identityMap {
                         let encoder = JSONEncoder()
                         encoder.outputFormatting = .prettyPrinted
