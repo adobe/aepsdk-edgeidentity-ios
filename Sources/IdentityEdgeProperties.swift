@@ -101,17 +101,17 @@ struct IdentityEdgeProperties: Codable {
     /// Populates the fields with values stored in the Identity Edge data store
     mutating func loadFromPersistence() {
         let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        let savedProperties: IdentityEdgeProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let savedProperties: IdentityMap? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
 
         if let savedProperties = savedProperties {
-            self = savedProperties
+            self.propertyMap = savedProperties
         }
     }
 
     /// Saves this instance of `IdentityEdgeProperties` to the Identity data store
     func saveToPersistence() {
         let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
+        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: propertyMap)
     }
 
     /// Get the primary ECID from the properties map.

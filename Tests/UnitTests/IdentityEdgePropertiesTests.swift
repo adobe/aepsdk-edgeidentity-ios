@@ -117,4 +117,35 @@ class IdentityEdgePropertiesTests: XCTestCase {
         XCTAssertEqual(false, props.propertyMap.getItems(withNamespace: "custom")?[0].primary)
     }
 
+    func testSaveToPersistenceIsIdentityMap() {
+        // setup
+        var properties = IdentityEdgeProperties()
+        properties.ecid = ECID().ecidString
+        properties.advertisingIdentifier = "test-ad-id"
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
+        properties.updateCustomerIdentifiers(identityMap)
+
+        // test
+        properties.saveToPersistence()
+
+        XCTAssertEqual(1, mockDataStore.dict.count)
+        guard let data = mockDataStore.dict[IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? Data else {
+            XCTFail("Failed to find identity.properties in mock data store.")
+            return
+        }
+
+        guard let identities = try? JSONDecoder().decode(IdentityMap.self, from: data) else {
+            XCTFail("Failed to decode identity.properties to IdentityMap.")
+            return
+        }
+
+        // verify
+        XCTAssertEqual(properties.ecid, identities.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID)?[0].id)
+        XCTAssertEqual("test-ad-id", identities.getItems(withNamespace: IdentityEdgeConstants.Namespaces.IDFA)?[0].id)
+        XCTAssertEqual("identifier", identities.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, identities.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, identities.getItems(withNamespace: "custom")?[0].primary)
+    }
+
 }
