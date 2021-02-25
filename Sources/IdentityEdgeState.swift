@@ -164,6 +164,19 @@ class IdentityEdgeState {
         }
     }
 
+    /// Update the legacy ECID property with `legacyEcid` provided it does not equal the current ECID or legacy ECID.
+    /// - Parameter legacyEcid: the current ECID for the Identity Direct extension
+    /// - Returns: true if the legacy ECID was updated, or false if the legacy ECID did not change
+    func updateLegacyExperienceCloudId(_ legacyEcid: String) -> Bool {
+        if legacyEcid == identityEdgeProperties.ecid?.ecidString || legacyEcid == identityEdgeProperties.ecidLegacy {
+            return false
+        }
+
+        identityEdgeProperties.ecidLegacy = legacyEcid
+        identityEdgeProperties.saveToPersistence()
+        return true
+    }
+
     /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
     /// - Parameter newAdID: the new ad id
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated

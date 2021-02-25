@@ -20,7 +20,7 @@ struct IdentityEdgeProperties: Codable {
     var ecid: ECID?
 
     /// The ECID used by the Identity Direct extension
-    var ecidLegacy: ECID?
+    var ecidLegacy: String?
 
     /// The IDFA from retrieved Apple APIs
     var advertisingIdentifier: String?
@@ -45,7 +45,7 @@ struct IdentityEdgeProperties: Codable {
 
         // add secondary ECID, primary is false
         if let ecidSecond = ecidLegacy {
-            identityMap.add(item: IdentityItem(id: ecidSecond.ecidString, authenticationState: .ambiguous, primary: false),
+            identityMap.add(item: IdentityItem(id: ecidSecond, authenticationState: .ambiguous, primary: false),
                             withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
 
@@ -87,7 +87,7 @@ struct IdentityEdgeProperties: Codable {
     /// Load the ECID value from the Identity direct extension datastore if available.
     /// - Returns: `ECID` from the Identity direct extension datastore, or nil if the datastore or the ECID are not found
     func getEcidFromDirectIdentityPersistence() -> ECID? {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT) // datastore name is same as shared state key
+        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT)
         let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
         return identityDirectProperties?.ecid
     }
