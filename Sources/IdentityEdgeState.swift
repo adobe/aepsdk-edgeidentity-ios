@@ -156,6 +156,7 @@ class IdentityEdgeState {
 
         identityEdgeProperties.advertisingIdentifier = nil
         identityEdgeProperties.customerIdentifiers = nil
+        identityEdgeProperties.ecidLegacy = nil
         identityEdgeProperties.ecid = ECID()
 
         saveToPersistence(and: createXDMSharedState, using: event)

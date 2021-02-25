@@ -282,6 +282,7 @@ class IdentityEdgeStateTests: XCTestCase {
         props.customerIdentifiers = currentIdentities
         props.advertisingIdentifier = "adid"
         props.ecid = ECID()
+        props.ecidLegacy = ECID().ecidString
 
         state = IdentityEdgeState(identityEdgeProperties: props)
 
@@ -304,6 +305,7 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
         XCTAssertNil(state.identityEdgeProperties.customerIdentifiers)
+        XCTAssertNil(state.identityEdgeProperties.ecidLegacy)
         XCTAssertNotNil(state.identityEdgeProperties.ecid)
         XCTAssertNotEqual(props.ecid?.ecidString, state.identityEdgeProperties.ecid?.ecidString)
 
