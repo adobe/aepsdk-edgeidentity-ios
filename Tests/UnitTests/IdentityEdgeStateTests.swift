@@ -70,6 +70,34 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertEqual(properties.ecid?.ecidString, state.identityEdgeProperties.ecid?.ecidString)
     }
 
+    // MARK: updateLegacyExperienceCloudId(...)
+
+    func testUpdateLegacyExperienceCloudIdNewEcidIsSet() {
+        state.identityEdgeProperties.ecid = ECID()
+        state.identityEdgeProperties.ecidLegacy = ECID().ecidString
+
+        XCTAssertTrue(state.updateLegacyExperienceCloudId("legacyEcid"))
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertEqual("legacyEcid", state.identityEdgeProperties.ecidLegacy)
+    }
+
+    func testUpdateLegacyExperienceCloudIdNotSetWhenEcidIsSame() {
+        let ecid = ECID()
+        state.identityEdgeProperties.ecid = ecid
+
+        XCTAssertFalse(state.updateLegacyExperienceCloudId(ecid.ecidString))
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertNil(state.identityEdgeProperties.ecidLegacy)
+    }
+
+    func testUpdateLegacyExperienceCloudIdNotSetWhenLegacyEcidIsSame() {
+        state.identityEdgeProperties.ecidLegacy = "legacyEcid"
+
+        XCTAssertFalse(state.updateLegacyExperienceCloudId("legacyEcid"))
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertEqual("legacyEcid", state.identityEdgeProperties.ecidLegacy) // unchanged
+    }
+
     // MARK: updateCustomerIdentifiers(...)
 
     func testUpdateCustomerIdentifiers() {

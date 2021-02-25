@@ -50,7 +50,7 @@ class IdentityEdgeState {
                 Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
             } else {
                 identityEdgeProperties.ecid = ECID() // generate new ECID
-                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid)'")
+                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid?.description ?? "")'")
             }
             identityEdgeProperties.saveToPersistence()
         }
