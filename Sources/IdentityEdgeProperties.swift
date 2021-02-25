@@ -19,6 +19,9 @@ struct IdentityEdgeProperties: Codable {
     /// The current Experience Cloud ID
     var ecid: ECID?
 
+    /// The ECID used by the Identity Direct extension
+    var ecidLegacy: ECID?
+
     /// The IDFA from retrieved Apple APIs
     var advertisingIdentifier: String?
 
@@ -37,6 +40,12 @@ struct IdentityEdgeProperties: Codable {
         // add ECID
         if let ecid = ecid {
             identityMap.add(item: IdentityItem(id: ecid.ecidString, authenticationState: .ambiguous, primary: true),
+                            withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+        }
+
+        // add secondary ECID, primary is false
+        if let ecidSecond = ecidLegacy {
+            identityMap.add(item: IdentityItem(id: ecidSecond.ecidString, authenticationState: .ambiguous, primary: false),
                             withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
 
@@ -75,4 +84,17 @@ struct IdentityEdgeProperties: Codable {
         dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
+    /// Load the ECID value from the Identity direct extension datastore if available.
+    /// - Returns: `ECID` from the Identity direct extension datastore, or nil if the datastore or the ECID are not found
+    func getEcidFromDirectIdentityPersistence() -> ECID? {
+        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT) // datastore name is same as shared state key
+        let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        return identityDirectProperties?.ecid
+    }
+
+}
+
+/// Helper structure which mimics the Identity Direct properties class. Used to decode the Identity Direct datastore.
+private struct IdentityDirectProperties: Codable {
+    var ecid: ECID?
 }

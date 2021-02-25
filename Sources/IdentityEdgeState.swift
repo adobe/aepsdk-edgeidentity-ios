@@ -43,9 +43,16 @@ class IdentityEdgeState {
         // load data from local storage
         identityEdgeProperties.loadFromPersistence()
 
-        // Generate new ECID on first launch
+        // Get new ECID on first launch
         if identityEdgeProperties.ecid == nil {
-            identityEdgeProperties.ecid = ECID()
+            if let ecid = identityEdgeProperties.getEcidFromDirectIdentityPersistence() {
+                identityEdgeProperties.ecid = ecid // get ECID from direct extension
+                Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
+            } else {
+                identityEdgeProperties.ecid = ECID() // generate new ECID
+                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid)'")
+            }
+            identityEdgeProperties.saveToPersistence()
         }
 
         hasBooted = true

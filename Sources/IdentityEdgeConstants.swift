@@ -25,6 +25,7 @@ enum IdentityEdgeConstants {
 
     enum SharedStateKeys {
         static let CONFIGURATION = "com.adobe.module.configuration"
+        static let IDENTITY_DIRECT = "com.adobe.module.identity"
     }
 
     enum EventNames {
