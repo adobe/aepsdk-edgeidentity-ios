@@ -119,10 +119,12 @@ import Foundation
             return
         }
 
-        guard let identitySharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value,
-              let legacyEcid = identitySharedState[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String else {
+        guard let identitySharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value else {
             return
         }
+
+        // Get ECID. If doesn't exist then use empty string to clear legacy value
+        let legacyEcid = identitySharedState[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String ?? ""
 
         if state.updateLegacyExperienceCloudId(legacyEcid) {
             createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: event)
