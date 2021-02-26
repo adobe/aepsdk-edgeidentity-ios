@@ -112,8 +112,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.propertyMap)
-        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.propertyMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     /// Tests when Identity receives an update identity event without valid data the customer identifiers are not updated
@@ -127,7 +127,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.propertyMap.isEmpty)
+        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.identityMap.isEmpty)
     }
 
     // MARK: handleRemoveIdentity
@@ -139,8 +139,8 @@ class IdentityEdgeTests: XCTestCase {
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
         identityEdge.state?.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
-        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.propertyMap)
-        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.propertyMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let identityMap = IdentityMap()
@@ -154,8 +154,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.propertyMap)
-        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.propertyMap.isEmpty)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.identityMap.isEmpty)
     }
 
     /// Tests when Identity receives a remove identity event without valid data the customer identifiers are not modified
@@ -165,8 +165,8 @@ class IdentityEdgeTests: XCTestCase {
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
         identityEdge.state?.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
-        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.propertyMap)
-        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.propertyMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let event = Event(name: "Test Remove Identity",
@@ -177,8 +177,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify data is the same
-        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.propertyMap)
-        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.propertyMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     // MARK: handleRequestReset
@@ -201,7 +201,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state?.identityEdgeProperties.propertyMap.getItems(withNamespace: "customer"))
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer"))
         XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
         XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.ecid)
         XCTAssertNotEqual(originalEcid.ecidString, identityEdge.state?.identityEdgeProperties.ecid)

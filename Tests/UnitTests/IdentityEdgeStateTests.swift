@@ -94,9 +94,9 @@ class IdentityEdgeStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(2, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
-        XCTAssertEqual("custom", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[1].id)
+        XCTAssertEqual(2, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual("custom", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[1].id)
     }
 
     func testUpdateCustomerIdentifiersFiltersOutUnallowedNamespaces() {
@@ -123,9 +123,9 @@ class IdentityEdgeStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(2, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
-        XCTAssertEqual("custom", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[1].id)
+        XCTAssertEqual(2, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual("custom", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[1].id)
     }
 
     func testUpdateCustomerIdentifiersNoCurrentIdentifiers() {
@@ -147,8 +147,8 @@ class IdentityEdgeStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(1, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("custom", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("custom", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
     func testUpdateCustomerIdentifiersNoEventDataDoesNotUpdateState() {
@@ -168,8 +168,8 @@ class IdentityEdgeStateTests: XCTestCase {
                                         createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
-        XCTAssertEqual(1, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
     // MARK: removeCustomerIdentifiers(...)
@@ -198,8 +198,8 @@ class IdentityEdgeStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
-        XCTAssertEqual(1, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
     func testRemoveCustomerIdentifiersNoEventDataDoesNotUpdateState() {
@@ -219,8 +219,8 @@ class IdentityEdgeStateTests: XCTestCase {
                                         createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
-        XCTAssertEqual(1, state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?.count)
-        XCTAssertEqual("identifier", state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space")?[0].id)
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
     // MARK: resetIdentities(...)
@@ -253,7 +253,7 @@ class IdentityEdgeStateTests: XCTestCase {
         wait(for: [xdmSharedStateExpectation, dispatchConsentExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
-        XCTAssertNil(state.identityEdgeProperties.propertyMap.getItems(withNamespace: "space"))
+        XCTAssertNil(state.identityEdgeProperties.identityMap.getItems(withNamespace: "space"))
         XCTAssertNotNil(state.identityEdgeProperties.ecid)
         XCTAssertNotEqual(props.ecid, state.identityEdgeProperties.ecid)
 

@@ -24,7 +24,8 @@ struct IdentityEdgeProperties: Codable {
         IdentityEdgeConstants.Namespaces.IDFA
     ]
 
-    private(set) var propertyMap: IdentityMap = IdentityMap()
+    /// The underlying IdentityMap structure which holds all the properties
+    private(set) var identityMap: IdentityMap = IdentityMap()
 
     /// The current Experience Cloud ID
     var ecid: String? {
@@ -36,13 +37,13 @@ struct IdentityEdgeProperties: Codable {
             guard let newEcid = newValue, !newEcid.isEmpty else {
                 // Remove ECID
                 if let primaryEcid = getPrimaryEcid() {
-                    propertyMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                    identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
                 }
                 return
             }
 
             // Update ECID
-            propertyMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
+            identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
                             withNamespace: IdentityEdgeConstants.Namespaces.ECID)
         }
     }
@@ -56,7 +57,7 @@ struct IdentityEdgeProperties: Codable {
         set {
             // remove current Ad ID; there can be only one!
             if let currentAdId = getAdvertisingIdentifier() {
-                propertyMap.remove(item: IdentityItem(id: currentAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+                identityMap.remove(item: IdentityItem(id: currentAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
             }
 
             guard let newAdId = newValue, !newAdId.isEmpty else {
@@ -64,23 +65,29 @@ struct IdentityEdgeProperties: Codable {
             }
 
             // Update IDFA
-            propertyMap.add(item: IdentityItem(id: newAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+            identityMap.add(item: IdentityItem(id: newAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
         }
     }
 
-    mutating func updateCustomerIdentifiers(_ identityMap: IdentityMap) {
-        removeIdentitiesWithReservedNamespaces(from: identityMap)
-        propertyMap.merge(map: identityMap)
+    /// Merge the given `identifiersMap` with the current properties. Items in `identifiersMap` will overrite current properties where the `id` and
+    /// `namespace` match. No items are removed. Identiifers under the namespaces "ECID" and "IDFA" are reserved and cannot be updated using this function.
+    /// - Parameter identifiersMap: the `IdentityMap` to merge with the current properties
+    mutating func updateCustomerIdentifiers(_ identifiersMap: IdentityMap) {
+        removeIdentitiesWithReservedNamespaces(from: identifiersMap)
+        identityMap.merge(map: identifiersMap)
     }
 
-    mutating func removeCustomerIdentifiers(_ identityMap: IdentityMap) {
-        removeIdentitiesWithReservedNamespaces(from: identityMap)
-        propertyMap.remove(map: identityMap)
+    /// Remove the given `identifiersMap` from the current properties.
+    /// Identiifers under the namespaces "ECID" and "IDFA" are reserved and cannot be removed using this function.
+    /// - Parameter identifiersMap: this `IdentityMap` with items to remove from the current properties
+    mutating func removeCustomerIdentifiers(_ identifiersMap: IdentityMap) {
+        removeIdentitiesWithReservedNamespaces(from: identifiersMap)
+        identityMap.remove(map: identifiersMap)
     }
 
     /// Clear all identifiers
     mutating func clear() {
-        propertyMap = IdentityMap()
+        identityMap = IdentityMap()
     }
 
     /// Converts `identityEdgeProperties` into an event data representation in XDM format
@@ -91,7 +98,7 @@ struct IdentityEdgeProperties: Codable {
         var map: [String: Any] = [:]
 
         // encode to event data
-        if let dict = propertyMap.asDictionary(), !dict.isEmpty || allowEmpty {
+        if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
             map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 
@@ -101,30 +108,28 @@ struct IdentityEdgeProperties: Codable {
     /// Populates the fields with values stored in the Identity Edge data store
     mutating func loadFromPersistence() {
         let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        let savedProperties: IdentityMap? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let savedProperties: IdentityEdgeProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
 
         if let savedProperties = savedProperties {
-            self.propertyMap = savedProperties
+            self = savedProperties
         }
     }
 
     /// Saves this instance of `IdentityEdgeProperties` to the Identity data store
     func saveToPersistence() {
         let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: propertyMap)
+        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
     /// Get the primary ECID from the properties map.
     /// - Returns: the primary ECID or nil if a primary ECID was not found
     private func getPrimaryEcid() -> String? {
-        guard let ecidList = propertyMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID) else {
+        guard let ecidList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID) else {
             return nil
         }
 
-        for ecidItem in ecidList {
-            if ecidItem.primary {
-                return ecidItem.id
-            }
+        for ecidItem in ecidList where ecidItem.primary {
+            return ecidItem.id
         }
 
         return nil
@@ -133,7 +138,7 @@ struct IdentityEdgeProperties: Codable {
     /// Get the advertising identifier from the properties map. Assumes only one `IdentityItem` under the "IDFA" namespace.
     /// - Returns: the advertising identifier or nil if not found
     private func getAdvertisingIdentifier() -> String? {
-        guard let adIdList = propertyMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.IDFA), !adIdList.isEmpty else {
+        guard let adIdList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.IDFA), !adIdList.isEmpty else {
             return nil
         }
 
@@ -142,12 +147,12 @@ struct IdentityEdgeProperties: Codable {
 
     /// Filter out any items contained in reserved namespaces from the given `identityMap`.
     /// The list of reserved namespaces can be found at `reservedNamespaces`.
-    /// - Parameter identityMap: the `IdentityMap` to filter out items contained in reserved namespaces.
-    private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
+    /// - Parameter identifiersMap: the `IdentityMap` to filter out items contained in reserved namespaces.
+    private func removeIdentitiesWithReservedNamespaces(from identifiersMap: IdentityMap) {
         // Filter out known identifiers to prevent modification of certain namespaces
         let filterItems = IdentityMap()
         for namespace in IdentityEdgeProperties.reservedNamespaces {
-            if let items = identityMap.getItems(withNamespace: namespace) {
+            if let items = identifiersMap.getItems(withNamespace: namespace) {
                 Log.debug(label: IdentityEdgeProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                 for item in items {
                     filterItems.add(item: item, withNamespace: namespace)
@@ -156,7 +161,7 @@ struct IdentityEdgeProperties: Codable {
         }
 
         if !filterItems.isEmpty {
-            identityMap.remove(map: filterItems)
+            identifiersMap.remove(map: filterItems)
         }
     }
 }

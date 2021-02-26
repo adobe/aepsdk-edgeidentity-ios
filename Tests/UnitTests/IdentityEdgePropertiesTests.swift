@@ -112,12 +112,12 @@ class IdentityEdgePropertiesTests: XCTestCase {
         XCTAssertNotNil(props.ecid)
         XCTAssertEqual(properties.ecid, props.ecid)
         XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
-        XCTAssertEqual("identifier", props.propertyMap.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.propertyMap.getItems(withNamespace: "custom")?[0].authenticationState)
-        XCTAssertEqual(false, props.propertyMap.getItems(withNamespace: "custom")?[0].primary)
+        XCTAssertEqual("identifier", props.identityMap.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.identityMap.getItems(withNamespace: "custom")?[0].primary)
     }
 
-    func testSaveToPersistenceIsIdentityMap() {
+    func testSaveToPersistenceHasIdentityMap() {
         // setup
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID().ecidString
@@ -135,17 +135,27 @@ class IdentityEdgePropertiesTests: XCTestCase {
             return
         }
 
-        guard let identities = try? JSONDecoder().decode(IdentityMap.self, from: data) else {
-            XCTFail("Failed to decode identity.properties to IdentityMap.")
+        // parse persisted data as dictionary
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
+            XCTFail("Failed to decode identity.properties to dictionary.")
             return
         }
 
+        let decodedProperties = json as? [String: Any]
+        let decodedMap = decodedProperties?["identityMap"] as? [String: [Any]]
+
         // verify
-        XCTAssertEqual(properties.ecid, identities.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID)?[0].id)
-        XCTAssertEqual("test-ad-id", identities.getItems(withNamespace: IdentityEdgeConstants.Namespaces.IDFA)?[0].id)
-        XCTAssertEqual("identifier", identities.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, identities.getItems(withNamespace: "custom")?[0].authenticationState)
-        XCTAssertEqual(false, identities.getItems(withNamespace: "custom")?[0].primary)
+        // IdentityMap has 3 items, and each item has only 1 item
+        XCTAssertEqual(3, decodedMap?.count)
+        XCTAssertEqual(1, decodedMap?["ECID"]?.count)
+        XCTAssertEqual(1, decodedMap?["IDFA"]?.count)
+        XCTAssertEqual(1, decodedMap?["custom"]?.count)
+
+        XCTAssertEqual(properties.ecid, (decodedMap?["ECID"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("test-ad-id", (decodedMap?["IDFA"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("identifier", (decodedMap?["custom"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("ambiguous", (decodedMap?["IDFA"]?[0] as? [String: Any])?["authenticationState"] as? String)
+        XCTAssertEqual(false, (decodedMap?["IDFA"]?[0] as? [String: Any])?["primary"] as? Bool)
     }
 
 }
