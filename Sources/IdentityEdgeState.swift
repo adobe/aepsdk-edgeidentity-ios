@@ -175,6 +175,7 @@ class IdentityEdgeState {
 
         identityEdgeProperties.ecidLegacy = legacyEcid
         identityEdgeProperties.saveToPersistence()
+        Log.debug(label: LOG_TAG, "Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
         return true
     }
 
