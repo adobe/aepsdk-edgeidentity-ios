@@ -179,8 +179,9 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
     // MARK: helper funcs
 
+    /// Register IdentityEdge + Configuration
     func initExtensionsAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
+        let initExpectation = XCTestExpectation(description: "init Identity Edge extensions")
         MobileCore.setLogLevel(.trace)
         MobileCore.registerExtensions([IdentityEdge.self]) {
             initExpectation.fulfill()
@@ -188,8 +189,9 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         wait(for: [initExpectation], timeout: 1)
     }
 
+    /// Register Identity direct + Configuration
     func initIdentityDirectAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
+        let initExpectation = XCTestExpectation(description: "init Identity Direct extensions")
         MobileCore.setLogLevel(.trace)
         MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
         MobileCore.registerExtensions([Identity.self]) {
@@ -198,16 +200,18 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         wait(for: [initExpectation], timeout: 1)
     }
 
+    /// Register IdentityEdge. Should be called after one of the 'init' functions above.
     func registerIdentityEdgeAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
+        let initExpectation = XCTestExpectation(description: "register Identity Edge extensions")
         MobileCore.registerExtension(IdentityEdge.self) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
     }
 
+    /// Register Identity direct. Should be called after one of the 'init' functions above.
     func registerIdentityDirectAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
+        let initExpectation = XCTestExpectation(description: "init Identity Direct extensions")
         MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
         MobileCore.registerExtension(Identity.self) {
             initExpectation.fulfill()
