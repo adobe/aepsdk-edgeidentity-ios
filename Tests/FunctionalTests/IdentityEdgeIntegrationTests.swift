@@ -44,98 +44,6 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
     }
 
-    // MARK: helper funcs
-
-    func initExtensionsAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
-        MobileCore.setLogLevel(.trace)
-        MobileCore.registerExtensions([IdentityEdge.self]) {
-            initExpectation.fulfill()
-        }
-        wait(for: [initExpectation], timeout: 1)
-    }
-
-    func initIdentityDirectAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
-        MobileCore.setLogLevel(.trace)
-        MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
-        MobileCore.registerExtensions([Identity.self]) {
-            initExpectation.fulfill()
-        }
-        wait(for: [initExpectation], timeout: 1)
-    }
-
-    func registerIdentityEdgeAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
-        MobileCore.registerExtension(IdentityEdge.self) {
-            initExpectation.fulfill()
-        }
-        wait(for: [initExpectation], timeout: 1)
-    }
-
-    func registerIdentityDirectAndWait() {
-        let initExpectation = XCTestExpectation(description: "init extensions")
-        MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
-        MobileCore.registerExtension(Identity.self) {
-            initExpectation.fulfill()
-        }
-        wait(for: [initExpectation], timeout: 1)
-    }
-
-    func getEcidFromIdentityEdge() -> String? {
-        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
-        var ecid: String?
-        IdentityEdge.getExperienceCloudId { id, _ in
-            ecid = id
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-        return ecid
-    }
-
-    func getLegacyEcidFromIdentity() -> String? {
-        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
-        var ecid: String?
-        Identity.getExperienceCloudId { id, _ in
-            ecid = id
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-        return ecid
-    }
-
-    func getPrimaryAndLegacyEcidIdentityItems() -> (IdentityItem?, IdentityItem?) {
-        let expectation = XCTestExpectation(description: "IdentityEdge.getIdentities callback")
-        var identities: IdentityMap?
-        IdentityEdge.getIdentities { identityMap, _ in
-            identities = identityMap
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-
-        guard let identityMap = identities, let ecids = identityMap.getItems(withNamespace: "ECID") else {
-            return (nil, nil)
-        }
-
-        if ecids.count == 1 {
-            return (ecids[0], nil)
-        } else {
-            let primaryIndex = ecids[0].primary ? 0 : 1
-            let legacyIndex = ecids[0].primary ? 1 : 0
-            return (ecids[primaryIndex], ecids[legacyIndex])
-        }
-    }
-
-    func toggleGlobalPrivacy() {
-        MobileCore.setPrivacyStatus(PrivacyStatus.optedOut)
-        MobileCore.setPrivacyStatus(PrivacyStatus.optedIn)
-        let expectation = XCTestExpectation(description: "getPrivacyStatus callback")
-        MobileCore.getPrivacyStatus { _ in
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1)
-    }
-
     // MARK: test cases
 
     func testGetExperienceCloudId() {
@@ -267,5 +175,97 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
+    }
+
+    // MARK: helper funcs
+
+    func initExtensionsAndWait() {
+        let initExpectation = XCTestExpectation(description: "init extensions")
+        MobileCore.setLogLevel(.trace)
+        MobileCore.registerExtensions([IdentityEdge.self]) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+    }
+
+    func initIdentityDirectAndWait() {
+        let initExpectation = XCTestExpectation(description: "init extensions")
+        MobileCore.setLogLevel(.trace)
+        MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
+        MobileCore.registerExtensions([Identity.self]) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+    }
+
+    func registerIdentityEdgeAndWait() {
+        let initExpectation = XCTestExpectation(description: "init extensions")
+        MobileCore.registerExtension(IdentityEdge.self) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+    }
+
+    func registerIdentityDirectAndWait() {
+        let initExpectation = XCTestExpectation(description: "init extensions")
+        MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
+        MobileCore.registerExtension(Identity.self) {
+            initExpectation.fulfill()
+        }
+        wait(for: [initExpectation], timeout: 1)
+    }
+
+    func getEcidFromIdentityEdge() -> String? {
+        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
+        var ecid: String?
+        IdentityEdge.getExperienceCloudId { id, _ in
+            ecid = id
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+        return ecid
+    }
+
+    func getLegacyEcidFromIdentity() -> String? {
+        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
+        var ecid: String?
+        Identity.getExperienceCloudId { id, _ in
+            ecid = id
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+        return ecid
+    }
+
+    func getPrimaryAndLegacyEcidIdentityItems() -> (IdentityItem?, IdentityItem?) {
+        let expectation = XCTestExpectation(description: "IdentityEdge.getIdentities callback")
+        var identities: IdentityMap?
+        IdentityEdge.getIdentities { identityMap, _ in
+            identities = identityMap
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+
+        guard let identityMap = identities, let ecids = identityMap.getItems(withNamespace: "ECID") else {
+            return (nil, nil)
+        }
+
+        if ecids.count == 1 {
+            return (ecids[0], nil)
+        } else {
+            let primaryIndex = ecids[0].primary ? 0 : 1
+            let legacyIndex = ecids[0].primary ? 1 : 0
+            return (ecids[primaryIndex], ecids[legacyIndex])
+        }
+    }
+
+    func toggleGlobalPrivacy() {
+        MobileCore.setPrivacyStatus(PrivacyStatus.optedOut)
+        MobileCore.setPrivacyStatus(PrivacyStatus.optedIn)
+        let expectation = XCTestExpectation(description: "getPrivacyStatus callback")
+        MobileCore.getPrivacyStatus { _ in
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
     }
 }
