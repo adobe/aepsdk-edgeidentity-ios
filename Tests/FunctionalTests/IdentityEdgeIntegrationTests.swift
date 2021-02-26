@@ -107,17 +107,12 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertNotEqual(ecidLegacy, ecidEdge)
 
         XCTAssertNotNil(identities)
-        guard let ecids = identities?.getItems(withNamespace: "ECID") else {
-            XCTFail("Failed to retrieve items from namespace ECID")
-            return
-        }
-        XCTAssertEqual(2, ecids.count)
-        let primaryIndex = ecids[0].primary ? 0 : 1
-        let legacyIndex = ecids[0].primary ? 1 : 0
-        XCTAssertEqual(ecidEdge, ecids[primaryIndex].id)
-        XCTAssertTrue(ecids[primaryIndex].primary)
-        XCTAssertEqual(ecidLegacy, ecids[legacyIndex].id)
-        XCTAssertFalse(ecids[legacyIndex].primary)
+
+        var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
+        XCTAssertEqual(true, primaryEcidItem?.primary)
+        XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
+        XCTAssertEqual(false, legacyEcidItem?.primary)
     }
 
     /// Test IdentityEdge and IdentityDirect have same ECID on bootup, and after resetIdentities call ECIDs are different
@@ -220,7 +215,7 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     }
 
     func getEcidFromIdentityEdge() -> String? {
-        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
+        let expectation = XCTestExpectation(description: "IdentityEdge.getExperienceCloudId callback")
         var ecid: String?
         IdentityEdge.getExperienceCloudId { id, _ in
             ecid = id
