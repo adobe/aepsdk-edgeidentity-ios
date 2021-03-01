@@ -172,6 +172,34 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
     }
 
+    /// Test IdentityEdge and IdentityDirect have same ECID on bootup, and after resetIdentities and privacy change ECIDs are different
+    func testEcidsAreDifferentAfterResetIdentitiesAndPrivacyChange() {
+        // 1) Register Identity then IdentityEdge and verify both have same ECID
+        initIdentityDirectAndWait()
+        var ecidLegacy = getLegacyEcidFromIdentity()
+
+        registerIdentityEdgeAndWait()
+        var ecidEdge = getEcidFromIdentityEdge()
+
+        // verify ECIDs from both extensions are the same
+        XCTAssertNotNil(ecidEdge)
+        XCTAssertNotNil(ecidLegacy)
+        XCTAssertEqual(ecidEdge, ecidLegacy)
+
+        // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
+        IdentityEdge.resetIdentities()
+        toggleGlobalPrivacy()
+        ecidLegacy = getLegacyEcidFromIdentity()
+        ecidEdge = getEcidFromIdentityEdge()
+
+        let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        XCTAssertNotNil(primaryEcidItem)
+        XCTAssertNotNil(legacyEcidItem)
+        XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
+        XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
+        XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
+    }
+
     // MARK: helper funcs
 
     /// Register IdentityEdge + Configuration
