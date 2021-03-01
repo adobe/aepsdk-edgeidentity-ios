@@ -70,7 +70,7 @@ struct IdentityEdgeProperties: Codable {
     }
 
     /// Merge the given `identifiersMap` with the current properties. Items in `identifiersMap` will overrite current properties where the `id` and
-    /// `namespace` match. No items are removed. Identiifers under the namespaces "ECID" and "IDFA" are reserved and cannot be updated using this function.
+    /// `namespace` match. No items are removed. Identifiers under the namespaces "ECID" and "IDFA" are reserved and cannot be updated using this function.
     /// - Parameter identifiersMap: the `IdentityMap` to merge with the current properties
     mutating func updateCustomerIdentifiers(_ identifiersMap: IdentityMap) {
         removeIdentitiesWithReservedNamespaces(from: identifiersMap)
@@ -78,7 +78,7 @@ struct IdentityEdgeProperties: Codable {
     }
 
     /// Remove the given `identifiersMap` from the current properties.
-    /// Identiifers under the namespaces "ECID" and "IDFA" are reserved and cannot be removed using this function.
+    /// Identifiers under the namespaces "ECID" and "IDFA" are reserved and cannot be removed using this function.
     /// - Parameter identifiersMap: this `IdentityMap` with items to remove from the current properties
     mutating func removeCustomerIdentifiers(_ identifiersMap: IdentityMap) {
         removeIdentitiesWithReservedNamespaces(from: identifiersMap)
