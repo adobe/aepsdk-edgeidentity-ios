@@ -148,11 +148,11 @@ class IdentityEdgeState {
     /// - Parameter legacyEcid: the current ECID for the Identity Direct extension
     /// - Returns: true if the legacy ECID was updated, or false if the legacy ECID did not change
     func updateLegacyExperienceCloudId(_ legacyEcid: String) -> Bool {
-        if legacyEcid == identityEdgeProperties.ecid || legacyEcid == identityEdgeProperties.ecidLegacy {
+        if legacyEcid == identityEdgeProperties.ecid || legacyEcid == identityEdgeProperties.ecidSecondary {
             return false
         }
 
-        identityEdgeProperties.ecidLegacy = legacyEcid
+        identityEdgeProperties.ecidSecondary = legacyEcid
         identityEdgeProperties.saveToPersistence()
         Log.debug(label: LOG_TAG, "Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
         return true

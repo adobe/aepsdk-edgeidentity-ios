@@ -223,12 +223,12 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("legacyEcidValue", identityEdge.state?.identityEdgeProperties.ecidLegacy)
+        XCTAssertEqual("legacyEcidValue", identityEdge.state?.identityEdgeProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
     }
 
     func testHandleHubSharedStateWhenEcidNotInDataClearsLegacyEcid() {
-        identityEdge.state?.identityEdgeProperties.ecidLegacy = "currentLegacyEcid"
+        identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
@@ -243,12 +243,12 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state?.identityEdgeProperties.ecidLegacy)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
     }
 
     func testHandleHubSharedStateWhenEcidTheSameDoesNotCreateSharedState() {
-        identityEdge.state?.identityEdgeProperties.ecidLegacy = "currentLegacyEcid"
+        identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
@@ -263,12 +263,12 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidLegacy) // no change
+        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 
     func testHandleHubSharedStateWhenNoSharedStateDoesNotUpdateLegacyEcid() {
-        identityEdge.state?.identityEdgeProperties.ecidLegacy = "currentLegacyEcid"
+        identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
@@ -279,12 +279,12 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidLegacy) // no change
+        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 
     func testHandleHubSharedStateWhenIncorrectStateownerDoesNotUpdateLegacyEcid() {
-        identityEdge.state?.identityEdgeProperties.ecidLegacy = "currentLegacyEcid"
+        identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
@@ -299,7 +299,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidLegacy) // no change
+        XCTAssertEqual("currentLegacyEcid", identityEdge.state?.identityEdgeProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 }

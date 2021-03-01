@@ -48,7 +48,7 @@ struct IdentityEdgeProperties: Codable {
     }
 
     /// The secondary Experience Cloud ID taken from the Identity direct extension
-    var ecidLegacy: String? {
+    var ecidSecondary: String? {
         get {
             return getSecondaryEcid()
         }
