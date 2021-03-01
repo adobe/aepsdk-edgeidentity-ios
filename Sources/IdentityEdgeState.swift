@@ -144,11 +144,6 @@ class IdentityEdgeState {
         guard let newAdID = newAdID else { return (false, false) }
 
         let existingAdId = identityEdgeProperties.advertisingIdentifier ?? ""
-        //        guard let existingAdId = identityEdgeProperties.advertisingIdentifier else {
-        //            // existing is nil but new is not, update with new and update consent
-        //            // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
-        //            return (true, true)
-        //        }
 
         // did the advertising identifier change?
         if (!newAdID.isEmpty && newAdID != existingAdId)
