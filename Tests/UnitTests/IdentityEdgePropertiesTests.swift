@@ -40,17 +40,17 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testToXdmDataFull() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
 
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
-        properties.customerIdentifiers = identityMap
+        properties.updateCustomerIdentifiers(identityMap)
 
         // test
         let xdmData = properties.toXdmData()
 
-        guard let ecidString = properties.ecid?.ecidString else {
+        guard let ecidString = properties.ecid else {
             XCTFail("properties.ecid is nil, which is unexpected.")
             return
         }
@@ -70,14 +70,13 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testToXdmDataDoesNotIncludeEmptyValues() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = ""
-        properties.customerIdentifiers = IdentityMap()
 
         // test
         let xdmData = properties.toXdmData()
 
-        guard let ecidString = properties.ecid?.ecidString else {
+        guard let ecidString = properties.ecid else {
             XCTFail("properties.ecid is nil, which is unexpected.")
             return
         }
@@ -95,11 +94,11 @@ class IdentityEdgePropertiesTests: XCTestCase {
     func testSaveToPersistenceLoadFromPersistence() {
         // setup
         var properties = IdentityEdgeProperties()
-        properties.ecid = ECID()
+        properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
-        properties.customerIdentifiers = identityMap
+        properties.updateCustomerIdentifiers(identityMap)
 
         // test
         properties.saveToPersistence()
@@ -111,12 +110,52 @@ class IdentityEdgePropertiesTests: XCTestCase {
         //verify
         XCTAssertEqual(1, mockDataStore.dict.count)
         XCTAssertNotNil(props.ecid)
-        XCTAssertEqual(properties.ecid?.ecidString, props.ecid?.ecidString)
+        XCTAssertEqual(properties.ecid, props.ecid)
         XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
-        XCTAssertNotNil(props.customerIdentifiers)
-        XCTAssertEqual("identifier", props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].authenticationState)
-        XCTAssertEqual(false, props.customerIdentifiers?.getItems(withNamespace: "custom")?[0].primary)
+        XCTAssertEqual("identifier", props.identityMap.getItems(withNamespace: "custom")?[0].id)
+        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(false, props.identityMap.getItems(withNamespace: "custom")?[0].primary)
+    }
+
+    func testSaveToPersistenceHasIdentityMap() {
+        // setup
+        var properties = IdentityEdgeProperties()
+        properties.ecid = ECID().ecidString
+        properties.advertisingIdentifier = "test-ad-id"
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
+        properties.updateCustomerIdentifiers(identityMap)
+
+        // test
+        properties.saveToPersistence()
+
+        XCTAssertEqual(1, mockDataStore.dict.count)
+        guard let data = mockDataStore.dict[IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? Data else {
+            XCTFail("Failed to find identity.properties in mock data store.")
+            return
+        }
+
+        // parse persisted data as dictionary
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
+            XCTFail("Failed to decode identity.properties to dictionary.")
+            return
+        }
+
+        let decodedProperties = json as? [String: Any]
+        let decodedMap = decodedProperties?["identityMap"] as? [String: [Any]]
+
+        // verify
+        // IdentityMap has 3 items, and each item has only 1 item
+        XCTAssertEqual(3, decodedMap?.count)
+        XCTAssertEqual(1, decodedMap?["ECID"]?.count)
+        XCTAssertEqual(1, decodedMap?["IDFA"]?.count)
+        XCTAssertEqual(1, decodedMap?["custom"]?.count)
+
+        XCTAssertEqual(properties.ecid, (decodedMap?["ECID"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("test-ad-id", (decodedMap?["IDFA"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("identifier", (decodedMap?["custom"]?[0] as? [String: Any])?["id"] as? String)
+        XCTAssertEqual("ambiguous", (decodedMap?["IDFA"]?[0] as? [String: Any])?["authenticationState"] as? String)
+        XCTAssertEqual(false, (decodedMap?["IDFA"]?[0] as? [String: Any])?["primary"] as? Bool)
     }
 
     func testGetEcidFromDirectIdentityPersistenceWhenNoDirectIdentityDatastoreReturnsNil() {

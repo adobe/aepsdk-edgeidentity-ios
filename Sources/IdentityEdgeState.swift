@@ -24,12 +24,6 @@ class IdentityEdgeState {
     private(set) var identityEdgeProperties: IdentityEdgeProperties
     #endif
 
-    /// List of namespaces which are not allowed to be modified from customer identifier
-    private static let reservedNamespaces = [
-        IdentityEdgeConstants.Namespaces.ECID,
-        IdentityEdgeConstants.Namespaces.IDFA
-    ]
-
     /// Creates a new `IdentityEdgeState` with the given identity edge properties
     /// - Parameter identityEdgeProperties: identity edge properties
     init(identityEdgeProperties: IdentityEdgeProperties) {
@@ -46,10 +40,10 @@ class IdentityEdgeState {
         // Get new ECID on first launch
         if identityEdgeProperties.ecid == nil {
             if let ecid = identityEdgeProperties.getEcidFromDirectIdentityPersistence() {
-                identityEdgeProperties.ecid = ecid // get ECID from direct extension
+                identityEdgeProperties.ecid = ecid.ecidString // get ECID from direct extension
                 Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
             } else {
-                identityEdgeProperties.ecid = ECID() // generate new ECID
+                identityEdgeProperties.ecid = ECID().ecidString // generate new ECID
                 Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid?.description ?? "")'")
             }
             identityEdgeProperties.saveToPersistence()
@@ -107,15 +101,7 @@ class IdentityEdgeState {
             return
         }
 
-        // Filter out known identifiers to prevent modification of certain namespaces
-        removeIdentitiesWithReservedNamespaces(from: updateIdentityMap)
-
-        if identityEdgeProperties.customerIdentifiers == nil {
-            identityEdgeProperties.customerIdentifiers = updateIdentityMap
-        } else {
-            identityEdgeProperties.customerIdentifiers?.merge(map: updateIdentityMap)
-        }
-
+        identityEdgeProperties.updateCustomerIdentifiers(updateIdentityMap)
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
@@ -134,12 +120,7 @@ class IdentityEdgeState {
             return
         }
 
-        guard let customerIdentityMap = identityEdgeProperties.customerIdentifiers else {
-            return
-        }
-
-        customerIdentityMap.remove(map: removeIdentityMap)
-
+        identityEdgeProperties.removeCustomerIdentifiers(removeIdentityMap)
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
@@ -154,10 +135,8 @@ class IdentityEdgeState {
                           dispatchEvent: (Event) -> Void) {
         let shouldDispatchConsent = identityEdgeProperties.advertisingIdentifier != nil && !(identityEdgeProperties.advertisingIdentifier?.isEmpty ?? true)
 
-        identityEdgeProperties.advertisingIdentifier = nil
-        identityEdgeProperties.customerIdentifiers = nil
-        identityEdgeProperties.ecidLegacy = nil
-        identityEdgeProperties.ecid = ECID()
+        identityEdgeProperties.clear()
+        identityEdgeProperties.ecid = ECID().ecidString
 
         saveToPersistence(and: createXDMSharedState, using: event)
         if shouldDispatchConsent {
@@ -169,7 +148,7 @@ class IdentityEdgeState {
     /// - Parameter legacyEcid: the current ECID for the Identity Direct extension
     /// - Returns: true if the legacy ECID was updated, or false if the legacy ECID did not change
     func updateLegacyExperienceCloudId(_ legacyEcid: String) -> Bool {
-        if legacyEcid == identityEdgeProperties.ecid?.ecidString || legacyEcid == identityEdgeProperties.ecidLegacy {
+        if legacyEcid == identityEdgeProperties.ecid || legacyEcid == identityEdgeProperties.ecidLegacy {
             return false
         }
 
@@ -185,11 +164,7 @@ class IdentityEdgeState {
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
         guard let newAdID = newAdID else { return (false, false) }
 
-        guard let existingAdId = identityEdgeProperties.advertisingIdentifier else {
-            // existing is nil but new is not, update with new and update consent
-            // covers first call case where existing ad ID is not set and new ad ID is empty/all zeros
-            return (true, true)
-        }
+        let existingAdId = identityEdgeProperties.advertisingIdentifier ?? ""
 
         // did the advertising identifier change?
         if (!newAdID.isEmpty && newAdID != existingAdId)
@@ -221,26 +196,6 @@ class IdentityEdgeState {
                                     ]
                           ])
         dispatchEvent(event)
-    }
-
-    /// Filter out any items contained in reserved namespaces from the given `identityMap`.
-    /// The list of reserved namespaces can be found at `IdentityState.reservedNamespaces`.
-    /// - Parameter identityMap: the `IdentityMap` to filter out items contained in reserved namespaces.
-    private func removeIdentitiesWithReservedNamespaces(from identityMap: IdentityMap) {
-        // Filter out known identifiers to prevent modification of certain namespaces
-        let filterItems = IdentityMap()
-        for namespace in IdentityEdgeState.reservedNamespaces {
-            if let items = identityMap.getItems(withNamespace: namespace) {
-                Log.debug(label: LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
-                for item in items {
-                    filterItems.add(item: item, withNamespace: namespace)
-                }
-            }
-        }
-
-        if !filterItems.isEmpty {
-            identityMap.remove(map: filterItems)
-        }
     }
 
     /// Save `identityEdgeProperties` to persistence and create an XDM shared state.
