@@ -34,17 +34,36 @@ struct IdentityEdgeProperties: Codable {
         }
 
         set {
-            guard let newEcid = newValue, !newEcid.isEmpty else {
-                // Remove ECID
-                if let primaryEcid = getPrimaryEcid() {
-                    identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
-                }
-                return
+            // Remove previous ECID
+            if let primaryEcid = getPrimaryEcid() {
+                identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
             }
 
-            // Update ECID
-            identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
-                            withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+            // Update ECID if new is not empty
+            if let newEcid = newValue, !newEcid.isEmpty {
+                identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
+                                withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+            }
+        }
+    }
+
+    /// The secondary Experience Cloud ID taken from the Identity direct extension
+    var ecidSecondary: String? {
+        get {
+            return getSecondaryEcid()
+        }
+
+        set {
+            // Remove previous ECID
+            if let secondaryEcid = getSecondaryEcid() {
+                identityMap.remove(item: IdentityItem(id: secondaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+            }
+
+            // Update ECID if new is not empty
+            if let newEcid = newValue, !newEcid.isEmpty {
+                identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: false),
+                                withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+            }
         }
     }
 
@@ -121,6 +140,14 @@ struct IdentityEdgeProperties: Codable {
         dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
+    /// Load the ECID value from the Identity direct extension datastore if available.
+    /// - Returns: `ECID` from the Identity direct extension datastore, or nil if the datastore or the ECID are not found
+    func getEcidFromDirectIdentityPersistence() -> ECID? {
+        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT)
+        let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        return identityDirectProperties?.ecid
+    }
+
     /// Get the primary ECID from the properties map.
     /// - Returns: the primary ECID or nil if a primary ECID was not found
     private func getPrimaryEcid() -> String? {
@@ -129,6 +156,21 @@ struct IdentityEdgeProperties: Codable {
         }
 
         for ecidItem in ecidList where ecidItem.primary {
+            return ecidItem.id
+        }
+
+        return nil
+    }
+
+    /// Get the secondary ECID from the properties map. It is assumed there is at most two ECID entries an the secondary ECID is the first non-primary id.
+    /// If the primary and secondary ECID ids are the same, then only the primary ECID is set and this function will return nil.
+    /// - Returns: the secondary ECID or nil if a secondary ECID was not found
+    private func getSecondaryEcid() -> String? {
+        guard let ecidList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID) else {
+            return nil
+        }
+
+        for ecidItem in ecidList where !ecidItem.primary {
             return ecidItem.id
         }
 
@@ -164,4 +206,9 @@ struct IdentityEdgeProperties: Codable {
             identifiersMap.remove(map: filterItems)
         }
     }
+}
+
+/// Helper structure which mimics the Identity Direct properties class. Used to decode the Identity Direct datastore.
+private struct IdentityDirectProperties: Codable {
+    var ecid: ECID?
 }

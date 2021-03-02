@@ -25,6 +25,7 @@ enum IdentityEdgeConstants {
 
     enum SharedStateKeys {
         static let CONFIGURATION = "com.adobe.module.configuration"
+        static let IDENTITY_DIRECT = "com.adobe.module.identity"
     }
 
     enum EventNames {
@@ -40,6 +41,7 @@ enum IdentityEdgeConstants {
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
+        static let STATE_OWNER = "stateowner"
     }
 
     enum DataStoreKeys {

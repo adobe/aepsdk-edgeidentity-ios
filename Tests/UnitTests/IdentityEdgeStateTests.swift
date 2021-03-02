@@ -70,6 +70,34 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertEqual(properties.ecid, state.identityEdgeProperties.ecid)
     }
 
+    // MARK: updateLegacyExperienceCloudId(...)
+
+    func testUpdateLegacyExperienceCloudIdNewEcidIsSet() {
+        state.identityEdgeProperties.ecid = ECID().ecidString
+        state.identityEdgeProperties.ecidSecondary = ECID().ecidString
+
+        XCTAssertTrue(state.updateLegacyExperienceCloudId("legacyEcid"))
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertEqual("legacyEcid", state.identityEdgeProperties.ecidSecondary)
+    }
+
+    func testUpdateLegacyExperienceCloudIdNotSetWhenEcidIsSame() {
+        let ecid = ECID().ecidString
+        state.identityEdgeProperties.ecid = ecid
+
+        XCTAssertFalse(state.updateLegacyExperienceCloudId(ecid))
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertNil(state.identityEdgeProperties.ecidSecondary)
+    }
+
+    func testUpdateLegacyExperienceCloudIdNotSetWhenLegacyEcidIsSame() {
+        state.identityEdgeProperties.ecidSecondary = "legacyEcid"
+
+        XCTAssertFalse(state.updateLegacyExperienceCloudId("legacyEcid"))
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // properties saved to persistence
+        XCTAssertEqual("legacyEcid", state.identityEdgeProperties.ecidSecondary) // unchanged
+    }
+
     // MARK: updateCustomerIdentifiers(...)
 
     func testUpdateCustomerIdentifiers() {
@@ -231,6 +259,7 @@ class IdentityEdgeStateTests: XCTestCase {
         var props = IdentityEdgeProperties()
         props.updateCustomerIdentifiers(currentIdentities)
         props.advertisingIdentifier = "adid"
+        props.ecidSecondary = ECID().ecidString
         props.ecid = ECID().ecidString
 
         state = IdentityEdgeState(identityEdgeProperties: props)
@@ -253,6 +282,7 @@ class IdentityEdgeStateTests: XCTestCase {
         wait(for: [xdmSharedStateExpectation, dispatchConsentExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(state.identityEdgeProperties.ecidSecondary)
         XCTAssertNil(state.identityEdgeProperties.identityMap.getItems(withNamespace: "space"))
         XCTAssertNotNil(state.identityEdgeProperties.ecid)
         XCTAssertNotEqual(props.ecid, state.identityEdgeProperties.ecid)

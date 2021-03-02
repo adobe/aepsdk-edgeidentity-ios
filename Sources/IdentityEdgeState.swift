@@ -37,9 +37,16 @@ class IdentityEdgeState {
         // load data from local storage
         identityEdgeProperties.loadFromPersistence()
 
-        // Generate new ECID on first launch
+        // Get new ECID on first launch
         if identityEdgeProperties.ecid == nil {
-            identityEdgeProperties.ecid = ECID().ecidString
+            if let ecid = identityEdgeProperties.getEcidFromDirectIdentityPersistence() {
+                identityEdgeProperties.ecid = ecid.ecidString // get ECID from direct extension
+                Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
+            } else {
+                identityEdgeProperties.ecid = ECID().ecidString // generate new ECID
+                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid?.description ?? "")'")
+            }
+            identityEdgeProperties.saveToPersistence()
         }
 
         hasBooted = true
@@ -135,6 +142,20 @@ class IdentityEdgeState {
         if shouldDispatchConsent {
             dispatchAdIdConsentRequestEvent(val: IdentityEdgeConstants.XDMKeys.Consent.NO, dispatchEvent: dispatchEvent)
         }
+    }
+
+    /// Update the legacy ECID property with `legacyEcid` provided it does not equal the current ECID or legacy ECID.
+    /// - Parameter legacyEcid: the current ECID for the Identity Direct extension
+    /// - Returns: true if the legacy ECID was updated, or false if the legacy ECID did not change
+    func updateLegacyExperienceCloudId(_ legacyEcid: String) -> Bool {
+        if legacyEcid == identityEdgeProperties.ecid || legacyEcid == identityEdgeProperties.ecidSecondary {
+            return false
+        }
+
+        identityEdgeProperties.ecidSecondary = legacyEcid
+        identityEdgeProperties.saveToPersistence()
+        Log.debug(label: LOG_TAG, "Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
+        return true
     }
 
     /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.

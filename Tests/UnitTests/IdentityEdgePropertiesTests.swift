@@ -158,4 +158,30 @@ class IdentityEdgePropertiesTests: XCTestCase {
         XCTAssertEqual(false, (decodedMap?["IDFA"]?[0] as? [String: Any])?["primary"] as? Bool)
     }
 
+    func testGetEcidFromDirectIdentityPersistenceWhenNoDirectIdentityDatastoreReturnsNil() {
+        let properties = IdentityEdgeProperties()
+        XCTAssertNil(properties.getEcidFromDirectIdentityPersistence())
+    }
+
+    func testGetEcidFromDirectIdentityPersistenceReturnsEcid() {
+        let legacyEcid = ECID()
+        addLegacyEcidToPersistence(ecid: legacyEcid)
+
+        let properties = IdentityEdgeProperties()
+        XCTAssertEqual(legacyEcid.ecidString, properties.getEcidFromDirectIdentityPersistence()?.ecidString)
+    }
+
+    func testGetEcidFromDirectIdentityPersistenceReturnsEcidNil() {
+        addLegacyEcidToPersistence(ecid: nil)
+
+        let properties = IdentityEdgeProperties()
+        XCTAssertNil(properties.getEcidFromDirectIdentityPersistence())
+    }
+
+    private func addLegacyEcidToPersistence(ecid: ECID?) {
+        let data: [String: ECID?] = ["ecid": ecid]
+        let jsonData = try? JSONEncoder().encode(data)
+        mockDataStore.dict["identity.properties"] = jsonData
+    }
+
 }

@@ -36,6 +36,7 @@ import Foundation
         registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
+        registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
     }
 
     public func onUnregistered() {
@@ -104,5 +105,29 @@ import Foundation
         state?.resetIdentifiers(event: event,
                                 createXDMSharedState: createXDMSharedState(data:event:),
                                 dispatchEvent: dispatch(event:))
+    }
+
+    /// Handler for `EventType.hub` `EventSource.sharedState` events.
+    /// If the state change event is for the Identity Direct extension, get the Identity Direct shared state, extract the ECID, and update the legacy ECID property.
+    /// - Parameter event: shared state change event
+    private func handleHubSharedState(event: Event) {
+        guard let state = state else { return }
+
+        guard let eventData = event.data,
+              let stateowner = eventData[IdentityEdgeConstants.EventDataKeys.STATE_OWNER] as? String,
+              stateowner == IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT else {
+            return
+        }
+
+        guard let identitySharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value else {
+            return
+        }
+
+        // Get ECID. If doesn't exist then use empty string to clear legacy value
+        let legacyEcid = identitySharedState[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String ?? ""
+
+        if state.updateLegacyExperienceCloudId(legacyEcid) {
+            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: event)
+        }
     }
 }

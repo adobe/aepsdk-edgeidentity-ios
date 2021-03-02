@@ -11,13 +11,15 @@
 //
 
 import AEPCore
+import AEPIdentity
 import AEPIdentityEdge
 import SwiftUI
 
 struct ContentView: View {
-    @State var ecidText: String
-    @State var adIdText: String
-    @State var identityMapText: String
+    @State var ecidIdentityEdgeText: String = ""
+    @State var ecidIdentityText: String = ""
+    @State var adIdText: String = ""
+    @State var identityMapText: String = ""
     @State var identityItemText: String = ""
     @State var identityNamespaceText: String = ""
     @State var selectedAuthenticationState: AuthenticationState = .ambiguous
@@ -53,21 +55,32 @@ struct ContentView: View {
 
         VStack {
             Button(action: {
-                self.ecidText = ""
+                self.ecidIdentityEdgeText = ""
+                self.ecidIdentityText = ""
+
+                IdentityEdge.getExperienceCloudId { ecid, _ in
+                    if let ecid = ecid {
+                        self.ecidIdentityEdgeText = ecid
+                    } else {
+                        self.ecidIdentityEdgeText = "ecid is nil"
+                    }
+                }
+
                 Identity.getExperienceCloudId { ecid, _ in
                     if let ecid = ecid {
-                        self.ecidText = ecid
+                        self.ecidIdentityText = ecid
                     } else {
-                        self.ecidText = "ecid is nil"
+                        self.ecidIdentityText = "ecid is nil"
                     }
                 }
             }) {
                 Text("Get ECID")
             }.padding()
 
-            Text(ecidText)
+            Text("edge : \(ecidIdentityEdgeText)\ndirect: \(ecidIdentityText)")
                 .font(.system(size: 12))
                 .padding()
+
         }.padding()
 
         VStack {
@@ -104,13 +117,13 @@ struct ContentView: View {
                     let map = IdentityMap()
                     map.add(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
                             withNamespace: identityNamespaceText)
-                    Identity.updateIdentities(with: map)
+                    IdentityEdge.updateIdentities(with: map)
                 }) {
                     Text("Update Identity")
                 }.padding()
                 Button(action: {
-                    Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
-                                            withNamespace: identityNamespaceText)
+                    IdentityEdge.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                                                withNamespace: identityNamespaceText)
                 }) {
                     Text("Remove Identity")
                 }.padding()
@@ -120,7 +133,7 @@ struct ContentView: View {
 
         VStack {
             Button(action: {
-                Identity.resetIdentities()
+                IdentityEdge.resetIdentities()
             }) {
                 Text("Reset Identities")
             }
@@ -129,7 +142,7 @@ struct ContentView: View {
         VStack {
             Button(action: {
                 self.identityMapText = ""
-                Identity.getIdentities { identityMap, _ in
+                IdentityEdge.getIdentities { identityMap, _ in
                     if let identityMap = identityMap {
                         let encoder = JSONEncoder()
                         encoder.outputFormatting = .prettyPrinted
@@ -154,11 +167,27 @@ struct ContentView: View {
             }
         }
 
+        VStack {
+            Divider()
+            HStack {
+                Button(action: {
+                    UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.module.identity.identity.properties")
+                }) {
+                    Text("Clear Identity")
+                }
+                Button(action: {
+                    UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.identityedge.identity.properties")
+                }) {
+                    Text("Clear IdentityEdge")
+                }
+
+            }
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(ecidText: "", adIdText: "", identityMapText: "")
+        ContentView()
     }
 }
