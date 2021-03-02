@@ -42,6 +42,8 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
         wait(for: [unregisterExpectation], timeout: 2)
 
+        // Clear persisted data
+        UserDefaults.clear()
     }
 
     // MARK: test cases
@@ -94,21 +96,11 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         registerIdentityDirectAndWait()
         let ecidLegacy = getLegacyEcidFromIdentity()
 
-        let expectation2 = XCTestExpectation(description: "IdentityEdge.getIdentities callback")
-        var identities: IdentityMap?
-        IdentityEdge.getIdentities { identityMap, _ in
-            identities = identityMap
-            expectation2.fulfill()
-        }
-        wait(for: [expectation2], timeout: 1)
-
         XCTAssertNotNil(ecidEdge)
         XCTAssertNotNil(ecidLegacy)
         XCTAssertNotEqual(ecidLegacy, ecidEdge)
 
-        XCTAssertNotNil(identities)
-
-        var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
         XCTAssertEqual(true, primaryEcidItem?.primary)
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
@@ -208,6 +200,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
         registerIdentityDirectAndWait()
         var ecidLegacy = getLegacyEcidFromIdentity()
+
+        XCTAssertNotNil(ecidEdge)
+        XCTAssertNotNil(ecidLegacy)
+        XCTAssertNotEqual(ecidLegacy, ecidEdge)
 
         var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
 
