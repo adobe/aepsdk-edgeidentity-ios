@@ -200,6 +200,32 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
     }
 
+    /// Test legacy ECID is removed when privacy is opted out
+    func testLegacyEcidIsRemovedOnPrivacyOptOut() {
+        // 1) Register IdentityEdge then Identity and verify ECIDs are different
+        initExtensionsAndWait() // register and boot IdentityEdge
+        let ecidEdge = getEcidFromIdentityEdge()
+
+        registerIdentityDirectAndWait()
+        var ecidLegacy = getLegacyEcidFromIdentity()
+
+        var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+
+        XCTAssertNotNil(primaryEcidItem)
+        XCTAssertNotNil(legacyEcidItem)
+        XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
+        XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
+        XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
+
+        // 2) Set privacy opted-out and verify legacy ECID is removed
+        setPrivacyStatus(PrivacyStatus.optedOut)
+        ecidLegacy = getLegacyEcidFromIdentity() // call gives time for IdentityEdge to process Identity state change
+        (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        XCTAssertNotNil(primaryEcidItem)
+        XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
+        XCTAssertNil(legacyEcidItem)
+    }
+
     // MARK: helper funcs
 
     /// Register IdentityEdge + Configuration
@@ -289,6 +315,15 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     func toggleGlobalPrivacy() {
         MobileCore.setPrivacyStatus(PrivacyStatus.optedOut)
         MobileCore.setPrivacyStatus(PrivacyStatus.optedIn)
+        let expectation = XCTestExpectation(description: "getPrivacyStatus callback")
+        MobileCore.getPrivacyStatus { _ in
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func setPrivacyStatus(_ privacyStatus: PrivacyStatus) {
+        MobileCore.setPrivacyStatus(privacyStatus)
         let expectation = XCTestExpectation(description: "getPrivacyStatus callback")
         MobileCore.getPrivacyStatus { _ in
             expectation.fulfill()
