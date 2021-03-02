@@ -88,7 +88,7 @@ class IdentityEdgeTests: XCTestCase {
         let event = Event(name: "Test Request Content",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: ["someKey": "newAdId"] as [String: Any])
+                          data: ["someKey": "someValue"] as [String: Any])
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -237,7 +237,7 @@ class IdentityEdgeTests: XCTestCase {
 
         mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT,
                                         event: event,
-                                        data: (["somekey": "legacyEcidValue"], .set))
+                                        data: (["somekey": "someValue"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
