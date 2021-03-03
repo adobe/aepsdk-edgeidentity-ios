@@ -12,12 +12,12 @@
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for AEPIdentityEdge.
-FOUNDATION_EXPORT double AEPIdentityEdgeVersionNumber;
+//! Project version number for AEPEdgeIdentity.
+FOUNDATION_EXPORT double AEPEdgeIdentityVersionNumber;
 
-//! Project version string for AEPIdentityEdge.
-FOUNDATION_EXPORT const unsigned char AEPIdentityEdgeVersionString[];
+//! Project version string for AEPEdgeIdentity.
+FOUNDATION_EXPORT const unsigned char AEPEdgeIdentityVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <AEPIdentityEdge/PublicHeader.h>
+// In this header, you should import all the public headers of your framework using statements like #import <AEPEdgeIdentity/PublicHeader.h>
 
 

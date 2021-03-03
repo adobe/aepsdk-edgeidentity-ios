@@ -19,7 +19,7 @@
                BlueprintIdentifier = "D43BAB2425BBA8A800B08CC0"
                BuildableName = "UnitTests.xctest"
                BlueprintName = "UnitTests"
-               ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+               ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

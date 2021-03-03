@@ -15,7 +15,7 @@
 import AEPServices
 import XCTest
 
-class EdgeIdentityTests: XCTestCase {
+class IdentityTests: XCTestCase {
     var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
@@ -29,7 +29,7 @@ class EdgeIdentityTests: XCTestCase {
 
     // MARK: handleIdentifiersRequest
 
-    /// Tests that when edge identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
+    /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
     func testIdentityEdgeRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers",
@@ -49,7 +49,7 @@ class EdgeIdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    /// Tests that when identity edge receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
+    /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
     func testIdentityEdgeRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers",

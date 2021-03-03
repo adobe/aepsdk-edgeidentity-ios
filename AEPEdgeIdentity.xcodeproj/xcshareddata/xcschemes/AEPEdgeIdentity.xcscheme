@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D43BAB0F25BBA4F700B08CC0"
-               BuildableName = "AEPIdentityEdge.framework"
-               BlueprintName = "AEPIdentityEdge"
-               ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+               BuildableName = "AEPEdgeIdentity.framework"
+               BlueprintName = "AEPEdgeIdentity"
+               ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D43BAB0F25BBA4F700B08CC0"
-            BuildableName = "AEPIdentityEdge.framework"
-            BlueprintName = "AEPIdentityEdge"
-            ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+            BuildableName = "AEPEdgeIdentity.framework"
+            BlueprintName = "AEPEdgeIdentity"
+            ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
       <Testables>
@@ -46,7 +46,7 @@
                BlueprintIdentifier = "D43BAB2425BBA8A800B08CC0"
                BuildableName = "UnitTests.xctest"
                BlueprintName = "UnitTests"
-               ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+               ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -56,7 +56,7 @@
                BlueprintIdentifier = "D43BAB3525BBA8C700B08CC0"
                BuildableName = "FunctionalTests.xctest"
                BlueprintName = "FunctionalTests"
-               ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+               ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D43BAB0F25BBA4F700B08CC0"
-            BuildableName = "AEPIdentityEdge.framework"
-            BlueprintName = "AEPIdentityEdge"
-            ReferencedContainer = "container:AEPIdentityEdge.xcodeproj">
+            BuildableName = "AEPEdgeIdentity.framework"
+            BlueprintName = "AEPEdgeIdentity"
+            ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

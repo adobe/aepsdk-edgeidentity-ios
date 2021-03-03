@@ -10,11 +10,11 @@
 // governing permissions and limitations under the License.
 //
 
-@testable import AEPIdentityEdge
+@testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
 
-class IdentityEdgePropertiesTests: XCTestCase {
+class IdentityPropertiesTests: XCTestCase {
 
     var mockDataStore: MockDataStore {
         return ServiceProvider.shared.namedKeyValueService as! MockDataStore
@@ -27,7 +27,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup
-        let properties = IdentityEdgeProperties()
+        let properties = IdentityProperties()
 
         // test
         let xdmData = properties.toXdmData()
@@ -39,7 +39,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
     /// Test that xdm data is populated correctly when all properties are non-nil
     func testToXdmDataFull() {
         // setup
-        var properties = IdentityEdgeProperties()
+        var properties = IdentityProperties()
         properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
 
@@ -69,7 +69,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
 
     func testToXdmDataDoesNotIncludeEmptyValues() {
         // setup
-        var properties = IdentityEdgeProperties()
+        var properties = IdentityProperties()
         properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = ""
 
@@ -93,7 +93,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
 
     func testSaveToPersistenceLoadFromPersistence() {
         // setup
-        var properties = IdentityEdgeProperties()
+        var properties = IdentityProperties()
         properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
@@ -104,7 +104,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
         properties.saveToPersistence()
 
         // test
-        var props = IdentityEdgeProperties()
+        var props = IdentityProperties()
         props.loadFromPersistence()
 
         //verify
@@ -119,7 +119,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
 
     func testSaveToPersistenceHasIdentityMap() {
         // setup
-        var properties = IdentityEdgeProperties()
+        var properties = IdentityProperties()
         properties.ecid = ECID().ecidString
         properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
@@ -130,7 +130,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
         properties.saveToPersistence()
 
         XCTAssertEqual(1, mockDataStore.dict.count)
-        guard let data = mockDataStore.dict[IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? Data else {
+        guard let data = mockDataStore.dict[IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? Data else {
             XCTFail("Failed to find identity.properties in mock data store.")
             return
         }
@@ -159,7 +159,7 @@ class IdentityEdgePropertiesTests: XCTestCase {
     }
 
     func testGetEcidFromDirectIdentityPersistenceWhenNoDirectIdentityDatastoreReturnsNil() {
-        let properties = IdentityEdgeProperties()
+        let properties = IdentityProperties()
         XCTAssertNil(properties.getEcidFromDirectIdentityPersistence())
     }
 
@@ -167,14 +167,14 @@ class IdentityEdgePropertiesTests: XCTestCase {
         let legacyEcid = ECID()
         addLegacyEcidToPersistence(ecid: legacyEcid)
 
-        let properties = IdentityEdgeProperties()
+        let properties = IdentityProperties()
         XCTAssertEqual(legacyEcid.ecidString, properties.getEcidFromDirectIdentityPersistence()?.ecidString)
     }
 
     func testGetEcidFromDirectIdentityPersistenceReturnsEcidNil() {
         addLegacyEcidToPersistence(ecid: nil)
 
-        let properties = IdentityEdgeProperties()
+        let properties = IdentityProperties()
         XCTAssertNil(properties.getEcidFromDirectIdentityPersistence())
     }
 

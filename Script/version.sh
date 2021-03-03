@@ -14,13 +14,13 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 
 echo "Target version - ${BLUE}$1${NC}"
-echo "------------------AEPIdentityEdge-------------------"
-PODSPEC_VERSION_IN_AEPIdentityEdge=$(pod ipc spec AEPIdentityEdge.podspec | jq '.version' | tr -d '"')
-echo "Local podspec version - ${BLUE}${PODSPEC_VERSION_IN_AEPIdentityEdge}${NC}"
-SOUCE_CODE_VERSION_IN_AEPIdentityEdge=$(cat ./Sources/IdentityEdgeConstants.swift | egrep '\s*EXTENSION_VERSION\s*=\s*\"(.*)\"' | ruby -e "puts gets.scan(/\"(.*)\"/)[0] " | tr -d '"')
-echo "Souce code version - ${BLUE}${SOUCE_CODE_VERSION_IN_AEPIdentityEdge}${NC}"
+echo "------------------AEPEdgeIdentity-------------------"
+PODSPEC_VERSION_IN_AEPEdgeIdentity=$(pod ipc spec AEPEdgeIdentity.podspec | jq '.version' | tr -d '"')
+echo "Local podspec version - ${BLUE}${PODSPEC_VERSION_IN_AEPEdgeIdentity}${NC}"
+SOUCE_CODE_VERSION_IN_AEPEdgeIdentity=$(cat ./Sources/IdentityConstants.swift | egrep '\s*EXTENSION_VERSION\s*=\s*\"(.*)\"' | ruby -e "puts gets.scan(/\"(.*)\"/)[0] " | tr -d '"')
+echo "Souce code version - ${BLUE}${SOUCE_CODE_VERSION_IN_AEPEdgeIdentity}${NC}"
 
-if [[ "$1" == "$PODSPEC_VERSION_IN_AEPIdentityEdge" ]] && [[ "$1" == "$SOUCE_CODE_VERSION_IN_AEPIdentityEdge" ]]; then
+if [[ "$1" == "$PODSPEC_VERSION_IN_AEPEdgeIdentity" ]] && [[ "$1" == "$SOUCE_CODE_VERSION_IN_AEPEdgeIdentity" ]]; then
     echo "${GREEN}Pass!${NC}"
 else
     echo "${RED}[Error]${NC} Version do not match!"

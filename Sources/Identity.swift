@@ -13,20 +13,20 @@
 import AEPCore
 import Foundation
 
-@objc(AEPMobileIdentityEdge) public class IdentityEdge: NSObject, Extension {
+@objc(AEPEdgeIdentityObjc) public class Identity: NSObject, Extension {
 
     // MARK: Extension
-    public let name = IdentityEdgeConstants.EXTENSION_NAME
-    public let friendlyName = IdentityEdgeConstants.FRIENDLY_NAME
-    public static let extensionVersion = IdentityEdgeConstants.EXTENSION_VERSION
+    public let name = IdentityConstants.EXTENSION_NAME
+    public let friendlyName = IdentityConstants.FRIENDLY_NAME
+    public static let extensionVersion = IdentityConstants.EXTENSION_VERSION
     public let metadata: [String: String]? = nil
-    private(set) var state: IdentityEdgeState
+    private(set) var state: IdentityState
 
     public let runtime: ExtensionRuntime
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
-        state = IdentityEdgeState(identityEdgeProperties: IdentityEdgeProperties())
+        state = IdentityState(identityProperties: IdentityProperties())
         super.init()
     }
 
@@ -40,7 +40,7 @@ import Foundation
 
         // attempt to bootup
         if state.bootupIfReady() {
-            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
+            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
         }
 
     }
@@ -65,8 +65,8 @@ import Foundation
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
-        let xdmData = state.identityEdgeProperties.toXdmData(true)
-        let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+        let xdmData = state.identityProperties.toXdmData(true)
+        let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.identityEdge,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)
@@ -100,20 +100,20 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-              let stateowner = eventData[IdentityEdgeConstants.EventDataKeys.STATE_OWNER] as? String,
-              stateowner == IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT else {
+              let stateowner = eventData[IdentityConstants.EventDataKeys.STATE_OWNER] as? String,
+              stateowner == IdentityConstants.SharedStateKeys.IDENTITY_DIRECT else {
             return
         }
 
-        guard let identitySharedState = getSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value else {
+        guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value else {
             return
         }
 
         // Get ECID. If doesn't exist then use empty string to clear legacy value
-        let legacyEcid = identitySharedState[IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID] as? String ?? ""
+        let legacyEcid = identitySharedState[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String ?? ""
 
         if state.updateLegacyExperienceCloudId(legacyEcid) {
-            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: event)
+            createXDMSharedState(data: state.identityProperties.toXdmData(), event: event)
         }
     }
 }

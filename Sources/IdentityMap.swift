@@ -28,21 +28,21 @@ public enum AuthenticationState: Int, RawRepresentable, Codable {
     public var rawValue: RawValue {
         switch self {
         case .ambiguous:
-            return IdentityEdgeConstants.AuthenticationStates.AMBIGUOUS
+            return IdentityConstants.AuthenticationStates.AMBIGUOUS
         case .authenticated:
-            return IdentityEdgeConstants.AuthenticationStates.AUTHENTICATED
+            return IdentityConstants.AuthenticationStates.AUTHENTICATED
         case .loggedOut:
-            return IdentityEdgeConstants.AuthenticationStates.LOGGED_OUT
+            return IdentityConstants.AuthenticationStates.LOGGED_OUT
         }
     }
 
     public init?(rawValue: RawValue) {
         switch rawValue {
-        case IdentityEdgeConstants.AuthenticationStates.AMBIGUOUS:
+        case IdentityConstants.AuthenticationStates.AMBIGUOUS:
             self = .ambiguous
-        case IdentityEdgeConstants.AuthenticationStates.AUTHENTICATED:
+        case IdentityConstants.AuthenticationStates.AUTHENTICATED:
             self = .authenticated
-        case IdentityEdgeConstants.AuthenticationStates.LOGGED_OUT:
+        case IdentityConstants.AuthenticationStates.LOGGED_OUT:
             self = .loggedOut
         default:
             self = .ambiguous
@@ -177,7 +177,7 @@ public class IdentityMap: NSObject, Codable {
 
 }
 
-/// Identity Edge is used to clearly distinguish people that are interacting with digital experiences.
+/// Identity is used to clearly distinguish people that are interacting with digital experiences.
 @objc(AEPIdentityItem)
 @objcMembers
 public class IdentityItem: NSObject, Codable {

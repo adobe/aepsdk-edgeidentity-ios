@@ -11,12 +11,12 @@
 //
 
 import AEPCore
+import AEPEdgeIdentity
 import AEPIdentity
-import AEPIdentityEdge
 import SwiftUI
 
 class RegisteredExtensions: ObservableObject {
-    @Published var isIdentityEdgeRegistered: Bool = true
+    @Published var isEdgeIdentityRegistered: Bool = true
     @Published var isIdentityDirectRegistered: Bool = false
 }
 
@@ -55,35 +55,35 @@ struct ContentView: View {
 }
 
 struct GetIdentitiesView: View {
-    @State var ecidIdentityEdgeText: String = ""
+    @State var ecidEdgeIdentityText: String = ""
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
 
     var body: some View {
         VStack {
             Button(action: {
-                self.ecidIdentityEdgeText = ""
+                self.ecidEdgeIdentityText = ""
                 self.ecidIdentityText = ""
 
-                IdentityEdge.getExperienceCloudId { ecid, _ in
-                    self.ecidIdentityEdgeText = ecid ?? "no ECID value found"
+                AEPEdgeIdentity.Identity.getExperienceCloudId { ecid, _ in
+                    self.ecidEdgeIdentityText = ecid ?? "no ECID value found"
                 }
 
-                Identity.getExperienceCloudId { ecid, _ in
+                AEPIdentity.Identity.getExperienceCloudId { ecid, _ in
                     self.ecidIdentityText = ecid ?? ""
                 }
             }) {
                 Text("Get ECID")
             }
 
-            Text("edge : \(ecidIdentityEdgeText)" + (ecidIdentityText.isEmpty ? "" : "\ndirect: \(ecidIdentityText)"))
+            Text("edge : \(ecidEdgeIdentityText)" + (ecidIdentityText.isEmpty ? "" : "\ndirect: \(ecidIdentityText)"))
                 .font(.system(size: 12))
                 .padding()
 
             HStack {
                 Button(action: {
                     self.identityMapText = ""
-                    IdentityEdge.getIdentities { identityMap, _ in
+                    AEPEdgeIdentity.Identity.getIdentities { identityMap, _ in
                         if let identityMap = identityMap {
                             let encoder = JSONEncoder()
                             encoder.outputFormatting = .prettyPrinted
@@ -101,7 +101,7 @@ struct GetIdentitiesView: View {
                 }.padding()
 
                 Button(action: {
-                    IdentityEdge.resetIdentities()
+                    AEPEdgeIdentity.Identity.resetIdentities()
                 }) {
                     Text("Reset Identities")
                 }.padding()
@@ -190,13 +190,13 @@ struct CustomIdentiferView: View {
                     let map = IdentityMap()
                     map.add(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
                             withNamespace: identityNamespaceText)
-                    IdentityEdge.updateIdentities(with: map)
+                    AEPEdgeIdentity.Identity.updateIdentities(with: map)
                 }) {
                     Text("Update Identity")
                 }.padding()
                 Button(action: {
-                    IdentityEdge.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
-                                                withNamespace: identityNamespaceText)
+                    AEPEdgeIdentity.Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                                                            withNamespace: identityNamespaceText)
                 }) {
                     Text("Remove Identity")
                 }.padding()
@@ -207,36 +207,36 @@ struct CustomIdentiferView: View {
 }
 
 struct MultipleIdentityView: View {
-    private let identityEdgeStoredDataKey = "Adobe.com.adobe.identityedge.identity.properties"
+    private let edgeIdentityStoredDataKey = "Adobe.com.adobe.edge.identity.identity.properties"
     private let identityStoredDataKey = "Adobe.com.adobe.module.identity.identity.properties"
 
     @ObservedObject var extensions: RegisteredExtensions
-    @State var ecidIdentityEdgeText: String = ""
+    @State var ecidEdgeIdentityText: String = ""
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
 
     var body: some View {
         VStack {
             HStack(alignment: .center) {
-                Image(systemName: extensions.isIdentityEdgeRegistered ? "circle.fill" : "circle")
+                Image(systemName: extensions.isEdgeIdentityRegistered ? "circle.fill" : "circle")
                     .foregroundColor(Color.blue)
 
                 Button(action: {
-                    if extensions.isIdentityEdgeRegistered {
-                        MobileCore.unregisterExtension(IdentityEdge.self)
+                    if extensions.isEdgeIdentityRegistered {
+                        MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self)
                     } else {
-                        MobileCore.registerExtension(IdentityEdge.self)
+                        MobileCore.registerExtension(AEPEdgeIdentity.Identity.self)
                     }
 
-                    extensions.isIdentityEdgeRegistered.toggle()
+                    extensions.isEdgeIdentityRegistered.toggle()
 
                 }) {
-                    Text(extensions.isIdentityEdgeRegistered ? "Unregister Identity Edge" : "Register Identity Edge")
+                    Text(extensions.isEdgeIdentityRegistered ? "Unregister Edge Identity" : "Register Edge Identity")
                 }
             }.padding(.bottom, 5)
 
             Button(action: {
-                UserDefaults.standard.removeObject(forKey: identityEdgeStoredDataKey)
+                UserDefaults.standard.removeObject(forKey: edgeIdentityStoredDataKey)
             }) {
                 Text("Clear Persistence")
             }
@@ -251,9 +251,9 @@ struct MultipleIdentityView: View {
 
                 Button(action: {
                     if extensions.isIdentityDirectRegistered {
-                        MobileCore.unregisterExtension(Identity.self)
+                        MobileCore.unregisterExtension(AEPIdentity.Identity.self)
                     } else {
-                        MobileCore.registerExtension(Identity.self)
+                        MobileCore.registerExtension(AEPIdentity.Identity.self)
                     }
 
                     extensions.isIdentityDirectRegistered.toggle()

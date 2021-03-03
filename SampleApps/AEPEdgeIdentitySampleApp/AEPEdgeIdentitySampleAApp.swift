@@ -13,7 +13,7 @@
 import SwiftUI
 
 @main
-struct AEPIdentityEdgeSampleAppApp: App {
+struct AEPEdgeIdentitySampleApp: App {
     // swiftlint:disable weak_delegate
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 

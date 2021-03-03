@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = "AEPIdentityEdge"
+  s.name             = "AEPEdgeIdentity"
   s.version          = "1.0.0-alpha.1"
   s.summary          = "Experience Platform Identity Edge extension for Adobe Experience Platform Mobile SDK. Written and maintained by Adobe."
 

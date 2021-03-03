@@ -11,25 +11,25 @@
 //
 
 @testable import AEPCore
-@testable import AEPIdentityEdge
+@testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
 
-class IdentityEdgeTests: XCTestCase {
-    var identityEdge: IdentityEdge!
+class IdentityTests: XCTestCase {
+    var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identityEdge = IdentityEdge(runtime: mockRuntime)
+        identity = Identity(runtime: mockRuntime)
     }
 
     // MARK: handleIdentityRequest
 
     func testGenericIdentityRequestSetsAdId() {
-        var props = IdentityEdgeProperties()
+        var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
@@ -37,15 +37,15 @@ class IdentityEdgeTests: XCTestCase {
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
 
-        identityEdge.onRegistered() // trigger boot sequence
+        identity.onRegistered() // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("adId", identityEdge.state.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertEqual("adId", identity.state.identityProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
@@ -61,7 +61,7 @@ class IdentityEdgeTests: XCTestCase {
     }
 
     func testGenericIdentityRequestClearsAdId() {
-        var props = IdentityEdgeProperties()
+        var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
@@ -69,15 +69,15 @@ class IdentityEdgeTests: XCTestCase {
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
-        identityEdge.onRegistered() // trigger boot sequence
+        identity.onRegistered() // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [

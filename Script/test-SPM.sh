@@ -30,7 +30,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: \"AEPCore\", url: \"https://github.com/adobe/aepsdk-core-ios.git\", .branch(\"main\")),
-        .package(name: \"AEPIdentityEdge\", path: \"../\")
+        .package(name: \"AEPEdgeIdentity\", path: \"../\")
     ],
     targets: [
         .target(
@@ -41,7 +41,7 @@ let package = Package(
                 .product(name: \"AEPLifecycle\", package: \"AEPCore\"),
                 .product(name: \"AEPServices\", package: \"AEPCore\"),
                 .product(name: \"AEPSignal\", package: \"AEPCore\"),
-                .product(name: \"AEPIdentityEdge\", package: \"AEPIdentityEdge\"),
+                .product(name: \"AEPEdgeIdentity\", package: \"AEPEdgeIdentity\"),
             ])
     ]
 )
