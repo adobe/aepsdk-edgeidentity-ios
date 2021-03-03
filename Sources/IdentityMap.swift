@@ -62,6 +62,16 @@ public class IdentityMap: NSObject, Codable {
         return items.isEmpty
     }
 
+    /// A list of all namespaces used in this `IdentityMap`.
+    internal var namespaces: [String] {
+        var keys: [String] = []
+        for item in items {
+            keys.append(item.key)
+        }
+
+        return keys
+    }
+
     public override init() {}
 
     /// Adds an `IdentityItem` to this map. If an item is added which shares the same `withNamespace` and `item.id` as an item
