@@ -51,6 +51,7 @@ enum IdentityEdgeConstants {
     enum Namespaces {
         static let ECID = "ECID"
         static let IDFA = "IDFA"
+        static let GAID = "GAID"
     }
 
     enum AuthenticationStates {

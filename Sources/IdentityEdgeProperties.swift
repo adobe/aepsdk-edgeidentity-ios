@@ -21,7 +21,8 @@ struct IdentityEdgeProperties: Codable {
     /// List of namespaces which are not allowed to be modified from customer identifier
     private static let reservedNamespaces = [
         IdentityEdgeConstants.Namespaces.ECID,
-        IdentityEdgeConstants.Namespaces.IDFA
+        IdentityEdgeConstants.Namespaces.IDFA,
+        IdentityEdgeConstants.Namespaces.GAID
     ]
 
     /// The underlying IdentityMap structure which holds all the properties
@@ -193,11 +194,13 @@ struct IdentityEdgeProperties: Codable {
     private func removeIdentitiesWithReservedNamespaces(from identifiersMap: IdentityMap) {
         // Filter out known identifiers to prevent modification of certain namespaces
         let filterItems = IdentityMap()
-        for namespace in IdentityEdgeProperties.reservedNamespaces {
-            if let items = identifiersMap.getItems(withNamespace: namespace) {
-                Log.debug(label: IdentityEdgeProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
-                for item in items {
-                    filterItems.add(item: item, withNamespace: namespace)
+        for reservedNamespace in IdentityEdgeProperties.reservedNamespaces {
+            for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
+                if let items = identifiersMap.getItems(withNamespace: namespace) {
+                    Log.debug(label: IdentityEdgeProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    for item in items {
+                        filterItems.add(item: item, withNamespace: namespace)
+                    }
                 }
             }
         }
