@@ -28,6 +28,7 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         FileManager.default.clearCache()
         ServiceProvider.shared.reset()
         EventHub.reset()
+        MobileCore.setLogLevel(LogLevel.trace)
     }
 
     override func tearDown() {
