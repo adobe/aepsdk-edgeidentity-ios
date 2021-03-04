@@ -64,12 +64,7 @@ public class IdentityMap: NSObject, Codable {
 
     /// A list of all namespaces used in this `IdentityMap`.
     internal var namespaces: [String] {
-        var keys: [String] = []
-        for item in items {
-            keys.append(item.key)
-        }
-
-        return keys
+        return items.map({$0.key})
     }
 
     public override init() {}
