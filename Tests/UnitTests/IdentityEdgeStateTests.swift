@@ -282,6 +282,70 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
+    func testRemoveCustomerIdentifiersFiltersOutUnallowedNamespaces() {
+        let props = IdentityEdgeProperties()
+        props.identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.GAID)
+
+        state = IdentityEdgeState(identityEdgeProperties: props)
+
+        let customerIdentities = IdentityMap()
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.GAID)
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.removeIdentity,
+                          data: customerIdentities.asDictionary())
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.removeCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
+    }
+
+    func testRemoveCustomerIdentifiersFiltersOutUnallowedNamespacesCaseInsensitive() {
+        let props = IdentityEdgeProperties()
+        props.identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: IdentityEdgeConstants.Namespaces.GAID)
+
+        state = IdentityEdgeState(identityEdgeProperties: props)
+
+        let customerIdentities = IdentityMap()
+        customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: "ecid")
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: "idfa")
+        customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: "gaid")
+
+        let event = Event(name: "Test event",
+                          type: EventType.identityEdge,
+                          source: EventSource.removeIdentity,
+                          data: customerIdentities.asDictionary())
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        state.removeCustomerIdentifiers(event: event,
+                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertEqual(1, state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?.count)
+        XCTAssertEqual("identifier", state.identityEdgeProperties.identityMap.getItems(withNamespace: "space")?[0].id)
+    }
+
     // MARK: resetIdentities(...)
 
     func testResetIdentities() {
