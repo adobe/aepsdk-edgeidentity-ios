@@ -269,6 +269,12 @@ struct MultipleIdentityView: View {
             }.padding(.bottom, 5)
 
             Button(action: {
+                MobileCore.setAdvertisingIdentifier(String(Int.random(in: 1...32)))
+            }) {
+                Text("Trigger State Change")
+            }.padding(.bottom, 5)
+
+            Button(action: {
                 UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.module.identity.identity.properties")
             }) {
                 Text("Clear Persistence")
