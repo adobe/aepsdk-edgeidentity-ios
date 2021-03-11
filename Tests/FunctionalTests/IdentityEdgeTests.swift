@@ -45,7 +45,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("adId", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertEqual("adId", identityEdge.state.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
@@ -77,7 +77,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(identityEdge.state.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
