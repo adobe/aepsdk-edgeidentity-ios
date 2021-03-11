@@ -24,7 +24,6 @@ class IdentityEdgeTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
         identityEdge = IdentityEdge(runtime: mockRuntime)
-        identityEdge.onRegistered()
     }
 
     // MARK: handleIdentityRequest
@@ -40,13 +39,13 @@ class IdentityEdgeTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
 
-        _ = identityEdge.readyForEvent(event) // trigger boot sequence
+        identityEdge.onRegistered() // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("adId", identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertEqual("adId", identityEdge.state.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
@@ -72,13 +71,13 @@ class IdentityEdgeTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
-        _ = identityEdge.readyForEvent(event) // trigger boot sequence
+        identityEdge.onRegistered() // trigger boot sequence
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state?.identityEdgeProperties.advertisingIdentifier)
+        XCTAssertNil(identityEdge.state.identityEdgeProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [

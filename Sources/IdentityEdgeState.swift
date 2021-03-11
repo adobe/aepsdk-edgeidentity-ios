@@ -33,6 +33,7 @@ class IdentityEdgeState {
     /// Completes init for the Identity Edge extension.
     /// - Returns: True if we should share state after bootup, false otherwise
     func bootupIfReady() -> Bool {
+        if hasBooted { return false }
 
         // load data from local storage
         identityEdgeProperties.loadFromPersistence()
