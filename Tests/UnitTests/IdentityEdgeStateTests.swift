@@ -70,6 +70,14 @@ class IdentityEdgeStateTests: XCTestCase {
         XCTAssertEqual(properties.ecid, state.identityEdgeProperties.ecid)
     }
 
+    /// Test that bootup returns false if already booted
+    func testBootupIfReadyReturnsFalseWhenBooted() {
+        XCTAssertFalse(state.hasBooted)
+        XCTAssertTrue(state.bootupIfReady())
+        XCTAssertTrue(state.hasBooted)
+        XCTAssertFalse(state.bootupIfReady())
+    }
+
     // MARK: updateLegacyExperienceCloudId(...)
 
     func testUpdateLegacyExperienceCloudIdNewEcidIsSet() {
