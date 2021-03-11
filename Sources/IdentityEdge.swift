@@ -37,6 +37,17 @@ import Foundation
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
+
+        guard let state = state else {
+            return
+        }
+
+        // attempt to bootup
+        if state.bootupIfReady() {
+            createXDMSharedState(data: state.identityEdgeProperties.toXdmData(), event: nil)
+            return
+        }
+
     }
 
     public func onUnregistered() {

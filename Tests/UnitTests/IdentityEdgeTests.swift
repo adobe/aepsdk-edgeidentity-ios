@@ -118,6 +118,11 @@ class IdentityEdgeTests: XCTestCase {
 
     /// Tests when Identity receives an update identity event without valid data the customer identifiers are not updated
     func testIdentityUpdateIdentityWithNilData() {
+        // set default identities
+        let defaultIdentities = IdentityMap()
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        identityEdge.state?.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
+
         // setup
         let event = Event(name: "Test Update Identity",
                           type: EventType.identityEdge,
@@ -127,7 +132,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.identityMap.isEmpty)
+        XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
+        XCTAssertEqual("id", identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     // MARK: handleRemoveIdentity
@@ -155,7 +161,7 @@ class IdentityEdgeTests: XCTestCase {
 
         // verify
         XCTAssertNotNil(identityEdge.state?.identityEdgeProperties.identityMap)
-        XCTAssertEqual(true, identityEdge.state?.identityEdgeProperties.identityMap.isEmpty)
+        XCTAssertNil(identityEdge.state?.identityEdgeProperties.identityMap.getItems(withNamespace: "customer"))
     }
 
     /// Tests when Identity receives a remove identity event without valid data the customer identifiers are not modified
@@ -210,6 +216,7 @@ class IdentityEdgeTests: XCTestCase {
     // MARK: handleHubSharedState
 
     func testHandleHubSharedStateSetsLegacyEcid() {
+        mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
@@ -225,9 +232,19 @@ class IdentityEdgeTests: XCTestCase {
         // verify
         XCTAssertEqual("legacyEcidValue", identityEdge.state?.identityEdgeProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
+
+        guard let sharedState = mockRuntime.createdXdmSharedStates[0], let identityData = sharedState["identityMap"] as? [String: Any] else {
+            XCTFail("Failed to get identityMap data from shared state")
+            return
+        }
+
+        let identityMap = IdentityMap.from(eventData: identityData)
+        XCTAssertNotNil(identityMap)
+        XCTAssertEqual(2, identityMap?.getItems(withNamespace: "ECID")?.count)
     }
 
     func testHandleHubSharedStateWhenEcidNotInDataClearsLegacyEcid() {
+        mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
         identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
@@ -245,9 +262,19 @@ class IdentityEdgeTests: XCTestCase {
         // verify
         XCTAssertNil(identityEdge.state?.identityEdgeProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
+
+        guard let sharedState = mockRuntime.createdXdmSharedStates[0], let identityData = sharedState["identityMap"] as? [String: Any] else {
+            XCTFail("Failed to get identityMap data from shared state")
+            return
+        }
+
+        let identityMap = IdentityMap.from(eventData: identityData)
+        XCTAssertNotNil(identityMap)
+        XCTAssertEqual(1, identityMap?.getItems(withNamespace: "ECID")?.count)
     }
 
     func testHandleHubSharedStateWhenEcidTheSameDoesNotCreateSharedState() {
+        mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
         identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
@@ -268,6 +295,7 @@ class IdentityEdgeTests: XCTestCase {
     }
 
     func testHandleHubSharedStateWhenNoSharedStateDoesNotUpdateLegacyEcid() {
+        mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
         identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
@@ -284,6 +312,7 @@ class IdentityEdgeTests: XCTestCase {
     }
 
     func testHandleHubSharedStateWhenIncorrectStateownerDoesNotUpdateLegacyEcid() {
+        mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
         identityEdge.state?.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
