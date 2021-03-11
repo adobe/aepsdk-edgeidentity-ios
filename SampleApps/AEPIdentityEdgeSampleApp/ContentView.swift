@@ -66,19 +66,11 @@ struct GetIdentitiesView: View {
                 self.ecidIdentityText = ""
 
                 IdentityEdge.getExperienceCloudId { ecid, _ in
-                    if let ecid = ecid {
-                        self.ecidIdentityEdgeText = ecid
-                    } else {
-                        self.ecidIdentityEdgeText = "ecid is nil"
-                    }
+                    self.ecidIdentityEdgeText = ecid ?? "no ECID value found"
                 }
 
                 Identity.getExperienceCloudId { ecid, _ in
-                    if let ecid = ecid {
-                        self.ecidIdentityText = ecid
-                    } else {
-                        self.ecidIdentityText = ""
-                    }
+                    self.ecidIdentityText = ecid ?? ""
                 }
             }) {
                 Text("Get ECID")
@@ -215,6 +207,9 @@ struct CustomIdentiferView: View {
 }
 
 struct MultipleIdentityView: View {
+    private let identityEdgeStoredDataKey = "Adobe.com.adobe.identityedge.identity.properties"
+    private let identityStoredDataKey = "Adobe.com.adobe.module.identity.identity.properties"
+
     @ObservedObject var extensions: RegisteredExtensions
     @State var ecidIdentityEdgeText: String = ""
     @State var ecidIdentityText: String = ""
@@ -241,7 +236,7 @@ struct MultipleIdentityView: View {
             }.padding(.bottom, 5)
 
             Button(action: {
-                UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.identityedge.identity.properties")
+                UserDefaults.standard.removeObject(forKey: identityEdgeStoredDataKey)
             }) {
                 Text("Clear Persistence")
             }
@@ -275,7 +270,7 @@ struct MultipleIdentityView: View {
             }.padding(.bottom, 5)
 
             Button(action: {
-                UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.module.identity.identity.properties")
+                UserDefaults.standard.removeObject(forKey: identityStoredDataKey)
             }) {
                 Text("Clear Persistence")
             }.padding(.bottom, 5)
