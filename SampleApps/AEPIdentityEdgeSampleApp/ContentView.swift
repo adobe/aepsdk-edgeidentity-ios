@@ -15,18 +15,112 @@ import AEPIdentity
 import AEPIdentityEdge
 import SwiftUI
 
+class RegisteredExtensions: ObservableObject {
+    @Published var isIdentityEdgeRegistered: Bool = true
+    @Published var isIdentityDirectRegistered: Bool = false
+}
+
 struct ContentView: View {
-    @State var ecidIdentityEdgeText: String = ""
-    @State var ecidIdentityText: String = ""
-    @State var adIdText: String = ""
-    @State var identityMapText: String = ""
-    @State var identityItemText: String = ""
-    @State var identityNamespaceText: String = ""
-    @State var selectedAuthenticationState: AuthenticationState = .ambiguous
-    @State var isPrimaryChecked: Bool = false
+    @StateObject var registeredExtensions = RegisteredExtensions()
 
     var body: some View {
 
+        NavigationView {
+            VStack(alignment: .center, spacing: 20, content: {
+
+                NavigationLink(
+                    destination: AdvertisingIdentifierView(),
+                    label: {
+                        Text("Set Advertising Identifier")
+                    })
+
+                NavigationLink(
+                    destination: CustomIdentiferView(),
+                    label: {
+                        Text("Update Custom Identity")
+                    })
+
+                NavigationLink(
+                    destination: MultipleIdentityView(extensions: registeredExtensions),
+                    label: {
+                        Text("Test with Multiple Identities")
+                    })
+            })
+        }
+
+        Divider()
+        GetIdentitiesView()
+
+    }
+}
+
+struct GetIdentitiesView: View {
+    @State var ecidIdentityEdgeText: String = ""
+    @State var ecidIdentityText: String = ""
+    @State var identityMapText: String = ""
+
+    var body: some View {
+        VStack {
+            Button(action: {
+                self.ecidIdentityEdgeText = ""
+                self.ecidIdentityText = ""
+
+                IdentityEdge.getExperienceCloudId { ecid, _ in
+                    self.ecidIdentityEdgeText = ecid ?? "no ECID value found"
+                }
+
+                Identity.getExperienceCloudId { ecid, _ in
+                    self.ecidIdentityText = ecid ?? ""
+                }
+            }) {
+                Text("Get ECID")
+            }
+
+            Text("edge : \(ecidIdentityEdgeText)" + (ecidIdentityText.isEmpty ? "" : "\ndirect: \(ecidIdentityText)"))
+                .font(.system(size: 12))
+                .padding()
+
+            HStack {
+                Button(action: {
+                    self.identityMapText = ""
+                    IdentityEdge.getIdentities { identityMap, _ in
+                        if let identityMap = identityMap {
+                            let encoder = JSONEncoder()
+                            encoder.outputFormatting = .prettyPrinted
+                            guard let data = try? encoder.encode(identityMap) else {
+                                self.identityMapText = "failed to encode IdentityMap"
+                                return
+                            }
+                            self.identityMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
+                        } else {
+                            self.identityMapText = "IdentityMap was nil"
+                        }
+                    }
+                }) {
+                    Text("Get Identities")
+                }.padding()
+
+                Button(action: {
+                    IdentityEdge.resetIdentities()
+                }) {
+                    Text("Reset Identities")
+                }.padding()
+            }
+            ScrollView {
+                Text(identityMapText)
+                    .font(.system(size: 12))
+                    .padding()
+                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+            }
+        }
+
+    }
+}
+
+struct AdvertisingIdentifierView: View {
+    @State var adIdText: String = ""
+
+    var body: some View {
         VStack {
             HStack {
                 Button(action: {
@@ -52,37 +146,16 @@ struct ContentView: View {
                 }.padding()
             }
         }
+    }
+}
 
-        VStack {
-            Button(action: {
-                self.ecidIdentityEdgeText = ""
-                self.ecidIdentityText = ""
+struct CustomIdentiferView: View {
+    @State var identityItemText: String = ""
+    @State var identityNamespaceText: String = ""
+    @State var selectedAuthenticationState: AuthenticationState = .ambiguous
+    @State var isPrimaryChecked: Bool = false
 
-                IdentityEdge.getExperienceCloudId { ecid, _ in
-                    if let ecid = ecid {
-                        self.ecidIdentityEdgeText = ecid
-                    } else {
-                        self.ecidIdentityEdgeText = "ecid is nil"
-                    }
-                }
-
-                Identity.getExperienceCloudId { ecid, _ in
-                    if let ecid = ecid {
-                        self.ecidIdentityText = ecid
-                    } else {
-                        self.ecidIdentityText = "ecid is nil"
-                    }
-                }
-            }) {
-                Text("Get ECID")
-            }.padding()
-
-            Text("edge : \(ecidIdentityEdgeText)\ndirect: \(ecidIdentityText)")
-                .font(.system(size: 12))
-                .padding()
-
-        }.padding()
-
+    var body: some View {
         VStack {
             VStack {
                 TextField("Enter Identifier", text: $identityItemText)
@@ -130,59 +203,94 @@ struct ContentView: View {
             }
 
         }
+    }
+}
 
-        VStack {
-            Button(action: {
-                IdentityEdge.resetIdentities()
-            }) {
-                Text("Reset Identities")
-            }
-        }
+struct MultipleIdentityView: View {
+    private let identityEdgeStoredDataKey = "Adobe.com.adobe.identityedge.identity.properties"
+    private let identityStoredDataKey = "Adobe.com.adobe.module.identity.identity.properties"
 
+    @ObservedObject var extensions: RegisteredExtensions
+    @State var ecidIdentityEdgeText: String = ""
+    @State var ecidIdentityText: String = ""
+    @State var identityMapText: String = ""
+
+    var body: some View {
         VStack {
-            Button(action: {
-                self.identityMapText = ""
-                IdentityEdge.getIdentities { identityMap, _ in
-                    if let identityMap = identityMap {
-                        let encoder = JSONEncoder()
-                        encoder.outputFormatting = .prettyPrinted
-                        guard let data = try? encoder.encode(identityMap) else {
-                            self.identityMapText = "failed to encode IdentityMap"
-                            return
-                        }
-                        self.identityMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
+            HStack(alignment: .center) {
+                Image(systemName: extensions.isIdentityEdgeRegistered ? "circle.fill" : "circle")
+                    .foregroundColor(Color.blue)
+
+                Button(action: {
+                    if extensions.isIdentityEdgeRegistered {
+                        MobileCore.unregisterExtension(IdentityEdge.self)
                     } else {
-                        self.identityMapText = "IdentityMap was nil"
+                        MobileCore.registerExtension(IdentityEdge.self)
                     }
-                }
-            }) {
-                Text("Get Identities")
-            }.padding()
 
-            ScrollView {
-                Text(identityMapText)
-                    .font(.system(size: 12))
-                    .padding()
-                    .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+                    extensions.isIdentityEdgeRegistered.toggle()
+
+                }) {
+                    Text(extensions.isIdentityEdgeRegistered ? "Unregister Identity Edge" : "Register Identity Edge")
+                }
+            }.padding(.bottom, 5)
+
+            Button(action: {
+                UserDefaults.standard.removeObject(forKey: identityEdgeStoredDataKey)
+            }) {
+                Text("Clear Persistence")
             }
         }
+        .padding()
+        .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
 
         VStack {
-            Divider()
+            HStack {
+                Image(systemName: extensions.isIdentityDirectRegistered ? "circle.fill" : "circle")
+                    .foregroundColor(Color.blue)
+
+                Button(action: {
+                    if extensions.isIdentityDirectRegistered {
+                        MobileCore.unregisterExtension(Identity.self)
+                    } else {
+                        MobileCore.registerExtension(Identity.self)
+                    }
+
+                    extensions.isIdentityDirectRegistered.toggle()
+
+                }) {
+                    Text(extensions.isIdentityDirectRegistered ? "Unregister Identity Direct" : "Register Identity Direct")
+                }
+            }.padding(.bottom, 5)
+
+            Button(action: {
+                MobileCore.setAdvertisingIdentifier(String(Int.random(in: 1...32)))
+            }) {
+                Text("Trigger State Change")
+            }.padding(.bottom, 5)
+
+            Button(action: {
+                UserDefaults.standard.removeObject(forKey: identityStoredDataKey)
+            }) {
+                Text("Clear Persistence")
+            }.padding(.bottom, 5)
+
             HStack {
                 Button(action: {
-                    UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.module.identity.identity.properties")
+                    MobileCore.setPrivacyStatus(.optedIn)
                 }) {
-                    Text("Clear Identity")
+                    Text("Privacy OptIn")
                 }
                 Button(action: {
-                    UserDefaults.standard.removeObject(forKey: "Adobe.com.adobe.identityedge.identity.properties")
+                    MobileCore.setPrivacyStatus(.optedOut)
                 }) {
-                    Text("Clear IdentityEdge")
+                    Text("Privacy OptOut")
                 }
-
             }
+
         }
+        .padding()
+        .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
     }
 }
 
