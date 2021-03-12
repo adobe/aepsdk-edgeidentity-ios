@@ -381,7 +381,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecidSecondary)
         XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "space"))
         XCTAssertNotNil(state.identityProperties.ecid)
-        XCTAssertNotEqual(props.ecid, state.identityEdgeProperties.ecid)
+        XCTAssertNotEqual(props.ecid, state.identityProperties.ecid)
     }
 
 }

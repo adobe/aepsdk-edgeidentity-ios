@@ -40,7 +40,6 @@ enum IdentityConstants {
 
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
-        static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
         static let STATE_OWNER = "stateowner"
     }
 
@@ -65,7 +64,6 @@ enum IdentityConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
-            static let AD_ID = "adId"
             static let VAL = "val"
             static let YES = "y"
             static let NO = "n"
