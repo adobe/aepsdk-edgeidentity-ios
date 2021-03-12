@@ -49,7 +49,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getExperienceCloudId should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { _ in
             expectation.fulfill()
         }
 
@@ -65,9 +65,9 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                          type: EventType.identityEdge,
+                                                          type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
                                                           data: nil)
             MobileCore.dispatch(event: responseEvent)
@@ -89,7 +89,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { _ in
             expectation.fulfill()
         }
 
@@ -105,9 +105,9 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getIdentities callback should get called")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                          type: EventType.identityEdge,
+                                                          type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
                                                           data: nil)
             MobileCore.dispatch(event: responseEvent)
@@ -129,9 +129,9 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "getIdentities callback should get called")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                          type: EventType.identityEdge,
+                                                          type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
                                                           data: [IdentityConstants.XDMKeys.IDENTITY_MAP: [:]])
             MobileCore.dispatch(event: responseEvent)
@@ -152,7 +152,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "updateIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity) { _ in
             expectation.fulfill()
         }
 
@@ -170,7 +170,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "removeIdentity should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity) { _ in
             expectation.fulfill()
         }
 
@@ -181,12 +181,12 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    /// Tests that resetIdentities dispatches an identity edge reset request event
+    /// Tests that resetIdentities dispatches an edge identity reset request event
     func testResetIdentities() {
         // setup
         let expectation = XCTestExpectation(description: "resetIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestReset) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestReset) { _ in
             expectation.fulfill()
         }
 

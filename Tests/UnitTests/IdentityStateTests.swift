@@ -120,7 +120,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -150,7 +150,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "gaid"), withNamespace: IdentityConstants.Namespaces.GAID)
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -180,7 +180,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "gaid"), withNamespace: "gaid")
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -204,7 +204,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "custom"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -227,7 +227,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: nil)
 
@@ -255,7 +255,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "identifier2"), withNamespace: "space")
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -278,7 +278,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: nil)
 
@@ -308,7 +308,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: IdentityConstants.Namespaces.GAID)
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -340,7 +340,7 @@ class IdentityStateTests: XCTestCase {
         customerIdentities.add(item: IdentityItem(id: "id"), withNamespace: "gaid")
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
@@ -367,7 +367,7 @@ class IdentityStateTests: XCTestCase {
         state = IdentityState(identityProperties: props)
 
         let event = Event(name: "Test event",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.requestReset,
                           data: nil)
 
@@ -388,6 +388,6 @@ class IdentityStateTests: XCTestCase {
 
 private extension Event {
     static func fakeIdentityEvent() -> Event {
-        return Event(name: "Fake Identity Event", type: EventType.identityEdge, source: EventSource.requestContent, data: nil)
+        return Event(name: "Fake Identity Event", type: EventType.edgeIdentity, source: EventSource.requestContent, data: nil)
     }
 }
