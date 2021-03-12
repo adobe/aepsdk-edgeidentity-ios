@@ -48,7 +48,7 @@ import Foundation
     }
 
     /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
-    /// in the `IdentityEdge` extension, then an empty `IdentityMap` is returned.
+    /// in the `Identity` extension, then an empty `IdentityMap` is returned.
     /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
@@ -73,7 +73,7 @@ import Foundation
         }
     }
 
-    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The IdentityEdge extension will merge the received identifiers
+    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The Identity extension will merge the received identifiers
     ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
     ///  Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameter map: The identifiers to add or update
@@ -92,7 +92,7 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
-    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The IdentityEdge extension will stop sending this identifier.
+    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The Identity extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
     /// Identifiers which have an empty `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameters:
