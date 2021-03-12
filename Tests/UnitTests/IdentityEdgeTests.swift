@@ -66,36 +66,6 @@ class IdentityEdgeTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    // MARK: handleRequestContent
-
-    /// Tests that when identity receives a generic identity request content event with an advertising ID, that the ID is updated
-    func testGenericIdentityRequestWithAdId() {
-        // setup
-        let event = Event(name: "Test Request Content",
-                          type: EventType.genericIdentity,
-                          source: EventSource.requestContent,
-                          data: [IdentityEdgeConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertEqual("newAdId", identityEdge.state.identityEdgeProperties.advertisingIdentifier)
-    }
-
-    /// Tests that when identity receives a generic identity request content event without an advertising ID, that the ID is not changed
-    func testGenericIdentityRequestWithoutAdId() {
-        // setup
-        let event = Event(name: "Test Request Content",
-                          type: EventType.genericIdentity,
-                          source: EventSource.requestContent,
-                          data: ["someKey": "someValue"] as [String: Any])
-        // test
-        mockRuntime.simulateComingEvent(event: event)
-
-        // verify
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.advertisingIdentifier)
-    }
-
     // MARK: handleUpdateIdentity
 
     /// Tests when Identity receives an update identity event with valid data the customer identifiers are updated
@@ -196,7 +166,6 @@ class IdentityEdgeTests: XCTestCase {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
         identityEdge.state.identityEdgeProperties.updateCustomerIdentifiers(identityMap)
-        identityEdge.state.identityEdgeProperties.advertisingIdentifier = "adid"
         identityEdge.state.identityEdgeProperties.ecid = originalEcid.ecidString
 
         let event = Event(name: "Test Request Event",
@@ -208,7 +177,6 @@ class IdentityEdgeTests: XCTestCase {
 
         // verify
         XCTAssertNil(identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer"))
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.advertisingIdentifier)
         XCTAssertNotNil(identityEdge.state.identityEdgeProperties.ecid)
         XCTAssertNotEqual(originalEcid.ecidString, identityEdge.state.identityEdgeProperties.ecid)
     }

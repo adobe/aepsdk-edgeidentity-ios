@@ -41,7 +41,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         // setup
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID().ecidString
-        properties.advertisingIdentifier = "test-ad-id"
 
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
@@ -59,7 +58,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         let expectedResult: [String: Any] =
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
-                "IDFA": [ ["id": "test-ad-id", "authenticationState": "ambiguous", "primary": 0] ],
                 "custom": [ ["id": "identifier", "authenticationState": "ambiguous", "primary": 0] ]
             ]
             ]
@@ -71,7 +69,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         // setup
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID().ecidString
-        properties.advertisingIdentifier = ""
 
         // test
         let xdmData = properties.toXdmData()
@@ -95,7 +92,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         // setup
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID().ecidString
-        properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
         properties.updateCustomerIdentifiers(identityMap)
@@ -111,7 +107,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         XCTAssertEqual(1, mockDataStore.dict.count)
         XCTAssertNotNil(props.ecid)
         XCTAssertEqual(properties.ecid, props.ecid)
-        XCTAssertEqual(properties.advertisingIdentifier, props.advertisingIdentifier)
         XCTAssertEqual("identifier", props.identityMap.getItems(withNamespace: "custom")?[0].id)
         XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticationState)
         XCTAssertEqual(false, props.identityMap.getItems(withNamespace: "custom")?[0].primary)
@@ -121,7 +116,6 @@ class IdentityEdgePropertiesTests: XCTestCase {
         // setup
         var properties = IdentityEdgeProperties()
         properties.ecid = ECID().ecidString
-        properties.advertisingIdentifier = "test-ad-id"
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "custom")
         properties.updateCustomerIdentifiers(identityMap)
@@ -146,16 +140,12 @@ class IdentityEdgePropertiesTests: XCTestCase {
 
         // verify
         // IdentityMap has 3 items, and each item has only 1 item
-        XCTAssertEqual(3, decodedMap?.count)
+        XCTAssertEqual(2, decodedMap?.count)
         XCTAssertEqual(1, decodedMap?["ECID"]?.count)
-        XCTAssertEqual(1, decodedMap?["IDFA"]?.count)
         XCTAssertEqual(1, decodedMap?["custom"]?.count)
 
         XCTAssertEqual(properties.ecid, (decodedMap?["ECID"]?[0] as? [String: Any])?["id"] as? String)
-        XCTAssertEqual("test-ad-id", (decodedMap?["IDFA"]?[0] as? [String: Any])?["id"] as? String)
         XCTAssertEqual("identifier", (decodedMap?["custom"]?[0] as? [String: Any])?["id"] as? String)
-        XCTAssertEqual("ambiguous", (decodedMap?["IDFA"]?[0] as? [String: Any])?["authenticationState"] as? String)
-        XCTAssertEqual(false, (decodedMap?["IDFA"]?[0] as? [String: Any])?["primary"] as? Bool)
     }
 
     func testGetEcidFromDirectIdentityPersistenceWhenNoDirectIdentityDatastoreReturnsNil() {

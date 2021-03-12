@@ -22,7 +22,6 @@
 		BFF649A125C0D29D0012A4C5 /* IdentityEdgeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649A025C0D29D0012A4C5 /* IdentityEdgeStateTests.swift */; };
 		BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */; };
 		BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */; };
-		BFF64A3225C3A60E0012A4C5 /* Event+IdentityEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A3125C3A60E0012A4C5 /* Event+IdentityEdge.swift */; };
 		BFF64A6025C4C63F0012A4C5 /* IdentityEdgeIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* IdentityEdgeIntegrationTests.swift */; };
 		BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */; };
 		BFF64AE925C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */; };
@@ -35,7 +34,6 @@
 		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */; };
 		D43BAB2A25BBA8A900B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
-		D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */; };
 		D43BAB3B25BBA8C700B08CC0 /* AEPIdentityEdge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPIdentityEdge.framework */; };
 		D43BAB6A25BBAF6100B08CC0 /* IdentityEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB6925BBAF6000B08CC0 /* IdentityEdge.swift */; };
 		D43BAB7225BBAFC700B08CC0 /* IdentityEdgeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */; };
@@ -90,7 +88,6 @@
 		BFF649A025C0D29D0012A4C5 /* IdentityEdgeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeStateTests.swift; sourceTree = "<group>"; };
 		BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMap.swift; sourceTree = "<group>"; };
 		BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityMapTests.swift; sourceTree = "<group>"; };
-		BFF64A3125C3A60E0012A4C5 /* Event+IdentityEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+IdentityEdge.swift"; sourceTree = "<group>"; };
 		BFF64A5A25C4C5410012A4C5 /* IdentityEdgeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeIntegrationTests.swift; sourceTree = "<group>"; };
 		BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		BFF64AE625C8A9B40012A4C5 /* TestableExtensionRuntime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableExtensionRuntime.swift; sourceTree = "<group>"; };
@@ -105,7 +102,6 @@
 		D43BAB2725BBA8A900B08CC0 /* IdentityEdgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeTests.swift; sourceTree = "<group>"; };
 		D43BAB2925BBA8A900B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB3625BBA8C700B08CC0 /* FunctionalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunctionalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeTests.swift; sourceTree = "<group>"; };
 		D43BAB3A25BBA8C700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB6925BBAF6000B08CC0 /* IdentityEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdge.swift; sourceTree = "<group>"; };
 		D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityEdgeConstants.swift; sourceTree = "<group>"; };
@@ -232,7 +228,6 @@
 			children = (
 				BF1DABA225D5B77700CCD574 /* Public */,
 				BFF6491A25BFD1990012A4C5 /* ECID.swift */,
-				BFF64A3125C3A60E0012A4C5 /* Event+IdentityEdge.swift */,
 				D43BAB6925BBAF6000B08CC0 /* IdentityEdge.swift */,
 				D43BAB7125BBAFC700B08CC0 /* IdentityEdgeConstants.swift */,
 				BFF6492025BFD1CB0012A4C5 /* IdentityEdgeProperties.swift */,
@@ -260,7 +255,6 @@
 		D43BAB3725BBA8C700B08CC0 /* FunctionalTests */ = {
 			isa = PBXGroup;
 			children = (
-				D43BAB3825BBA8C700B08CC0 /* IdentityEdgeTests.swift */,
 				BFF64A5A25C4C5410012A4C5 /* IdentityEdgeIntegrationTests.swift */,
 				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
 				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
@@ -687,7 +681,6 @@
 				BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */,
 				BFF6492125BFD1CB0012A4C5 /* IdentityEdgeProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* IdentityEdge.swift in Sources */,
-				BFF64A3225C3A60E0012A4C5 /* Event+IdentityEdge.swift in Sources */,
 				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -714,7 +707,6 @@
 			files = (
 				BFF64A6025C4C63F0012A4C5 /* IdentityEdgeIntegrationTests.swift in Sources */,
 				BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */,
-				D43BAB3925BBA8C700B08CC0 /* IdentityEdgeTests.swift in Sources */,
 				BFF64AEA25C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */,
 				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,

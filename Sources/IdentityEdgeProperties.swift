@@ -68,27 +68,6 @@ struct IdentityEdgeProperties: Codable {
         }
     }
 
-    /// The IDFA from retrieved Apple APIs
-    var advertisingIdentifier: String? {
-        get {
-            return getAdvertisingIdentifier()
-        }
-
-        set {
-            // remove current Ad ID; there can be only one!
-            if let currentAdId = getAdvertisingIdentifier() {
-                identityMap.remove(item: IdentityItem(id: currentAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
-            }
-
-            guard let newAdId = newValue, !newAdId.isEmpty else {
-                return // new ID is nil or empty
-            }
-
-            // Update IDFA
-            identityMap.add(item: IdentityItem(id: newAdId), withNamespace: IdentityEdgeConstants.Namespaces.IDFA)
-        }
-    }
-
     /// Merge the given `identifiersMap` with the current properties. Items in `identifiersMap` will overrite current properties where the `id` and
     /// `namespace` match. No items are removed. Identifiers under the namespaces "ECID" and "IDFA" are reserved and cannot be updated using this function.
     /// - Parameter identifiersMap: the `IdentityMap` to merge with the current properties
@@ -176,16 +155,6 @@ struct IdentityEdgeProperties: Codable {
         }
 
         return nil
-    }
-
-    /// Get the advertising identifier from the properties map. Assumes only one `IdentityItem` under the "IDFA" namespace.
-    /// - Returns: the advertising identifier or nil if not found
-    private func getAdvertisingIdentifier() -> String? {
-        guard let adIdList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.IDFA), !adIdList.isEmpty else {
-            return nil
-        }
-
-        return adIdList[0].id
     }
 
     /// Filter out any items contained in reserved namespaces from the given `identityMap`.

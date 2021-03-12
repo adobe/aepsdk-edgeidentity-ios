@@ -32,7 +32,6 @@ import Foundation
 
     public func onRegistered() {
         registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
-        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
@@ -53,14 +52,6 @@ import Foundation
     }
 
     // MARK: Event Listeners
-
-    /// Handles events to set the advertising identifier. Called by listener registered with event hub.
-    /// - Parameter event: event containing `advertisingIdentifier` data
-    private func handleRequestContent(event: Event) {
-        state.updateAdvertisingIdentifier(event: event,
-                                          createXDMSharedState: createXDMSharedState(data:event:),
-                                          dispatchEvent: dispatch(event:))
-    }
 
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
@@ -91,8 +82,7 @@ import Foundation
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: createXDMSharedState(data:event:),
-                               dispatchEvent: dispatch(event:))
+                               createXDMSharedState: createXDMSharedState(data:event:))
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.
