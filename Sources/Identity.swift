@@ -13,7 +13,7 @@
 import AEPCore
 import Foundation
 
-@objc(AEPEdgeIdentityObjc) public class Identity: NSObject, Extension {
+@objc(AEPMobileEdgeIdentity) public class Identity: NSObject, Extension {
 
     // MARK: Extension
     public let name = IdentityConstants.EXTENSION_NAME

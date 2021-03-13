@@ -44,10 +44,9 @@
 		BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */; };
 		BFF64AED25C8A9B40012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */; };
 		BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE825C8A9B40012A4C5 /* MockDataStore.swift */; };
-		D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D43BAB1525BBA4F700B08CC0 /* AEPEdgeIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPEdgeIdentity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */; };
 		D43BAB2A25BBA8A900B08CC0 /* AEPEdgeIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPEdgeIdentity.framework */; };
-		D43BAB3925BBA8C700B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB3825BBA8C700B08CC0 /* IdentityTests.swift */; };
 		D43BAB3B25BBA8C700B08CC0 /* AEPEdgeIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPEdgeIdentity.framework */; };
 		D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB6925BBAF6000B08CC0 /* Identity.swift */; };
 		D43BAB7225BBAFC700B08CC0 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
@@ -122,7 +121,7 @@
 		CD4CAB9240C7391E58AAC050 /* Pods-AEPIdentityEdgeSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.release.xcconfig"; sourceTree = "<group>"; };
 		D255F74959CE3D0F523964A9 /* Pods-AEPEdgeIdentitySampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPEdgeIdentitySampleApp.debug.xcconfig"; path = "Target Support Files/Pods-AEPEdgeIdentitySampleApp/Pods-AEPEdgeIdentitySampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		D43BAB1025BBA4F700B08CC0 /* AEPEdgeIdentity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AEPEdgeIdentity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AEPIdentityEdge.h; sourceTree = "<group>"; };
+		D43BAB1325BBA4F700B08CC0 /* AEPEdgeIdentity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AEPEdgeIdentity.h; sourceTree = "<group>"; };
 		D43BAB1425BBA4F700B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D43BAB2525BBA8A800B08CC0 /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTests.swift; sourceTree = "<group>"; };
@@ -191,7 +190,7 @@
 		BF1DABA225D5B77700CCD574 /* Public */ = {
 			isa = PBXGroup;
 			children = (
-				D43BAB1325BBA4F700B08CC0 /* AEPIdentityEdge.h */,
+				D43BAB1325BBA4F700B08CC0 /* AEPEdgeIdentity.h */,
 				BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */,
 				BFF649AC25C0EFE10012A4C5 /* IdentityMap.swift */,
 			);
@@ -322,7 +321,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D43BAB1525BBA4F700B08CC0 /* AEPIdentityEdge.h in Headers */,
+				D43BAB1525BBA4F700B08CC0 /* AEPEdgeIdentity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
