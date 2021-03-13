@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D43BABA625BBC4BA00B08CC0"
-               BuildableName = "AEPEdgeIdentitySampleApp.app"
-               BlueprintName = "AEPEdgeIdentitySampleApp"
+               BuildableName = "TestApp.app"
+               BlueprintName = "TestApp"
                ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D43BABA625BBC4BA00B08CC0"
-            BuildableName = "AEPEdgeIdentitySampleApp.app"
-            BlueprintName = "AEPEdgeIdentitySampleApp"
+            BuildableName = "TestApp.app"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D43BABA625BBC4BA00B08CC0"
-            BuildableName = "AEPEdgeIdentitySampleApp.app"
-            BlueprintName = "AEPEdgeIdentitySampleApp"
+            BuildableName = "TestApp.app"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:AEPEdgeIdentity.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
