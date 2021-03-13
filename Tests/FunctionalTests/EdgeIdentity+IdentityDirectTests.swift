@@ -11,12 +11,12 @@
 //
 
 @testable import AEPCore
+import AEPEdgeIdentity
 import AEPIdentity
-import AEPIdentityEdge
 @testable import AEPServices
 import XCTest
 
-class IdentityEdgeIntegrationTests: XCTestCase {
+class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     private let defaultIdentityConfiguration = [
         "global.privacy": "optedin",
         "experienceCloud.org": "1234@Adobe",
@@ -34,10 +34,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     override func tearDown() {
         let unregisterExpectation = XCTestExpectation(description: "unregister extensions")
         unregisterExpectation.expectedFulfillmentCount = 2
-        MobileCore.unregisterExtension(IdentityEdge.self) {
+        MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self) {
             unregisterExpectation.fulfill()
         }
-        MobileCore.unregisterExtension(Identity.self) {
+        MobileCore.unregisterExtension(AEPIdentity.Identity.self) {
             unregisterExpectation.fulfill()
         }
 
@@ -50,10 +50,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     // MARK: test cases
 
     func testGetExperienceCloudId() {
-        initExtensionsAndWait()
+        registerEdgeIdentityAndStart()
 
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback")
-        IdentityEdge.getExperienceCloudId { ecid, error in
+        AEPEdgeIdentity.Identity.getExperienceCloudId { ecid, error in
             XCTAssertEqual(false, ecid?.isEmpty)
             XCTAssertNil(error)
             expectation.fulfill()
@@ -62,10 +62,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     }
 
     func testGetIdentitiesWithECID() {
-        initExtensionsAndWait()
+        registerEdgeIdentityAndStart()
 
         let expectation = XCTestExpectation(description: "getIdentities callback")
-        IdentityEdge.getIdentities { identityMap, error in
+        Identity.getIdentities { identityMap, error in
             XCTAssertNil(error)
             XCTAssertNotNil(identityMap)
             XCTAssertEqual(1, identityMap?.getItems(withNamespace: "ECID")?.count)
@@ -75,13 +75,13 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    /// Test IdentityEdge bootup will load ECID from legacy Identity direct extension
+    /// Test Edge Identity bootup will load ECID from legacy Identity direct extension
     func testLegacyEcidLoadedOnBootup() {
-        initIdentityDirectAndWait() // register Identity Direct first to allow bootup and shared state creation
+        registerIdentityDirectAndStart() // register Identity Direct first to allow bootup and shared state creation
         let ecidLegacy = getLegacyEcidFromIdentity()
 
-        registerIdentityEdgeAndWait() // register Identity Edge alone
-        let ecidEdge = getEcidFromIdentityEdge()
+        registerEdgeIdentityAndWait() // register Edge Identity alone
+        let ecidEdge = getEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -89,10 +89,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidEdge, ecidLegacy)
     }
 
-    /// Test IdentityEdge will include legacy ECID in IdentityMap when read from Identity Direct shared state
+    /// Test Edge Identity will include legacy ECID in IdentityMap when read from Identity Direct shared state
     func testLegacyEcidAddedToIdentityMapAfterBootup() {
-        initExtensionsAndWait() // register and boot IdentityEdge
-        let ecidEdge = getEcidFromIdentityEdge()
+        registerEdgeIdentityAndStart() // register and boot Edge Identity
+        let ecidEdge = getEcidFromEdgeIdentity()
 
         registerIdentityDirectAndWait()
         let ecidLegacy = getLegacyEcidFromIdentity()
@@ -108,22 +108,22 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(false, legacyEcidItem?.primary)
     }
 
-    /// Test IdentityEdge and IdentityDirect have same ECID on bootup, and after resetIdentities call ECIDs are different
+    /// Test Edge Identity and IdentityDirect have same ECID on bootup, and after resetIdentities call ECIDs are different
     func testEcidsAreDifferentAfterReset() {
-        // 1) Register Identity then IdentityEdge and verify both have same ECID
-        initIdentityDirectAndWait()
+        // 1) Register Identity then Edge Identity and verify both have same ECID
+        registerIdentityDirectAndStart()
         var ecidLegacy = getLegacyEcidFromIdentity()
 
-        registerIdentityEdgeAndWait()
-        let ecidEdge = getEcidFromIdentityEdge()
+        registerEdgeIdentityAndWait()
+        let ecidEdge = getEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
         XCTAssertNotNil(ecidLegacy)
         XCTAssertEqual(ecidEdge, ecidLegacy)
 
-        // 2) Reset IdentityEdge identifiers and verify ECIDs are different
-        IdentityEdge.resetIdentities()
+        // 2) Reset Edge Identity identifiers and verify ECIDs are different
+        Identity.resetIdentities()
         var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNil(legacyEcidItem) // Legacy ECID is not set yet as it was cleared but no state change from Identity
@@ -140,14 +140,14 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
     }
 
-    /// Test IdentityEdge and IdentityDirect have same ECID on bootup, and after privacy change ECIDs are different
+    /// Test Edge Identity and IdentityDirect have same ECID on bootup, and after privacy change ECIDs are different
     func testEcidsAreDifferentAfterPrivacyChange() {
-        // 1) Register Identity then IdentityEdge and verify both have same ECID
-        initIdentityDirectAndWait()
+        // 1) Register Identity then Edge Identity and verify both have same ECID
+        registerIdentityDirectAndStart()
         var ecidLegacy = getLegacyEcidFromIdentity()
 
-        registerIdentityEdgeAndWait()
-        let ecidEdge = getEcidFromIdentityEdge()
+        registerEdgeIdentityAndWait()
+        let ecidEdge = getEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -165,14 +165,14 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
     }
 
-    /// Test IdentityEdge and IdentityDirect have same ECID on bootup, and after resetIdentities and privacy change ECIDs are different
+    /// Test Edge Identity and IdentityDirect have same ECID on bootup, and after resetIdentities and privacy change ECIDs are different
     func testEcidsAreDifferentAfterResetIdentitiesAndPrivacyChange() {
-        // 1) Register Identity then IdentityEdge and verify both have same ECID
-        initIdentityDirectAndWait()
+        // 1) Register Identity then Edge Identity and verify both have same ECID
+        registerIdentityDirectAndStart()
         var ecidLegacy = getLegacyEcidFromIdentity()
 
-        registerIdentityEdgeAndWait()
-        var ecidEdge = getEcidFromIdentityEdge()
+        registerEdgeIdentityAndWait()
+        var ecidEdge = getEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -180,10 +180,10 @@ class IdentityEdgeIntegrationTests: XCTestCase {
         XCTAssertEqual(ecidEdge, ecidLegacy)
 
         // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
-        IdentityEdge.resetIdentities()
+        Identity.resetIdentities()
         toggleGlobalPrivacy()
         ecidLegacy = getLegacyEcidFromIdentity()
-        ecidEdge = getEcidFromIdentityEdge()
+        ecidEdge = getEcidFromEdgeIdentity()
 
         let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertNotNil(primaryEcidItem)
@@ -195,9 +195,9 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
     /// Test legacy ECID is removed when privacy is opted out
     func testLegacyEcidIsRemovedOnPrivacyOptOut() {
-        // 1) Register IdentityEdge then Identity and verify ECIDs are different
-        initExtensionsAndWait() // register and boot IdentityEdge
-        let ecidEdge = getEcidFromIdentityEdge()
+        // 1) Register Edge Identity then Identity and verify ECIDs are different
+        registerEdgeIdentityAndStart() // register and boot Edge Identity
+        let ecidEdge = getEcidFromEdgeIdentity()
 
         registerIdentityDirectAndWait()
         var ecidLegacy = getLegacyEcidFromIdentity()
@@ -216,7 +216,7 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
         // 2) Set privacy opted-out and verify legacy ECID is removed
         setPrivacyStatus(PrivacyStatus.optedOut)
-        ecidLegacy = getLegacyEcidFromIdentity() // call gives time for IdentityEdge to process Identity state change
+        ecidLegacy = getLegacyEcidFromIdentity() // call gives time for Edge Identity to process Identity state change
         (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
@@ -225,31 +225,31 @@ class IdentityEdgeIntegrationTests: XCTestCase {
 
     // MARK: helper funcs
 
-    /// Register IdentityEdge + Configuration
-    func initExtensionsAndWait() {
-        let initExpectation = XCTestExpectation(description: "init Identity Edge extensions")
+    /// Register Edge Identity + Configuration
+    func registerEdgeIdentityAndStart() {
+        let initExpectation = XCTestExpectation(description: "init Edge Identity extensions")
         MobileCore.setLogLevel(.trace)
-        MobileCore.registerExtensions([IdentityEdge.self]) {
+        MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
     }
 
     /// Register Identity direct + Configuration
-    func initIdentityDirectAndWait() {
+    func registerIdentityDirectAndStart() {
         let initExpectation = XCTestExpectation(description: "init Identity Direct extensions")
         MobileCore.setLogLevel(.trace)
         MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
-        MobileCore.registerExtensions([Identity.self]) {
+        MobileCore.registerExtensions([AEPIdentity.Identity.self]) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
     }
 
-    /// Register IdentityEdge. Should be called after one of the 'init' functions above.
-    func registerIdentityEdgeAndWait() {
-        let initExpectation = XCTestExpectation(description: "register Identity Edge extensions")
-        MobileCore.registerExtension(IdentityEdge.self) {
+    /// Register AEPEdgeIdentity. Should be called after one of the 'init' functions above.
+    func registerEdgeIdentityAndWait() {
+        let initExpectation = XCTestExpectation(description: "register Edge Identity extensions")
+        MobileCore.registerExtension(AEPEdgeIdentity.Identity.self) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
@@ -259,16 +259,16 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     func registerIdentityDirectAndWait() {
         let initExpectation = XCTestExpectation(description: "init Identity Direct extensions")
         MobileCore.updateConfigurationWith(configDict: defaultIdentityConfiguration)
-        MobileCore.registerExtension(Identity.self) {
+        MobileCore.registerExtension(AEPIdentity.Identity.self) {
             initExpectation.fulfill()
         }
         wait(for: [initExpectation], timeout: 1)
     }
 
-    func getEcidFromIdentityEdge() -> String? {
-        let expectation = XCTestExpectation(description: "IdentityEdge.getExperienceCloudId callback")
+    func getEcidFromEdgeIdentity() -> String? {
+        let expectation = XCTestExpectation(description: "AEPEdgeIdentity.Identity.getExperienceCloudId callback")
         var ecid: String?
-        IdentityEdge.getExperienceCloudId { id, _ in
+        AEPEdgeIdentity.Identity.getExperienceCloudId { id, _ in
             ecid = id
             expectation.fulfill()
         }
@@ -277,9 +277,9 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     }
 
     func getLegacyEcidFromIdentity() -> String? {
-        let expectation = XCTestExpectation(description: "Identity.getExperienceCloudId callback")
+        let expectation = XCTestExpectation(description: "AEPIdentity.Identity.getExperienceCloudId callback")
         var ecid: String?
-        Identity.getExperienceCloudId { id, _ in
+        AEPIdentity.Identity.getExperienceCloudId { id, _ in
             ecid = id
             expectation.fulfill()
         }
@@ -288,9 +288,9 @@ class IdentityEdgeIntegrationTests: XCTestCase {
     }
 
     func getPrimaryAndLegacyEcidIdentityItems() -> (IdentityItem?, IdentityItem?) {
-        let expectation = XCTestExpectation(description: "IdentityEdge.getIdentities callback")
+        let expectation = XCTestExpectation(description: "AEPEdgeIdentity.Identity.getIdentities callback")
         var identities: IdentityMap?
-        IdentityEdge.getIdentities { identityMap, _ in
+        Identity.getIdentities { identityMap, _ in
             identities = identityMap
             expectation.fulfill()
         }

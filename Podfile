@@ -3,10 +3,10 @@ platform :ios, '10.0'
 # Comment the next line if you don't want to use dynamic frameworks
 use_frameworks!
 
-workspace 'AEPIdentityEdge'
-project 'AEPIdentityEdge.xcodeproj'
+workspace 'AEPEdgeIdentity'
+project 'AEPEdgeIdentity.xcodeproj'
 
-target 'AEPIdentityEdge' do
+target 'AEPEdgeIdentity' do
   pod 'AEPCore', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
   pod 'AEPServices', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
 end
@@ -22,7 +22,7 @@ target 'FunctionalTests' do
   pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
 end
 
-target 'AEPIdentityEdgeSampleApp' do
+target 'TestApp' do
   pod 'AEPCore', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
   pod 'AEPServices', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'
   pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'dev-v3.0.1'

@@ -10,16 +10,14 @@
 // governing permissions and limitations under the License.
 //
 
-import SwiftUI
+#import <Foundation/Foundation.h>
 
-@main
-struct AEPIdentityEdgeSampleAppApp: App {
-    // swiftlint:disable weak_delegate
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+//! Project version number for AEPEdgeIdentity.
+FOUNDATION_EXPORT double AEPEdgeIdentityVersionNumber;
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
+//! Project version string for AEPEdgeIdentity.
+FOUNDATION_EXPORT const unsigned char AEPEdgeIdentityVersionString[];
+
+// In this header, you should import all the public headers of your framework using statements like #import <AEPEdgeIdentity/PublicHeader.h>
+
+

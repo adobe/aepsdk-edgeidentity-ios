@@ -24,7 +24,7 @@ target '$PROJECT_NAME' do
   pod 'AEPServices', '~> 3.0.0'
   pod 'AEPSignal', '~> 3.0.0'
   pod 'AEPRulesEngine', '~> 1.0.0'
-  pod 'AEPIdentityEdge', :path => '../AEPIdentityEdge.podspec'
+  pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
 

@@ -11,10 +11,10 @@
 //
 
 @testable import AEPCore
-@testable import AEPIdentityEdge
+@testable import AEPEdgeIdentity
 import XCTest
 
-class IdentityEdgeAPITests: XCTestCase {
+class IdentityAPITests: XCTestCase {
 
     override func setUp() {
         MockExtension.reset()
@@ -54,7 +54,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.getExperienceCloudId { _, _ in }
+        Identity.getExperienceCloudId { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)
@@ -66,7 +66,7 @@ class IdentityEdgeAPITests: XCTestCase {
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
-            let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.identityEdge,
                                                           source: EventSource.responseIdentity,
                                                           data: nil)
@@ -74,7 +74,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.getExperienceCloudId { _, error in
+        Identity.getExperienceCloudId { _, error in
             XCTAssertNotNil(error)
             XCTAssertEqual(AEPError.unexpected, error as? AEPError)
             expectation.fulfill()
@@ -94,7 +94,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.getIdentities { _, _ in }
+        Identity.getIdentities { _, _ in }
 
         // verify
         wait(for: [expectation], timeout: 1)
@@ -106,7 +106,7 @@ class IdentityEdgeAPITests: XCTestCase {
         let expectation = XCTestExpectation(description: "getIdentities callback should get called")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
-            let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.identityEdge,
                                                           source: EventSource.responseIdentity,
                                                           data: nil)
@@ -114,7 +114,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.getIdentities { _, error in
+        Identity.getIdentities { _, error in
             XCTAssertNotNil(error)
             XCTAssertEqual(AEPError.unexpected, error as? AEPError)
             expectation.fulfill()
@@ -130,15 +130,15 @@ class IdentityEdgeAPITests: XCTestCase {
         let expectation = XCTestExpectation(description: "getIdentities callback should get called")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity) { event in
-            let responseEvent = event.createResponseEvent(name: IdentityEdgeConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.identityEdge,
                                                           source: EventSource.responseIdentity,
-                                                          data: [IdentityEdgeConstants.XDMKeys.IDENTITY_MAP: [:]])
+                                                          data: [IdentityConstants.XDMKeys.IDENTITY_MAP: [:]])
             MobileCore.dispatch(event: responseEvent)
         }
 
         // test
-        IdentityEdge.getIdentities { identityMap, _ in
+        Identity.getIdentities { identityMap, _ in
             XCTAssertEqual(true, identityMap?.isEmpty)
             expectation.fulfill()
         }
@@ -159,7 +159,7 @@ class IdentityEdgeAPITests: XCTestCase {
         // test
         let map = IdentityMap()
         map.add(item: IdentityItem(id: "id"), withNamespace: "namespace")
-        IdentityEdge.updateIdentities(with: map)
+        Identity.updateIdentities(with: map)
 
         // verify
         wait(for: [expectation], timeout: 1)
@@ -175,7 +175,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.removeIdentity(item: IdentityItem(id: "id"), withNamespace: "namespace")
+        Identity.removeIdentity(item: IdentityItem(id: "id"), withNamespace: "namespace")
 
         // verify
         wait(for: [expectation], timeout: 1)
@@ -191,7 +191,7 @@ class IdentityEdgeAPITests: XCTestCase {
         }
 
         // test
-        IdentityEdge.resetIdentities()
+        Identity.resetIdentities()
 
         // verify
         wait(for: [expectation], timeout: 1)

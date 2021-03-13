@@ -53,7 +53,7 @@ jobs:
           key: cocoapods-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Podfile.lock" }}
           paths:
             - ./Pods
-            - ./SampleApps/AEPIdentityEdgeSampleApp/Pods
+            - ./SampleApps/TestApp/Pods
             - ~/.cocoapods
 
       - run:
@@ -76,7 +76,7 @@ jobs:
       # code coverage
       - run:
           name: Upload Code Coverage Report
-          command: bash <(curl -s https://codecov.io/bash) -v -X s3 -c -D "./build/out" -J "AEPIdentityEdge" -t ${CODECOV_TOKEN}
+          command: bash <(curl -s https://codecov.io/bash) -v -X s3 -c -D "./build/out" -J "AEPEdgeIdentity" -t ${CODECOV_TOKEN}
 
       # verify XCFramework archive builds
       - run:

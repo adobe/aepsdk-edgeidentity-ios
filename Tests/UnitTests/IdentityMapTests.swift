@@ -10,7 +10,7 @@
 // governing permissions and limitations under the License.
 //
 
-@testable import AEPIdentityEdge
+@testable import AEPEdgeIdentity
 import XCTest
 
 class IdentityMapTests: XCTestCase {

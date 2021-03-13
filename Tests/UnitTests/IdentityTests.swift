@@ -11,32 +11,32 @@
 //
 
 @testable import AEPCore
-@testable import AEPIdentityEdge
+@testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
 
-class IdentityEdgeTests: XCTestCase {
-    var identityEdge: IdentityEdge!
+class IdentityTests: XCTestCase {
+    var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identityEdge = IdentityEdge(runtime: mockRuntime)
-        identityEdge.onRegistered()
+        identity = Identity(runtime: mockRuntime)
+        identity.onRegistered()
     }
 
     // MARK: handleIdentifiersRequest
 
-    /// Tests that when identity edge receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
+    /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
     func testIdentityEdgeRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers",
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
                                         event: event,
                                         data: (["testKey": "testVal"], .set))
 
@@ -49,7 +49,7 @@ class IdentityEdgeTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    /// Tests that when identity edge receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
+    /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
     func testIdentityEdgeRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers",
@@ -82,8 +82,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertEqual("id", identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     /// Tests when Identity receives an update identity event without valid data the customer identifiers are not updated
@@ -91,7 +91,7 @@ class IdentityEdgeTests: XCTestCase {
         // set default identities
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
-        identityEdge.state.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
+        identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
 
         // setup
         let event = Event(name: "Test Update Identity",
@@ -102,8 +102,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertEqual("id", identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     // MARK: handleRemoveIdentity
@@ -113,10 +113,10 @@ class IdentityEdgeTests: XCTestCase {
         // set default identities
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
-        identityEdge.state.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
+        identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertEqual("id", identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let identityMap = IdentityMap()
@@ -130,8 +130,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer"))
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "customer"))
     }
 
     /// Tests when Identity receives a remove identity event without valid data the customer identifiers are not modified
@@ -139,10 +139,10 @@ class IdentityEdgeTests: XCTestCase {
         // set default identities
         let defaultIdentities = IdentityMap()
         defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
-        identityEdge.state.identityEdgeProperties.updateCustomerIdentifiers(defaultIdentities)
+        identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertEqual("id", identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
 
         // setup
         let event = Event(name: "Test Remove Identity",
@@ -153,8 +153,8 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify data is the same
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.identityMap)
-        XCTAssertEqual("id", identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertNotNil(identity.state.identityProperties.identityMap)
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
     // MARK: handleRequestReset
@@ -165,8 +165,8 @@ class IdentityEdgeTests: XCTestCase {
         let originalEcid = ECID()
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
-        identityEdge.state.identityEdgeProperties.updateCustomerIdentifiers(identityMap)
-        identityEdge.state.identityEdgeProperties.ecid = originalEcid.ecidString
+        identity.state.identityProperties.updateCustomerIdentifiers(identityMap)
+        identity.state.identityProperties.ecid = originalEcid.ecidString
 
         let event = Event(name: "Test Request Event",
                           type: EventType.identityEdge,
@@ -176,9 +176,9 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.identityMap.getItems(withNamespace: "customer"))
-        XCTAssertNotNil(identityEdge.state.identityEdgeProperties.ecid)
-        XCTAssertNotEqual(originalEcid.ecidString, identityEdge.state.identityEdgeProperties.ecid)
+        XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "customer"))
+        XCTAssertNotNil(identity.state.identityProperties.ecid)
+        XCTAssertNotEqual(originalEcid.ecidString, identity.state.identityProperties.ecid)
     }
 
     // MARK: handleHubSharedState
@@ -188,17 +188,17 @@ class IdentityEdgeTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityEdgeConstants.EventDataKeys.STATE_OWNER: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
                                         event: event,
-                                        data: ([IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
+                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("legacyEcidValue", identityEdge.state.identityEdgeProperties.ecidSecondary)
+        XCTAssertEqual("legacyEcidValue", identity.state.identityProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
 
         guard let sharedState = mockRuntime.createdXdmSharedStates[0], let identityData = sharedState["identityMap"] as? [String: Any] else {
@@ -213,14 +213,14 @@ class IdentityEdgeTests: XCTestCase {
 
     func testHandleHubSharedStateWhenEcidNotInDataClearsLegacyEcid() {
         mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
-        identityEdge.state.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
+        identity.state.identityProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityEdgeConstants.EventDataKeys.STATE_OWNER: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
                                         event: event,
                                         data: (["somekey": "someValue"], .set))
 
@@ -228,7 +228,7 @@ class IdentityEdgeTests: XCTestCase {
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state.identityEdgeProperties.ecidSecondary)
+        XCTAssertNil(identity.state.identityProperties.ecidSecondary)
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
 
         guard let sharedState = mockRuntime.createdXdmSharedStates[0], let identityData = sharedState["identityMap"] as? [String: Any] else {
@@ -243,60 +243,60 @@ class IdentityEdgeTests: XCTestCase {
 
     func testHandleHubSharedStateWhenEcidTheSameDoesNotCreateSharedState() {
         mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
-        identityEdge.state.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
+        identity.state.identityProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityEdgeConstants.EventDataKeys.STATE_OWNER: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
                                         event: event,
-                                        data: ([IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID: "currentLegacyEcid"], .set))
+                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "currentLegacyEcid"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state.identityEdgeProperties.ecidSecondary) // no change
+        XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 
     func testHandleHubSharedStateWhenNoSharedStateDoesNotUpdateLegacyEcid() {
         mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
-        identityEdge.state.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
+        identity.state.identityProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityEdgeConstants.EventDataKeys.STATE_OWNER: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state.identityEdgeProperties.ecidSecondary) // no change
+        XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 
     func testHandleHubSharedStateWhenIncorrectStateownerDoesNotUpdateLegacyEcid() {
         mockRuntime.createdXdmSharedStates = [] // clear shared state from boot
-        identityEdge.state.identityEdgeProperties.ecidSecondary = "currentLegacyEcid"
+        identity.state.identityProperties.ecidSecondary = "currentLegacyEcid"
 
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityEdgeConstants.EventDataKeys.STATE_OWNER: IdentityEdgeConstants.SharedStateKeys.CONFIGURATION])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.CONFIGURATION])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
                                         event: event,
-                                        data: ([IdentityEdgeConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
+                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("currentLegacyEcid", identityEdge.state.identityEdgeProperties.ecidSecondary) // no change
+        XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
         XCTAssertEqual(0, mockRuntime.createdXdmSharedStates.count) // shared state not created
     }
 }

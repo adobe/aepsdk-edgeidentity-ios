@@ -1,8 +1,8 @@
-# Adobe Experience Platform Identity Edge Mobile Extension
+# Adobe Experience Platform Edge Identity Mobile Extension
 
 ## About this project
 
-The AEP Identity Edge Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and requires the `AEPCore` extension.
+The AEP Edge Identity Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks) and requires the `AEPCore` extension.
 
 ## Requirements
 - Xcode 11.0 (or newer)
@@ -21,7 +21,7 @@ use_frameworks!
 # for app development, include all the following pods
 target 'YOUR_TARGET_NAME' do
   	pod 'AEPCore'
-  	pod 'AEPIdentityEdge', :git => 'git@github.com:adobe/aepsdk-identityedge-ios.git', :branch => 'main'
+  	pod 'AEPEdgeIdentity', :git => 'git@github.com:adobe/aepsdk-identityedge-ios.git', :branch => 'main'
 end
 ```
 
@@ -33,22 +33,22 @@ $ pod install
 
 ### [Swift Package Manager](https://github.com/apple/swift-package-manager)
 
-To add the AEPIdentityEdge Package to your application, from the Xcode menu select:
+To add the AEPEdgeIdentity Package to your application, from the Xcode menu select:
 
 `File > Swift Packages > Add Package Dependency...`
 
-Enter the URL for the AEPIdentityEdge package repository: `https://github.com/adobe/aepsdk-identityedge-ios.git`.
+Enter the URL for the AEPEdgeIdentity package repository: `https://github.com/adobe/aepsdk-identityedge-ios.git`.
 
 When prompted, make sure you change the branch to `main`. (Once the repo is public, we will reference specific tags/versions instead of a branch)
 
-Alternatively, if your project has a `Package.swift` file, you can add AEPIdentityEdge directly to your dependencies:
+Alternatively, if your project has a `Package.swift` file, you can add AEPEdgeIdentity directly to your dependencies:
 
 ```
 dependencies: [
 	.package(url: "https://github.com/adobe/aepsdk-identityedge-ios.git", .branch: "main"),
 targets: [
    	.target(name: "YourTarget",
-    				dependencies: ["AEPIdentityEdge"],
+    				dependencies: ["AEPEdgeIdentity"],
           	path: "your/path"),
     ]
 ]
@@ -56,7 +56,7 @@ targets: [
 
 ### Binaries
 
-To generate an `AEPIdenityEdge.xcframework`, run the following command:
+To generate an `AEPEdgeIdentity.xcframework`, run the following command:
 
 ```ruby
 $ make archive
@@ -97,7 +97,7 @@ make test
 
 | Project                                                      | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [AEPCore Extensions](https://github.com/adobe/aepsdk-core-ios) | The AEPCore, AEPServices and AEPIdentity represent the foundation of the Adobe Experience Platform SDK. |
+| [AEPCore Extensions](https://github.com/adobe/aepsdk-core-ios) | The AEPCore and AEPServices represent the foundation of the Adobe Experience Platform SDK. |
 | [AEP SDK Sample App for iOS](https://github.com/adobe/aepsdk-sample-app-ios) | Contains iOS sample apps for the AEP SDK. Apps are provided for both Objective-C and Swift implementations. |
 | [AEP SDK Sample App for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains Android sample app for the AEP SDK.                 |
 ## Contributing

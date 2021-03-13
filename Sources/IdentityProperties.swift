@@ -14,15 +14,15 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// Represents a type which contains instances variables for the Identity Edge extension
-struct IdentityEdgeProperties: Codable {
-    private static let LOG_TAG = "IdentityEdgeProperties"
+/// Represents a type which contains instances variables for this Identity extension
+struct IdentityProperties: Codable {
+    private static let LOG_TAG = "IdentityProperties"
 
     /// List of namespaces which are not allowed to be modified from customer identifier
     private static let reservedNamespaces = [
-        IdentityEdgeConstants.Namespaces.ECID,
-        IdentityEdgeConstants.Namespaces.IDFA,
-        IdentityEdgeConstants.Namespaces.GAID
+        IdentityConstants.Namespaces.ECID,
+        IdentityConstants.Namespaces.IDFA,
+        IdentityConstants.Namespaces.GAID
     ]
 
     /// The underlying IdentityMap structure which holds all the properties
@@ -37,13 +37,13 @@ struct IdentityEdgeProperties: Codable {
         set {
             // Remove previous ECID
             if let primaryEcid = getPrimaryEcid() {
-                identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityConstants.Namespaces.ECID)
             }
 
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
                 identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
-                                withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                                withNamespace: IdentityConstants.Namespaces.ECID)
             }
         }
     }
@@ -57,13 +57,13 @@ struct IdentityEdgeProperties: Codable {
         set {
             // Remove previous ECID
             if let secondaryEcid = getSecondaryEcid() {
-                identityMap.remove(item: IdentityItem(id: secondaryEcid), withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                identityMap.remove(item: IdentityItem(id: secondaryEcid), withNamespace: IdentityConstants.Namespaces.ECID)
             }
 
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
                 identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: false),
-                                withNamespace: IdentityEdgeConstants.Namespaces.ECID)
+                                withNamespace: IdentityConstants.Namespaces.ECID)
             }
         }
     }
@@ -89,49 +89,49 @@ struct IdentityEdgeProperties: Codable {
         identityMap = IdentityMap()
     }
 
-    /// Converts `identityEdgeProperties` into an event data representation in XDM format
-    /// - Parameter allowEmpty: If this `identityEdgeProperties` contains no data, return a dictionary with a single `identityMap` key
+    /// Converts `identityProperties` into an event data representation in XDM format
+    /// - Parameter allowEmpty: If this `identityProperties` contains no data, return a dictionary with a single `identityMap` key
     /// to represent an empty IdentityMap when `allowEmpty` is true
-    /// - Returns: A dictionary representing this `identityEdgeProperties` in XDM format
+    /// - Returns: A dictionary representing this `identityProperties` in XDM format
     func toXdmData(_ allowEmpty: Bool = false) -> [String: Any] {
         var map: [String: Any] = [:]
 
         // encode to event data
         if let dict = identityMap.asDictionary(), !dict.isEmpty || allowEmpty {
-            map[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] = dict
+            map[IdentityConstants.XDMKeys.IDENTITY_MAP] = dict
         }
 
         return map
     }
 
-    /// Populates the fields with values stored in the Identity Edge data store
+    /// Populates the fields with values stored in the data store of this Identity extension
     mutating func loadFromPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        let savedProperties: IdentityEdgeProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
+        let savedProperties: IdentityProperties? = dataStore.getObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES)
 
         if let savedProperties = savedProperties {
             self = savedProperties
         }
     }
 
-    /// Saves this instance of `IdentityEdgeProperties` to the Identity data store
+    /// Saves this instance of `IdentityProperties` to the Identity data store
     func saveToPersistence() {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.DATASTORE_NAME)
-        dataStore.setObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.DATASTORE_NAME)
+        dataStore.setObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES, value: self)
     }
 
     /// Load the ECID value from the Identity direct extension datastore if available.
     /// - Returns: `ECID` from the Identity direct extension datastore, or nil if the datastore or the ECID are not found
     func getEcidFromDirectIdentityPersistence() -> ECID? {
-        let dataStore = NamedCollectionDataStore(name: IdentityEdgeConstants.SharedStateKeys.IDENTITY_DIRECT)
-        let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityEdgeConstants.DataStoreKeys.IDENTITY_PROPERTIES)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT)
+        let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES)
         return identityDirectProperties?.ecid
     }
 
     /// Get the primary ECID from the properties map.
     /// - Returns: the primary ECID or nil if a primary ECID was not found
     private func getPrimaryEcid() -> String? {
-        guard let ecidList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID) else {
+        guard let ecidList = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID) else {
             return nil
         }
 
@@ -146,7 +146,7 @@ struct IdentityEdgeProperties: Codable {
     /// If the primary and secondary ECID ids are the same, then only the primary ECID is set and this function will return nil.
     /// - Returns: the secondary ECID or nil if a secondary ECID was not found
     private func getSecondaryEcid() -> String? {
-        guard let ecidList = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID) else {
+        guard let ecidList = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID) else {
             return nil
         }
 
@@ -163,10 +163,10 @@ struct IdentityEdgeProperties: Codable {
     private func removeIdentitiesWithReservedNamespaces(from identifiersMap: IdentityMap) {
         // Filter out known identifiers to prevent modification of certain namespaces
         let filterItems = IdentityMap()
-        for reservedNamespace in IdentityEdgeProperties.reservedNamespaces {
+        for reservedNamespace in IdentityProperties.reservedNamespaces {
             for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
                 if let items = identifiersMap.getItems(withNamespace: namespace) {
-                    Log.debug(label: IdentityEdgeProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    Log.debug(label: IdentityProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                     for item in items {
                         filterItems.add(item: item, withNamespace: namespace)
                     }

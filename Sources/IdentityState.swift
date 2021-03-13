@@ -14,44 +14,44 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// Manages the business logic of the Identity Edge extension
-class IdentityEdgeState {
-    private let LOG_TAG = "IdentityEdgeState"
+/// Manages the business logic of this Identity extension
+class IdentityState {
+    private let LOG_TAG = "IdentityState"
     private(set) var hasBooted = false
     #if DEBUG
-    var identityEdgeProperties: IdentityEdgeProperties
+    var identityProperties: IdentityProperties
     #else
-    private(set) var identityEdgeProperties: IdentityEdgeProperties
+    private(set) var identityProperties: IdentityProperties
     #endif
 
-    /// Creates a new `IdentityEdgeState` with the given identity edge properties
-    /// - Parameter identityEdgeProperties: identity edge properties
-    init(identityEdgeProperties: IdentityEdgeProperties) {
-        self.identityEdgeProperties = identityEdgeProperties
+    /// Creates a new `IdentityState` with the given Identity properties
+    /// - Parameter identityProperties: Identity properties
+    init(identityProperties: IdentityProperties) {
+        self.identityProperties = identityProperties
     }
 
-    /// Completes init for the Identity Edge extension.
+    /// Completes init for this Identity extension.
     /// - Returns: True if we should share state after bootup, false otherwise
     func bootupIfReady() -> Bool {
         if hasBooted { return false }
 
         // load data from local storage
-        identityEdgeProperties.loadFromPersistence()
+        identityProperties.loadFromPersistence()
 
         // Get new ECID on first launch
-        if identityEdgeProperties.ecid == nil {
-            if let ecid = identityEdgeProperties.getEcidFromDirectIdentityPersistence() {
-                identityEdgeProperties.ecid = ecid.ecidString // get ECID from direct extension
+        if identityProperties.ecid == nil {
+            if let ecid = identityProperties.getEcidFromDirectIdentityPersistence() {
+                identityProperties.ecid = ecid.ecidString // get ECID from direct extension
                 Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
             } else {
-                identityEdgeProperties.ecid = ECID().ecidString // generate new ECID
-                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityEdgeProperties.ecid?.description ?? "")'")
+                identityProperties.ecid = ECID().ecidString // generate new ECID
+                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityProperties.ecid?.description ?? "")'")
             }
-            identityEdgeProperties.saveToPersistence()
+            identityProperties.saveToPersistence()
         }
 
         hasBooted = true
-        Log.debug(label: LOG_TAG, "Identity Edge has successfully booted up")
+        Log.debug(label: LOG_TAG, "Edge Identity has successfully booted up")
         return true
     }
 
@@ -76,7 +76,7 @@ class IdentityEdgeState {
             return
         }
 
-        identityEdgeProperties.updateCustomerIdentifiers(updateIdentityMap)
+        identityProperties.updateCustomerIdentifiers(updateIdentityMap)
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
@@ -95,7 +95,7 @@ class IdentityEdgeState {
             return
         }
 
-        identityEdgeProperties.removeCustomerIdentifiers(removeIdentityMap)
+        identityProperties.removeCustomerIdentifiers(removeIdentityMap)
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
@@ -106,8 +106,8 @@ class IdentityEdgeState {
     func resetIdentifiers(event: Event,
                           createXDMSharedState: ([String: Any], Event) -> Void) {
 
-        identityEdgeProperties.clear()
-        identityEdgeProperties.ecid = ECID().ecidString
+        identityProperties.clear()
+        identityProperties.ecid = ECID().ecidString
 
         saveToPersistence(and: createXDMSharedState, using: event)
     }
@@ -116,22 +116,22 @@ class IdentityEdgeState {
     /// - Parameter legacyEcid: the current ECID for the Identity Direct extension
     /// - Returns: true if the legacy ECID was updated, or false if the legacy ECID did not change
     func updateLegacyExperienceCloudId(_ legacyEcid: String) -> Bool {
-        if legacyEcid == identityEdgeProperties.ecid || legacyEcid == identityEdgeProperties.ecidSecondary {
+        if legacyEcid == identityProperties.ecid || legacyEcid == identityProperties.ecidSecondary {
             return false
         }
 
-        identityEdgeProperties.ecidSecondary = legacyEcid
-        identityEdgeProperties.saveToPersistence()
+        identityProperties.ecidSecondary = legacyEcid
+        identityProperties.saveToPersistence()
         Log.debug(label: LOG_TAG, "Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
         return true
     }
 
-    /// Save `identityEdgeProperties` to persistence and create an XDM shared state.
+    /// Save `identityProperties` to persistence and create an XDM shared state.
     /// - Parameters:
     ///   - createXDMSharedState: function which creates an XDM shared state
     ///   - event: the event used to share the XDM state
     private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
-        identityEdgeProperties.saveToPersistence()
-        createXDMSharedState(identityEdgeProperties.toXdmData(), event)
+        identityProperties.saveToPersistence()
+        createXDMSharedState(identityProperties.toXdmData(), event)
     }
 }

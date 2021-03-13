@@ -16,26 +16,26 @@
 import PackageDescription
 
 let package = Package(
-    name: "AEPIdentityEdge",
+    name: "AEPEdgeIdentity",
     platforms: [.iOS(.v10)],
     products: [
-        .library(name: "AEPIdentityEdge", targets: ["AEPIdentityEdge"])
+        .library(name: "AEPEdgeIdentity", targets: ["AEPEdgeIdentity"])
     ],
     dependencies: [
         .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .branch("main"))
     ],
     targets: [
-        .target(name: "AEPIdentityEdge",
+        .target(name: "AEPEdgeIdentity",
                 dependencies: ["AEPCore"],
                 path: "Sources"),
-        .testTarget(name: "AEPIdentityEdgeSampleApp",
-                    dependencies: ["AEPIdentityEdge"],
-                    path: "SampleApps/AEPIdentityEdgeSampleApp"),
+        .testTarget(name: "AEPEdgeIdentitySampleApp",
+                    dependencies: ["AEPEdgeIdentity"],
+                    path: "SampleApps/AEPEdgeIdentitySampleApp"),
         .testTarget(name: "FunctionalTests",
-                    dependencies: ["AEPIdentityEdge"],
+                    dependencies: ["AEPEdgeIdentity"],
                     path: "Tests/FunctionalTests"),
         .testTarget(name: "UnitTests",
-                    dependencies: ["AEPIdentityEdge"],
+                    dependencies: ["AEPEdgeIdentity"],
                     path: "Tests/UnitTests")
     ]
 )

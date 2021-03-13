@@ -13,9 +13,9 @@
 import AEPCore
 import Foundation
 
-enum IdentityEdgeConstants {
-    static let EXTENSION_NAME = "com.adobe.identityedge"
-    static let FRIENDLY_NAME = "IdentityEdge"
+enum IdentityConstants {
+    static let EXTENSION_NAME = "com.adobe.edge.identity"
+    static let FRIENDLY_NAME = "Edge Identity"
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
 
@@ -29,18 +29,17 @@ enum IdentityEdgeConstants {
     }
 
     enum EventNames {
-        static let REQUEST_IDENTITY_ECID = "Identity Edge Request ECID"
-        static let REQUEST_IDENTITIES = "Identity Edge Request Identities"
-        static let UPDATE_IDENTITIES = "Identity Edge Update Identities"
+        static let REQUEST_IDENTITY_ECID = "Edge Identity Request ECID"
+        static let REQUEST_IDENTITIES = "Edge Identity Request Identities"
+        static let UPDATE_IDENTITIES = "Edge Identity Update Identities"
         static let REMOVE_IDENTITIES = "Idetity Edge Remove Identities"
-        static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Identity Edge Response Content One Time"
+        static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
-        static let REQUEST_RESET = "Identity Edge Request Reset"
+        static let REQUEST_RESET = "Edge Identity Request Reset"
     }
 
     enum EventDataKeys {
         static let VISITOR_ID_ECID = "mid"
-        static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
         static let STATE_OWNER = "stateowner"
     }
 
@@ -65,7 +64,6 @@ enum IdentityEdgeConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
-            static let AD_ID = "adId"
             static let VAL = "val"
             static let YES = "y"
             static let NO = "n"

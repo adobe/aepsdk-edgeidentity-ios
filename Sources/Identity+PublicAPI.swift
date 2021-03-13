@@ -15,14 +15,13 @@ import AEPServices
 import Foundation
 
 /// Defines the public interface for the Identity extension
-@objc public extension IdentityEdge {
-    private static let LOG_TAG = "IdentityEdge"
+@objc public extension Identity {
 
     /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
     /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
-        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITY_ECID,
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -33,13 +32,13 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
                   let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            guard let items = identityMap.getItems(withNamespace: IdentityEdgeConstants.Namespaces.ECID), let ecidItem = items.first else {
+            guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
                 completion("", .none) // IdentityMap exists but ECID has no value, return an empty string
                 return
             }
@@ -49,11 +48,11 @@ import Foundation
     }
 
     /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
-    /// in the `IdentityEdge` extension, then an empty `IdentityMap` is returned.
+    /// in the `Identity` extension, then an empty `IdentityMap` is returned.
     /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
-        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_IDENTITIES,
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.requestIdentity,
                           data: nil)
@@ -64,7 +63,7 @@ import Foundation
                 return
             }
 
-            guard let data = responseEvent.data?[IdentityEdgeConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
+            guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
                   let identityMap = IdentityMap.from(eventData: data) else {
                 completion(nil, AEPError.unexpected)
                 return
@@ -74,18 +73,18 @@ import Foundation
         }
     }
 
-    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The IdentityEdge extension will merge the received identifiers
+    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The Identity extension will merge the received identifiers
     ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
     ///  Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameter map: The identifiers to add or update
     @objc(updateIdentitiesWith:)
     static func updateIdentities(with map: IdentityMap) {
         guard !map.isEmpty, let identityDict = map.asDictionary() else {
-            Log.debug(label: LOG_TAG, "Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")
             return
         }
 
-        let event = Event(name: IdentityEdgeConstants.EventNames.UPDATE_IDENTITIES,
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.updateIdentity,
                           data: identityDict)
@@ -93,7 +92,7 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
-    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The IdentityEdge extension will stop sending this identifier.
+    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The Identity extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
     /// Identifiers which have an empty `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameters:
@@ -105,11 +104,11 @@ import Foundation
         identities.add(item: item, withNamespace: withNamespace)
 
         guard !identities.isEmpty, let identityDict = identities.asDictionary() else {
-            Log.debug(label: LOG_TAG, "Unable to removeIdentity as IdentityItem is empty or could not be encoded to a dictionary.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "Unable to removeIdentity as IdentityItem is empty or could not be encoded to a dictionary.")
             return
         }
 
-        let event = Event(name: IdentityEdgeConstants.EventNames.REMOVE_IDENTITIES,
+        let event = Event(name: IdentityConstants.EventNames.REMOVE_IDENTITIES,
                           type: EventType.identityEdge,
                           source: EventSource.removeIdentity,
                           data: identityDict)
@@ -117,10 +116,10 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
-    /// Clears all Identity Edge identifiers and generates a new Experience Cloud ID (ECID).
+    /// Clears all identifiers from this Identity extension and generates a new Experience Cloud ID (ECID).
     @objc(resetIdentities)
     static func resetIdentities() {
-        let event = Event(name: IdentityEdgeConstants.EventNames.REQUEST_RESET,
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_RESET,
                           type: EventType.identityEdge,
                           source: EventSource.requestReset,
                           data: nil)

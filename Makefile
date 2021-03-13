@@ -1,9 +1,9 @@
 
-export EXTENSION_NAME = AEPIdentityEdge
-export APP_NAME = AEPIdentityEdgeSampleApp
+export EXTENSION_NAME = AEPEdgeIdentity
+export APP_NAME = TestApp
 PROJECT_NAME = $(EXTENSION_NAME)
 TARGET_NAME_XCFRAMEWORK = $(EXTENSION_NAME).xcframework
-SCHEME_NAME_XCFRAMEWORK = AEPIdentityEdgeXCF
+SCHEME_NAME_XCFRAMEWORK = $(EXTENSION_NAME)XCF
 
 SIMULATOR_ARCHIVE_PATH = ./build/ios_simulator.xcarchive/Products/Library/Frameworks/
 IOS_ARCHIVE_PATH = ./build/ios.xcarchive/Products/Library/Frameworks/
