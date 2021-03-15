@@ -123,13 +123,13 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         XCTAssertEqual(ecidEdge, ecidLegacy)
 
         // 2) Reset Edge Identity identifiers and verify ECIDs are different
-        Identity.resetIdentities()
+        MobileCore.resetIdentities()
         var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNil(legacyEcidItem) // Legacy ECID is not set yet as it was cleared but no state change from Identity
         XCTAssertNotEqual(ecidLegacy, primaryEcidItem?.id)
 
-        // 3) Identity Driect state change will add legacy ECID to Identity Map
+        // 3) Identity Direct state change will add legacy ECID to Identity Map
         Identity.syncIdentifiers(identifiers: ["email": "email@example.com"])
         ecidLegacy = getLegacyEcidFromIdentity() // causes test to wait for state change from sync call
 
@@ -180,7 +180,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         XCTAssertEqual(ecidEdge, ecidLegacy)
 
         // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
-        Identity.resetIdentities()
+        MobileCore.resetIdentities()
         toggleGlobalPrivacy()
         ecidLegacy = getLegacyEcidFromIdentity()
         ecidEdge = getEcidFromEdgeIdentity()
