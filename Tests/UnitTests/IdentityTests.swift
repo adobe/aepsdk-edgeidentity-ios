@@ -90,7 +90,7 @@ class IdentityTests: XCTestCase {
     func testIdentityUpdateIdentityWithNilData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
 
         // setup
@@ -112,7 +112,7 @@ class IdentityTests: XCTestCase {
     func testIdentityRemoveIdentityWithValidData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -138,7 +138,7 @@ class IdentityTests: XCTestCase {
     func testIdentityRemoveIdentityWithNilData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
         XCTAssertNotNil(identity.state.identityProperties.identityMap)

@@ -24,13 +24,13 @@ class IdentityMapTests: XCTestCase {
 
     func testGetItemsWith() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
 
         let spaceItems = identityMap.getItems(withNamespace: "space")
         XCTAssertNotNil(spaceItems)
         XCTAssertEqual(1, spaceItems?.count)
         XCTAssertEqual("id", spaceItems?[0].id)
-        XCTAssertEqual("ambiguous", spaceItems?[0].authenticationState.rawValue)
+        XCTAssertEqual("ambiguous", spaceItems?[0].authenticatedState.rawValue)
         XCTAssertFalse(spaceItems?[0].primary ?? true)
 
         let unknown = identityMap.getItems(withNamespace: "unknown")
@@ -41,9 +41,9 @@ class IdentityMapTests: XCTestCase {
 
     func testAddItemWithNamespace() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
         identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
-        identityMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "custom", authenticatedState: AuthenticatedState.ambiguous, primary: true), withNamespace: "space")
 
         guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
@@ -52,10 +52,10 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(2, spaceItems.count)
         XCTAssertEqual("id", spaceItems[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, spaceItems[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, spaceItems[0].authenticatedState)
         XCTAssertFalse(spaceItems[0].primary)
         XCTAssertEqual("custom", spaceItems[1].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, spaceItems[1].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, spaceItems[1].authenticatedState)
         XCTAssertTrue(spaceItems[1].primary)
 
         guard let emailItems = identityMap.getItems(withNamespace: "email") else {
@@ -69,8 +69,8 @@ class IdentityMapTests: XCTestCase {
 
     func testAddItemWithNamespace_overwrite() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.authenticated), withNamespace: "space")
 
         guard let spaceItems = identityMap.getItems(withNamespace: "space") else {
             XCTFail("Namespace 'space' is nil but expected not nil.")
@@ -79,21 +79,21 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(1, spaceItems.count)
         XCTAssertEqual("id", spaceItems[0].id)
-        XCTAssertEqual(AuthenticationState.authenticated, spaceItems[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.authenticated, spaceItems[0].authenticatedState)
         XCTAssertFalse(spaceItems[0].primary)
     }
 
     func testAddItemWithNamespace_withEmptyIdNotAllowed() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.authenticated), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "", authenticatedState: AuthenticatedState.authenticated), withNamespace: "space")
 
         XCTAssertNil(identityMap.getItems(withNamespace: "space"))
     }
 
     func testAddItemWithNamespace_withEmptyNamespaceNotAllowed() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "")
 
         XCTAssertNil(identityMap.getItems(withNamespace: ""))
     }
@@ -102,10 +102,10 @@ class IdentityMapTests: XCTestCase {
 
     func testRemoveItemWithNamespace() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
-        identityMap.add(item: IdentityItem(id: "id2", authenticationState: AuthenticationState.authenticated, primary: true), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id2", authenticatedState: AuthenticatedState.authenticated, primary: true), withNamespace: "space")
         identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
-        identityMap.add(item: IdentityItem(id: "custom", authenticationState: AuthenticationState.ambiguous, primary: true), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "custom", authenticatedState: AuthenticatedState.ambiguous, primary: true), withNamespace: "space")
 
         identityMap.remove(item: IdentityItem(id: "id"), withNamespace: "space")
         identityMap.remove(item: IdentityItem(id: "id2"), withNamespace: "space")
@@ -118,7 +118,7 @@ class IdentityMapTests: XCTestCase {
 
     func testRemoveItemWithNamespaceNotExist() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
 
         identityMap.remove(item: IdentityItem(id: "custom"), withNamespace: "space")
 
@@ -128,7 +128,7 @@ class IdentityMapTests: XCTestCase {
 
     func testRemoveItemWithNamespaceWrongNamespace() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
 
         identityMap.remove(item: IdentityItem(id: "custom"), withNamespace: "galaxy")
 
@@ -153,21 +153,21 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_oneItem() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
             XCTFail("IdentityMap.asDictionary returned nil!")
             return
         }
         let expectedResult: [String: Any] =
-            ["space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]]
+            ["space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
 
     func testEncode_twoItems() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
         identityMap.add(item: IdentityItem(id: "123"), withNamespace: "A")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
@@ -176,8 +176,8 @@ class IdentityMapTests: XCTestCase {
         }
         let expectedResult: [String: Any] =
             [
-                "A": [ ["id": "123", "authenticationState": "ambiguous", "primary": false] ],
-                "space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]
+                "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false] ],
+                "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]
             ]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
@@ -185,7 +185,7 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_twoItemsSameNamespace() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "id", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
         identityMap.add(item: IdentityItem(id: "123"), withNamespace: "space")
 
         guard let actualResult: [String: Any] = identityMap.asDictionary() else {
@@ -195,8 +195,8 @@ class IdentityMapTests: XCTestCase {
         let expectedResult: [String: Any] =
             [
                 "space": [
-                    ["id": "id", "authenticationState": "ambiguous", "primary": false],
-                    ["id": "123", "authenticationState": "ambiguous", "primary": false]
+                    ["id": "id", "authenticatedState": "ambiguous", "primary": false],
+                    ["id": "123", "authenticatedState": "ambiguous", "primary": false]
                 ]
             ]
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
@@ -204,7 +204,7 @@ class IdentityMapTests: XCTestCase {
 
     func testEncode_itemWithEmptyIdNotAllowed() {
         let identityMap = IdentityMap()
-        identityMap.add(item: IdentityItem(id: "", authenticationState: AuthenticationState.ambiguous, primary: false), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "", authenticatedState: AuthenticatedState.ambiguous, primary: false), withNamespace: "space")
 
         XCTAssertEqual(true, identityMap.asDictionary()?.isEmpty)
     }
@@ -216,7 +216,7 @@ class IdentityMapTests: XCTestCase {
             {
               "space" : [
                 {
-                  "authenticationState" : "ambiguous",
+                  "authenticatedState" : "ambiguous",
                   "id" : "id",
                   "primary" : false
                 }
@@ -237,7 +237,7 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(1, items.count)
         XCTAssertEqual("id", items[0].id)
-        XCTAssertEqual("ambiguous", items[0].authenticationState.rawValue)
+        XCTAssertEqual("ambiguous", items[0].authenticatedState.rawValue)
         XCTAssertFalse(items[0].primary)
     }
 
@@ -251,7 +251,7 @@ class IdentityMapTests: XCTestCase {
                ],
                "space" : [
                  {
-                   "authenticationState" : "loggedOut",
+                   "authenticatedState" : "loggedOut",
                    "id" : "id",
                    "primary" : true
                  }
@@ -272,7 +272,7 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(1, spaceItems.count)
         XCTAssertEqual("id", spaceItems[0].id)
-        XCTAssertEqual("loggedOut", spaceItems[0].authenticationState.rawValue)
+        XCTAssertEqual("loggedOut", spaceItems[0].authenticatedState.rawValue)
         XCTAssertTrue(spaceItems[0].primary)
 
         guard let aItems = identityMap?.getItems(withNamespace: "A") else {
@@ -281,7 +281,7 @@ class IdentityMapTests: XCTestCase {
         }
 
         XCTAssertEqual("123", aItems[0].id)
-        XCTAssertEqual("ambiguous", aItems[0].authenticationState.rawValue)
+        XCTAssertEqual("ambiguous", aItems[0].authenticatedState.rawValue)
         XCTAssertFalse(aItems[0].primary)
     }
 
@@ -290,7 +290,7 @@ class IdentityMapTests: XCTestCase {
              {
                "space" : [
                  {
-                   "authenticationState" : "loggedOut",
+                   "authenticatedState" : "loggedOut",
                    "id" : "id",
                    "primary" : true
                  },
@@ -315,11 +315,11 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(2, spaceItems.count)
         XCTAssertEqual("id", spaceItems[0].id)
-        XCTAssertEqual("loggedOut", spaceItems[0].authenticationState.rawValue)
+        XCTAssertEqual("loggedOut", spaceItems[0].authenticatedState.rawValue)
         XCTAssertTrue(spaceItems[0].primary)
 
         XCTAssertEqual("123", spaceItems[1].id)
-        XCTAssertEqual("ambiguous", spaceItems[1].authenticationState.rawValue)
+        XCTAssertEqual("ambiguous", spaceItems[1].authenticatedState.rawValue)
         XCTAssertFalse(spaceItems[1].primary)
 
     }
@@ -329,7 +329,7 @@ class IdentityMapTests: XCTestCase {
               {
                 "space" : [
                   {
-                    "authenticationState" : "ambiguous",
+                    "authenticatedState" : "ambiguous",
                     "id" : "id",
                     "unknown" : true,
                     "primary" : false
@@ -352,7 +352,7 @@ class IdentityMapTests: XCTestCase {
 
         XCTAssertEqual(1, spaceItems.count)
         XCTAssertEqual("id", spaceItems[0].id)
-        XCTAssertEqual("ambiguous", spaceItems[0].authenticationState.rawValue)
+        XCTAssertEqual("ambiguous", spaceItems[0].authenticatedState.rawValue)
         XCTAssertFalse(spaceItems[0].primary)
     }
 
@@ -412,11 +412,11 @@ class IdentityMapTests: XCTestCase {
     func testMerge() {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space1")
-        identityMap.add(item: IdentityItem(id: "item1", authenticationState: .loggedOut, primary: false), withNamespace: "space2")
+        identityMap.add(item: IdentityItem(id: "item1", authenticatedState: .loggedOut, primary: false), withNamespace: "space2")
         identityMap.add(item: IdentityItem(id: "item2"), withNamespace: "space2")
 
         let otherIdentityMap = IdentityMap()
-        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true), withNamespace: "space2")
+        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticatedState: .authenticated, primary: true), withNamespace: "space2")
         otherIdentityMap.add(item: IdentityItem(id: "item3"), withNamespace: "space2")
         otherIdentityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space3")
 
@@ -427,27 +427,27 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)
         // namespace: space1, item: 1: same as original
         XCTAssertEqual("item1", identityMap.getItems(withNamespace: "space1")?[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space1")?[0].primary)
 
         XCTAssertEqual(3, identityMap.getItems(withNamespace: "space2")?.count)
         // namespace: space2, item: 1: overwritten by other
         XCTAssertEqual("item1", identityMap.getItems(withNamespace: "space2")?[0].id)
-        XCTAssertEqual(AuthenticationState.authenticated, identityMap.getItems(withNamespace: "space2")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.authenticated, identityMap.getItems(withNamespace: "space2")?[0].authenticatedState)
         XCTAssertEqual(true, identityMap.getItems(withNamespace: "space2")?[0].primary)
         // namespace: space2, item: 2: same as original
         XCTAssertEqual("item2", identityMap.getItems(withNamespace: "space2")?[1].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space2")?[1].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space2")?[1].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space2")?[1].primary)
         // namespace: space2, item: 3: added by other
         XCTAssertEqual("item3", identityMap.getItems(withNamespace: "space2")?[2].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space2")?[2].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space2")?[2].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space2")?[2].primary)
 
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space3")?.count)
         // namespace: space3, item: 1: added by other
         XCTAssertEqual("item1", identityMap.getItems(withNamespace: "space3")?[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space3")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space3")?[0].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space3")?[0].primary)
     }
 
@@ -462,7 +462,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)
         // namespace: space1, item: 1
         XCTAssertEqual("item1", identityMap.getItems(withNamespace: "space1")?[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space1")?[0].primary)
     }
 
@@ -479,7 +479,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space1")?.count)
         // namespace: space1, item: 1
         XCTAssertEqual("item1", identityMap.getItems(withNamespace: "space1")?[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space1")?[0].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space1")?[0].primary)
     }
 
@@ -488,12 +488,12 @@ class IdentityMapTests: XCTestCase {
     func testRemoveMap() {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space1")
-        identityMap.add(item: IdentityItem(id: "item1", authenticationState: .loggedOut, primary: false), withNamespace: "space2")
+        identityMap.add(item: IdentityItem(id: "item1", authenticatedState: .loggedOut, primary: false), withNamespace: "space2")
         identityMap.add(item: IdentityItem(id: "item2"), withNamespace: "space2")
 
         let otherIdentityMap = IdentityMap()
-        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true), withNamespace: "space1")
-        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticationState: .authenticated, primary: true), withNamespace: "space2")
+        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticatedState: .authenticated, primary: true), withNamespace: "space1")
+        otherIdentityMap.add(item: IdentityItem(id: "item1", authenticatedState: .authenticated, primary: true), withNamespace: "space2")
         otherIdentityMap.add(item: IdentityItem(id: "item3"), withNamespace: "space2")
         otherIdentityMap.add(item: IdentityItem(id: "item1"), withNamespace: "space3")
 
@@ -503,7 +503,7 @@ class IdentityMapTests: XCTestCase {
         XCTAssertNil(identityMap.getItems(withNamespace: "space3"))
         XCTAssertEqual(1, identityMap.getItems(withNamespace: "space2")?.count)
         XCTAssertEqual("item2", identityMap.getItems(withNamespace: "space2")?[0].id)
-        XCTAssertEqual(AuthenticationState.ambiguous, identityMap.getItems(withNamespace: "space2")?[0].authenticationState)
+        XCTAssertEqual(AuthenticatedState.ambiguous, identityMap.getItems(withNamespace: "space2")?[0].authenticatedState)
         XCTAssertEqual(false, identityMap.getItems(withNamespace: "space2")?[0].primary)
 
     }
