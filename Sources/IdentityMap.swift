@@ -188,11 +188,11 @@ public class IdentityItem: NSObject, Codable {
     /// Creates a new `IdentityItem`.
     /// - Parameters:
     ///   - id: Identity of the consumer in the related namespace.
-    ///   - authenticationState: The state this identity is authenticated as. Default is 'ambiguous'.
+    ///   - authenticatedState: The state this identity is authenticated as. Default is 'ambiguous'.
     ///   - primary: Indicates this identity is the preferred identity. Is used as a hint to help systems better organize how identities are queried. Default is false.
-    public init(id: String, authenticationState: AuthenticationState = .ambiguous, primary: Bool = false) {
+    public init(id: String, authenticatedState: AuthenticationState = .ambiguous, primary: Bool = false) {
         self.id = id
-        self.authenticatedState = authenticationState
+        self.authenticatedState = authenticatedState
         self.primary = primary
     }
 
