@@ -17,8 +17,8 @@ import Foundation
 /// - ambiguous - Ambiguous.
 /// - authenticated - User identified by a login or similar action that was valid at the time of the event observation.
 /// - loggedOut - User was identified by a login action at some point of time previously, but is not currently logged in.
-@objc(AEPAuthenticationState)
-public enum AuthenticationState: Int, RawRepresentable, Codable {
+@objc(AEPAuthenticatedState)
+public enum AuthenticatedState: Int, RawRepresentable, Codable {
     case ambiguous = 0
     case authenticated = 1
     case loggedOut = 2
@@ -28,21 +28,21 @@ public enum AuthenticationState: Int, RawRepresentable, Codable {
     public var rawValue: RawValue {
         switch self {
         case .ambiguous:
-            return IdentityConstants.AuthenticationStates.AMBIGUOUS
+            return IdentityConstants.AuthenticatedStates.AMBIGUOUS
         case .authenticated:
-            return IdentityConstants.AuthenticationStates.AUTHENTICATED
+            return IdentityConstants.AuthenticatedStates.AUTHENTICATED
         case .loggedOut:
-            return IdentityConstants.AuthenticationStates.LOGGED_OUT
+            return IdentityConstants.AuthenticatedStates.LOGGED_OUT
         }
     }
 
     public init?(rawValue: RawValue) {
         switch rawValue {
-        case IdentityConstants.AuthenticationStates.AMBIGUOUS:
+        case IdentityConstants.AuthenticatedStates.AMBIGUOUS:
             self = .ambiguous
-        case IdentityConstants.AuthenticationStates.AUTHENTICATED:
+        case IdentityConstants.AuthenticatedStates.AUTHENTICATED:
             self = .authenticated
-        case IdentityConstants.AuthenticationStates.LOGGED_OUT:
+        case IdentityConstants.AuthenticatedStates.LOGGED_OUT:
             self = .loggedOut
         default:
             self = .ambiguous
@@ -182,7 +182,7 @@ public class IdentityMap: NSObject, Codable {
 @objcMembers
 public class IdentityItem: NSObject, Codable {
     public let id: String
-    public let authenticatedState: AuthenticationState
+    public let authenticatedState: AuthenticatedState
     public let primary: Bool
 
     /// Creates a new `IdentityItem`.
@@ -190,7 +190,7 @@ public class IdentityItem: NSObject, Codable {
     ///   - id: Identity of the consumer in the related namespace.
     ///   - authenticatedState: The state this identity is authenticated as. Default is 'ambiguous'.
     ///   - primary: Indicates this identity is the preferred identity. Is used as a hint to help systems better organize how identities are queried. Default is false.
-    public init(id: String, authenticatedState: AuthenticationState = .ambiguous, primary: Bool = false) {
+    public init(id: String, authenticatedState: AuthenticatedState = .ambiguous, primary: Bool = false) {
         self.id = id
         self.authenticatedState = authenticatedState
         self.primary = primary
@@ -213,7 +213,7 @@ public class IdentityItem: NSObject, Codable {
 
         self.id = try values.decode(String.self, forKey: .id)
 
-        if let state = try? values.decode(AuthenticationState.self, forKey: .authenticatedState) {
+        if let state = try? values.decode(AuthenticatedState.self, forKey: .authenticatedState) {
             self.authenticatedState = state
         } else {
             self.authenticatedState = .ambiguous

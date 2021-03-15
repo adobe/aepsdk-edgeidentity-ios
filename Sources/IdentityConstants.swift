@@ -53,7 +53,7 @@ enum IdentityConstants {
         static let GAID = "GAID"
     }
 
-    enum AuthenticationStates {
+    enum AuthenticatedStates {
         static let AMBIGUOUS = "ambiguous"
         static let AUTHENTICATED = "authenticated"
         static let LOGGED_OUT = "loggedOut"
