@@ -108,7 +108,7 @@ class IdentityPropertiesTests: XCTestCase {
         XCTAssertNotNil(props.ecid)
         XCTAssertEqual(properties.ecid, props.ecid)
         XCTAssertEqual("identifier", props.identityMap.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticatedState)
         XCTAssertEqual(false, props.identityMap.getItems(withNamespace: "custom")?[0].primary)
     }
 

@@ -182,7 +182,7 @@ public class IdentityMap: NSObject, Codable {
 @objcMembers
 public class IdentityItem: NSObject, Codable {
     public let id: String
-    public let authenticationState: AuthenticationState
+    public let authenticatedState: AuthenticationState
     public let primary: Bool
 
     /// Creates a new `IdentityItem`.
@@ -192,7 +192,7 @@ public class IdentityItem: NSObject, Codable {
     ///   - primary: Indicates this identity is the preferred identity. Is used as a hint to help systems better organize how identities are queried. Default is false.
     public init(id: String, authenticationState: AuthenticationState = .ambiguous, primary: Bool = false) {
         self.id = id
-        self.authenticationState = authenticationState
+        self.authenticatedState = authenticationState
         self.primary = primary
     }
 
@@ -204,7 +204,7 @@ public class IdentityItem: NSObject, Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case authenticationState
+        case authenticatedState
         case primary
     }
 
@@ -213,10 +213,10 @@ public class IdentityItem: NSObject, Codable {
 
         self.id = try values.decode(String.self, forKey: .id)
 
-        if let state = try? values.decode(AuthenticationState.self, forKey: .authenticationState) {
-            self.authenticationState = state
+        if let state = try? values.decode(AuthenticationState.self, forKey: .authenticatedState) {
+            self.authenticatedState = state
         } else {
-            self.authenticationState = .ambiguous
+            self.authenticatedState = .ambiguous
         }
 
         if let primaryId = try? values.decode(Bool.self, forKey: .primary) {
