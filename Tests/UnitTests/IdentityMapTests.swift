@@ -160,7 +160,7 @@ class IdentityMapTests: XCTestCase {
             return
         }
         let expectedResult: [String: Any] =
-            ["space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]]
+            ["space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
@@ -176,8 +176,8 @@ class IdentityMapTests: XCTestCase {
         }
         let expectedResult: [String: Any] =
             [
-                "A": [ ["id": "123", "authenticationState": "ambiguous", "primary": false] ],
-                "space": [ ["id": "id", "authenticationState": "ambiguous", "primary": false] ]
+                "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false] ],
+                "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]
             ]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
@@ -195,8 +195,8 @@ class IdentityMapTests: XCTestCase {
         let expectedResult: [String: Any] =
             [
                 "space": [
-                    ["id": "id", "authenticationState": "ambiguous", "primary": false],
-                    ["id": "123", "authenticationState": "ambiguous", "primary": false]
+                    ["id": "id", "authenticatedState": "ambiguous", "primary": false],
+                    ["id": "123", "authenticatedState": "ambiguous", "primary": false]
                 ]
             ]
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
@@ -216,7 +216,7 @@ class IdentityMapTests: XCTestCase {
             {
               "space" : [
                 {
-                  "authenticationState" : "ambiguous",
+                  "authenticatedState" : "ambiguous",
                   "id" : "id",
                   "primary" : false
                 }
@@ -251,7 +251,7 @@ class IdentityMapTests: XCTestCase {
                ],
                "space" : [
                  {
-                   "authenticationState" : "loggedOut",
+                   "authenticatedState" : "loggedOut",
                    "id" : "id",
                    "primary" : true
                  }
@@ -290,7 +290,7 @@ class IdentityMapTests: XCTestCase {
              {
                "space" : [
                  {
-                   "authenticationState" : "loggedOut",
+                   "authenticatedState" : "loggedOut",
                    "id" : "id",
                    "primary" : true
                  },
@@ -329,7 +329,7 @@ class IdentityMapTests: XCTestCase {
               {
                 "space" : [
                   {
-                    "authenticationState" : "ambiguous",
+                    "authenticatedState" : "ambiguous",
                     "id" : "id",
                     "unknown" : true,
                     "primary" : false
