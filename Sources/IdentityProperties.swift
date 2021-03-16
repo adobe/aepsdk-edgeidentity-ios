@@ -42,7 +42,7 @@ struct IdentityProperties: Codable {
 
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
-                identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: true),
+                identityMap.add(item: IdentityItem(id: newEcid, authenticatedState: .ambiguous, primary: true),
                                 withNamespace: IdentityConstants.Namespaces.ECID)
             }
         }
@@ -62,7 +62,7 @@ struct IdentityProperties: Codable {
 
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
-                identityMap.add(item: IdentityItem(id: newEcid, authenticationState: .ambiguous, primary: false),
+                identityMap.add(item: IdentityItem(id: newEcid, authenticatedState: .ambiguous, primary: false),
                                 withNamespace: IdentityConstants.Namespaces.ECID)
             }
         }

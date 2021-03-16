@@ -29,8 +29,8 @@ class IdentityTests: XCTestCase {
 
     // MARK: handleIdentifiersRequest
 
-    /// Tests that when identity receives a identity request identity event with empty event data that we dispatch a response event with the identifiers
-    func testIdentityEdgeRequestIdentifiersHappy() {
+    /// Tests that when identity receives an edge identity request identity event with empty event data that we dispatch a response event with the identifiers
+    func testEdgeIdentityRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers",
                           type: EventType.edgeIdentity,
@@ -49,8 +49,8 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
-    /// Tests that when identity receives a identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
-    func testIdentityEdgeRequestIdentifiersNoConfig() {
+    /// Tests that when identity receives an edge identity request identity event with empty event data and no config that we dispatch a response event with the identifiers
+    func testEdgeIdentityRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers",
                           type: EventType.edgeIdentity,
@@ -90,7 +90,7 @@ class IdentityTests: XCTestCase {
     func testIdentityUpdateIdentityWithNilData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
 
         // setup
@@ -112,7 +112,7 @@ class IdentityTests: XCTestCase {
     func testIdentityRemoveIdentityWithValidData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -138,7 +138,7 @@ class IdentityTests: XCTestCase {
     func testIdentityRemoveIdentityWithNilData() {
         // set default identities
         let defaultIdentities = IdentityMap()
-        defaultIdentities.add(item: IdentityItem(id: "id", authenticationState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
         // verify setup
         XCTAssertNotNil(identity.state.identityProperties.identityMap)

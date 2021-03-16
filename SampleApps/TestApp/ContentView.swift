@@ -114,7 +114,7 @@ struct GetIdentitiesView: View {
 struct CustomIdentiferView: View {
     @State var identityItemText: String = ""
     @State var identityNamespaceText: String = ""
-    @State var selectedAuthenticationState: AuthenticationState = .ambiguous
+    @State var selectedAuthenticatedState: AuthenticatedState = .ambiguous
     @State var isPrimaryChecked: Bool = false
 
     var body: some View {
@@ -141,23 +141,23 @@ struct CustomIdentiferView: View {
                 }
             }
             HStack {
-                Picker("AuthenticationState", selection: $selectedAuthenticationState) {
-                    Text("ambiguous").tag(AuthenticationState.ambiguous)
-                    Text("authenticated").tag(AuthenticationState.authenticated)
-                    Text("logged out").tag(AuthenticationState.loggedOut)
+                Picker("AuthenticatedState", selection: $selectedAuthenticatedState) {
+                    Text("ambiguous").tag(AuthenticatedState.ambiguous)
+                    Text("authenticated").tag(AuthenticatedState.authenticated)
+                    Text("logged out").tag(AuthenticatedState.loggedOut)
                 }.pickerStyle(SegmentedPickerStyle())
             }
             HStack {
                 Button(action: {
                     let map = IdentityMap()
-                    map.add(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                    map.add(item: IdentityItem(id: identityItemText, authenticatedState: selectedAuthenticatedState, primary: isPrimaryChecked),
                             withNamespace: identityNamespaceText)
                     AEPEdgeIdentity.Identity.updateIdentities(with: map)
                 }) {
                     Text("Update Identity")
                 }.padding()
                 Button(action: {
-                    AEPEdgeIdentity.Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticationState: selectedAuthenticationState, primary: isPrimaryChecked),
+                    AEPEdgeIdentity.Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticatedState: selectedAuthenticatedState, primary: isPrimaryChecked),
                                                             withNamespace: identityNamespaceText)
                 }) {
                     Text("Remove Identity")

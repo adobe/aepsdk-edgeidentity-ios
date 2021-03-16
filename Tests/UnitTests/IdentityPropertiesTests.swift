@@ -57,8 +57,8 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ],
-                "custom": [ ["id": "identifier", "authenticationState": "ambiguous", "primary": 0] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 1] ],
+                "custom": [ ["id": "identifier", "authenticatedState": "ambiguous", "primary": 0] ]
             ]
             ]
 
@@ -81,7 +81,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)", "authenticationState": "ambiguous", "primary": 1] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 1] ]
             ]
             ]
 
@@ -108,7 +108,7 @@ class IdentityPropertiesTests: XCTestCase {
         XCTAssertNotNil(props.ecid)
         XCTAssertEqual(properties.ecid, props.ecid)
         XCTAssertEqual("identifier", props.identityMap.getItems(withNamespace: "custom")?[0].id)
-        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticationState)
+        XCTAssertEqual(.ambiguous, props.identityMap.getItems(withNamespace: "custom")?[0].authenticatedState)
         XCTAssertEqual(false, props.identityMap.getItems(withNamespace: "custom")?[0].primary)
     }
 
