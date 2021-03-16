@@ -33,7 +33,7 @@ class IdentityTests: XCTestCase {
     func testIdentityEdgeRequestIdentifiersHappy() {
         // setup
         let event = Event(name: "Test Request Identifiers",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
                           data: nil)
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
@@ -53,7 +53,7 @@ class IdentityTests: XCTestCase {
     func testIdentityEdgeRequestIdentifiersNoConfig() {
         // setup
         let event = Event(name: "Test Request Identifiers",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
                           data: nil)
 
@@ -75,7 +75,7 @@ class IdentityTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
 
         let event = Event(name: "Test Update Identity",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: identityMap.asDictionary())
         // test
@@ -95,7 +95,7 @@ class IdentityTests: XCTestCase {
 
         // setup
         let event = Event(name: "Test Update Identity",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: nil)
         // test
@@ -123,7 +123,7 @@ class IdentityTests: XCTestCase {
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
 
         let event = Event(name: "Test Remove Identity",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.removeIdentity,
                           data: identityMap.asDictionary())
         // test
@@ -146,7 +146,7 @@ class IdentityTests: XCTestCase {
 
         // setup
         let event = Event(name: "Test Remove Identity",
-                          type: EventType.identityEdge,
+                          type: EventType.edgeIdentity,
                           source: EventSource.removeIdentity,
                           data: nil)
         // test
@@ -169,7 +169,7 @@ class IdentityTests: XCTestCase {
         identity.state.identityProperties.ecid = originalEcid.ecidString
 
         let event = Event(name: "Test Request Event",
-                          type: EventType.identityEdge,
+                          type: EventType.genericIdentity,
                           source: EventSource.requestReset,
                           data: nil)
         // test

@@ -31,10 +31,10 @@ import Foundation
     }
 
     public func onRegistered() {
-        registerListener(type: EventType.identityEdge, source: EventSource.requestIdentity, listener: handleIdentityRequest)
-        registerListener(type: EventType.identityEdge, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
-        registerListener(type: EventType.identityEdge, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
-        registerListener(type: EventType.identityEdge, source: EventSource.requestReset, listener: handleRequestReset)
+        registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
+        registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
+        registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
+        registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
 
         // attempt to bootup
@@ -58,7 +58,7 @@ import Foundation
     private func handleIdentityRequest(event: Event) {
         let xdmData = state.identityProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
-                                                      type: EventType.identityEdge,
+                                                      type: EventType.edgeIdentity,
                                                       source: EventSource.responseIdentity,
                                                       data: xdmData)
 
@@ -82,7 +82,8 @@ import Foundation
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: createXDMSharedState(data:event:))
+                               createXDMSharedState: createXDMSharedState(data:event:),
+                               eventDispatcher: dispatch(event:))
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.
