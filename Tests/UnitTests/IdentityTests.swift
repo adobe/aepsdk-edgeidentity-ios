@@ -169,7 +169,7 @@ class IdentityTests: XCTestCase {
         identity.state.identityProperties.ecid = originalEcid.ecidString
 
         let event = Event(name: "Test Request Event",
-                          type: EventType.edgeIdentity,
+                          type: EventType.genericIdentity,
                           source: EventSource.requestReset,
                           data: nil)
         // test

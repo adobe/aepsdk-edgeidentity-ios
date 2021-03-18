@@ -99,17 +99,26 @@ class IdentityState {
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
-    /// Clears all identities and regenerates a new ECID value. Saves identites to persistance and creates a new XDM shared state after operation completes.
+    /// Clears all identities and regenerates a new ECID value.
+    /// Saves identities to persistence and creates a new XDM shared state and dispatches a new` resetComplete` event after operation completes.
     /// - Parameters:
     ///   - event: event which triggered the reset call
     ///   - createXDMSharedState: function which creates new XDM shared states
+    ///   - eventDispatcher: function which dispatches a new `Event`
     func resetIdentifiers(event: Event,
-                          createXDMSharedState: ([String: Any], Event) -> Void) {
+                          createXDMSharedState: ([String: Any], Event) -> Void,
+                          eventDispatcher: (Event) -> Void) {
 
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
         saveToPersistence(and: createXDMSharedState, using: event)
+
+        let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
+                          type: EventType.edgeIdentity,
+                          source: EventSource.resetComplete,
+                          data: nil)
+        eventDispatcher(event)
     }
 
     /// Update the legacy ECID property with `legacyEcid` provided it does not equal the current ECID or legacy ECID.

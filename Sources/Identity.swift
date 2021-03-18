@@ -34,7 +34,7 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
-        registerListener(type: EventType.edgeIdentity, source: EventSource.requestReset, listener: handleRequestReset)
+        registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
 
         // attempt to bootup
@@ -82,7 +82,8 @@ import Foundation
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: createXDMSharedState(data:event:))
+                               createXDMSharedState: createXDMSharedState(data:event:),
+                               eventDispatcher: dispatch(event:))
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.

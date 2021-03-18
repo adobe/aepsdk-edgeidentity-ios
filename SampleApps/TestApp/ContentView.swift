@@ -95,7 +95,7 @@ struct GetIdentitiesView: View {
                 }.padding()
 
                 Button(action: {
-                    AEPEdgeIdentity.Identity.resetIdentities()
+                    MobileCore.resetIdentities()
                 }) {
                     Text("Reset Identities")
                 }.padding()
