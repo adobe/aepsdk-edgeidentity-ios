@@ -99,7 +99,8 @@ class IdentityState {
         saveToPersistence(and: createXDMSharedState, using: event)
     }
 
-    /// Clears all identities and regenerates a new ECID value. Saves identities to persistence and creates a new XDM shared state after operation completes.
+    /// Clears all identities and regenerates a new ECID value.
+    /// Saves identities to persistence and creates a new XDM shared state and dispatches a new` resetComplete` event after operation completes.
     /// - Parameters:
     ///   - event: event which triggered the reset call
     ///   - createXDMSharedState: function which creates new XDM shared states
@@ -113,9 +114,9 @@ class IdentityState {
 
         saveToPersistence(and: createXDMSharedState, using: event)
 
-        let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_RESPONSE,
+        let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
                           type: EventType.edgeIdentity,
-                          source: EventSource.responseIdentity,
+                          source: EventSource.resetComplete,
                           data: nil)
         eventDispatcher(event)
     }

@@ -377,7 +377,7 @@ class IdentityStateTests: XCTestCase {
                                createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
                                }, eventDispatcher: { event in
                                 XCTAssertEqual(EventType.edgeIdentity, event.type)
-                                XCTAssertEqual(EventSource.responseIdentity, event.source)
+                                XCTAssertEqual(EventSource.resetComplete, event.source)
                                 responseEventExpectation.fulfill()
                                })
 
