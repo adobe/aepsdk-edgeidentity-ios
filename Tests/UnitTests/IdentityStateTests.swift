@@ -99,6 +99,7 @@ class IdentityStateTests: XCTestCase {
     }
 
     func testUpdateLegacyExperienceCloudIdNotSetWhenLegacyEcidIsSame() {
+        state.identityProperties.ecid = ECID().ecidString
         state.identityProperties.ecidSecondary = "legacyEcid"
 
         XCTAssertFalse(state.updateLegacyExperienceCloudId("legacyEcid"))
