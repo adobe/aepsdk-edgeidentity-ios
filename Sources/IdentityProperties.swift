@@ -42,8 +42,19 @@ struct IdentityProperties: Codable {
 
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
-                identityMap.add(item: IdentityItem(id: newEcid, authenticatedState: .ambiguous, primary: true),
-                                withNamespace: IdentityConstants.Namespaces.ECID)
+                identityMap.add(item: IdentityItem(id: newEcid, authenticatedState: .ambiguous, primary: false),
+                                withNamespace: IdentityConstants.Namespaces.ECID,
+                                asFirstItem: true)
+
+            } else {
+                // If ECID is being removed, remove all other ECIDs as the primary ECID must be first in the list
+                if let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID) {
+                    for item in items {
+                        identityMap.remove(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
+                    }
+                    Log.debug(label: IdentityProperties.LOG_TAG, "Multiple ECID values found when clearing primary ECID. " +
+                                "Primary ECID must be set to have secondary ECID values. ECID value(s) are cleared \(items)")
+                }
             }
         }
     }
@@ -58,6 +69,11 @@ struct IdentityProperties: Codable {
             // Remove previous ECID
             if let secondaryEcid = getSecondaryEcid() {
                 identityMap.remove(item: IdentityItem(id: secondaryEcid), withNamespace: IdentityConstants.Namespaces.ECID)
+            }
+
+            guard let _ = getPrimaryEcid() else {
+                Log.debug(label: IdentityProperties.LOG_TAG, "Cannot set secondary ECID value as no primary ECID exists.")
+                return
             }
 
             // Update ECID if new is not empty
@@ -135,7 +151,8 @@ struct IdentityProperties: Codable {
             return nil
         }
 
-        for ecidItem in ecidList where ecidItem.primary {
+        // the primary ecid is always the first in the list
+        if let ecidItem = ecidList.first {
             return ecidItem.id
         }
 
@@ -150,8 +167,8 @@ struct IdentityProperties: Codable {
             return nil
         }
 
-        for ecidItem in ecidList where !ecidItem.primary {
-            return ecidItem.id
+        if ecidList.count > 1 {
+            return ecidList[1].id
         }
 
         return nil

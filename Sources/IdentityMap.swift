@@ -76,21 +76,7 @@ public class IdentityMap: NSObject, Codable {
     ///   - namespace: The namespace for this identity
     @objc(addItem:withNamespace:)
     public func add(item: IdentityItem, withNamespace: String) {
-        if item.id.isEmpty || withNamespace.isEmpty {
-            Log.debug(label: IdentityMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
-            return
-        }
-
-        if var namespaceItems = items[withNamespace] {
-            if let index = namespaceItems.firstIndex(of: item) {
-                namespaceItems[index] = item
-            } else {
-                namespaceItems.append(item)
-            }
-            items[withNamespace] = namespaceItems
-        } else {
-            items[withNamespace] = [item]
-        }
+        add(item: item, withNamespace: withNamespace, asFirstItem: false)
     }
 
     /// Remove a single `IdentityItem` from this map.
@@ -134,6 +120,32 @@ public class IdentityMap: NSObject, Codable {
                     self.add(item: item, withNamespace: namespace)
                 }
             }
+        }
+    }
+
+    /// Append an `IdentityItem` to this map, with option to insert at the front of items list.
+    /// If an item is added which shares the same `withNamespace` and `item.id` as an item already in the map, then the new item replaces
+    /// the existing item. Empty `withNamepace` or items with an empty `item.id` are not allowed and are ignored.
+    /// - Parameters:
+    ///   - item: The identity as an `IdentityItem` object
+    ///   - namespace: The namespace for this identity
+    ///   - asFirstItem: if true, `IdentityItem` is added as the first element in the list, otherwise it is appended to the end of the list
+    func add(item: IdentityItem, withNamespace: String, asFirstItem: Bool) {
+        if item.id.isEmpty || withNamespace.isEmpty {
+            Log.debug(label: IdentityMap.LOG_TAG, "Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
+            return
+        }
+
+        if var namespaceItems = items[withNamespace] {
+            if let index = namespaceItems.firstIndex(of: item) {
+                namespaceItems[index] = item
+            } else {
+                let insertIndex = asFirstItem ? 0 : namespaceItems.endIndex
+                namespaceItems.insert(item, at: insertIndex)
+            }
+            items[withNamespace] = namespaceItems
+        } else {
+            items[withNamespace] = [item]
         }
     }
 

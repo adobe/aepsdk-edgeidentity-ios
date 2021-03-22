@@ -57,7 +57,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 1] ],
+                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] ],
                 "custom": [ ["id": "identifier", "authenticatedState": "ambiguous", "primary": 0] ]
             ]
             ]
@@ -81,9 +81,86 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 1] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] ]
             ]
             ]
+
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
+    }
+
+    func testSetPrimaryECIDPreservesSecondaryECID() {
+        // setup
+        let primaryEcid = ECID()
+        let secondaryEcid = ECID()
+
+        var properties = IdentityProperties()
+        properties.ecid = ECID().ecidString
+        properties.ecidSecondary = secondaryEcid.ecidString
+
+        // test
+        properties.ecid = primaryEcid.ecidString
+        let xdmData = properties.toXdmData()
+
+        // verify
+        let expectedResult: [String: Any] =
+            [ "identityMap": [
+                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
+                          ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
+            ]]
+
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
+    }
+
+    func testSetSecondaryECID() {
+        // setup
+        let primaryEcid = ECID()
+        let secondaryEcid = ECID()
+
+        var properties = IdentityProperties()
+        properties.ecid = primaryEcid.ecidString
+        properties.ecidSecondary = ECID().ecidString
+
+        // test
+        properties.ecidSecondary = secondaryEcid.ecidString
+        let xdmData = properties.toXdmData()
+
+        // verify
+        let expectedResult: [String: Any] =
+            [ "identityMap": [
+                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
+                          ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
+            ]]
+
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
+    }
+
+    func testClearPrimaryECIDAlsoClearsSecondaryECID() {
+        // setup
+        var properties = IdentityProperties()
+        properties.ecid = ECID().ecidString
+        properties.ecidSecondary = ECID().ecidString
+
+        // test
+        properties.ecid = nil
+        let xdmData = properties.toXdmData()
+
+        // verify
+        let expectedResult: [String: Any] = [:]
+
+        XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
+    }
+
+    func testCannotSetSecondaryECIDIfPrimaryNotSet() {
+        // setup
+        var properties = IdentityProperties()
+        properties.ecidSecondary = ECID().ecidString
+
+        // test
+        properties.ecid = nil
+        let xdmData = properties.toXdmData()
+
+        // verify
+        let expectedResult: [String: Any] = [:]
 
         XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }
