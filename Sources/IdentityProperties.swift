@@ -40,28 +40,21 @@ struct IdentityProperties: Codable {
                 identityMap.remove(item: IdentityItem(id: primaryEcid), withNamespace: IdentityConstants.Namespaces.ECID)
             }
 
-            // Primary ECID needs to be first in list, get any other ECIDs then remove from IdentityMap
-            let otherEcids = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID)
-            if let items = otherEcids {
-                for item in items {
-                    identityMap.remove(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
-                }
-            }
-
             // Update ECID if new is not empty
             if let newEcid = newValue, !newEcid.isEmpty {
                 identityMap.add(item: IdentityItem(id: newEcid, authenticatedState: .ambiguous, primary: false),
-                                withNamespace: IdentityConstants.Namespaces.ECID)
+                                withNamespace: IdentityConstants.Namespaces.ECID,
+                                asFirstItem: true)
 
-                // Add back any other ECIDs. If the primary ECID is removed, then there cannot be secondary ECIDs
-                if let items = otherEcids {
+            } else {
+                // If ECID is being removed, remove all other ECIDs as the primary ECID must be first in the list
+                if let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID) {
                     for item in items {
-                        identityMap.add(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
+                        identityMap.remove(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
                     }
+                    Log.debug(label: IdentityProperties.LOG_TAG, "Multiple ECID values found when clearing primary ECID. " +
+                                "Primary ECID must be set to have secondary ECID values. ECID value(s) are cleared \(items)")
                 }
-            } else if let items = otherEcids {
-                Log.debug(label: IdentityProperties.LOG_TAG, "Multiple ECID values found when clearing primary ECID. " +
-                            "Primary ECID must be set to have secondary ECID values. ECID value(s) are cleared \(items)")
             }
         }
     }
