@@ -29,7 +29,7 @@ struct ContentView: View {
             VStack(alignment: .center, spacing: 20, content: {
 
                 NavigationLink(
-                    destination: CustomIdentiferView(),
+                    destination: CustomIdentifierView(),
                     label: {
                         Text("Update Custom Identity")
                     })
@@ -111,7 +111,7 @@ struct GetIdentitiesView: View {
     }
 }
 
-struct CustomIdentiferView: View {
+struct CustomIdentifierView: View {
     @State var identityItemText: String = ""
     @State var identityNamespaceText: String = ""
     @State var selectedAuthenticatedState: AuthenticatedState = .ambiguous
