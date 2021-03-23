@@ -9,8 +9,9 @@
 // OF ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 //
-
+import AEPAssurance
 import AEPCore
+import AEPEdge
 import AEPEdgeIdentity
 import AEPIdentity
 import SwiftUI
@@ -27,6 +28,13 @@ struct ContentView: View {
 
         NavigationView {
             VStack(alignment: .center, spacing: 20, content: {
+
+                NavigationLink(
+                    destination: AssuranceView(),
+                    label: {
+                        Text("Assurance")
+                    }
+                )
 
                 NavigationLink(
                     destination: CustomIdentifierView(),
@@ -253,6 +261,35 @@ struct MultipleIdentityView: View {
         }
         .padding()
         .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+    }
+}
+
+struct AssuranceView: View {
+    @State private var assuranceSessionUrl: String = ""
+
+    var body: some View {
+        VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
+            TextField("Copy Assurance Session URL to here", text: $assuranceSessionUrl)
+            HStack {
+                Button(action: {
+                    // step-assurance-start
+                    // replace the url with the valid one generated on Assurance UI
+                    if let url = URL(string: self.assuranceSessionUrl) {
+                        AEPAssurance.startSession(url)
+                    }
+                    // step-assurance-end
+                }) {
+                    Text("Connect")
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .font(.caption)
+                }.cornerRadius(5)
+            }
+        }.padding().onAppear {
+            MobileCore.track(state: "AssuranceView", data: nil)
+        }
     }
 }
 

@@ -103,7 +103,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
 
         let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
-        XCTAssertEqual(true, primaryEcidItem?.primary)
+        XCTAssertEqual(false, primaryEcidItem?.primary)
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
         XCTAssertEqual(false, legacyEcidItem?.primary)
     }
@@ -303,9 +303,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         if ecids.count == 1 {
             return (ecids[0], nil)
         } else {
-            let primaryIndex = ecids[0].primary ? 0 : 1
-            let legacyIndex = ecids[0].primary ? 1 : 0
-            return (ecids[primaryIndex], ecids[legacyIndex])
+            return (ecids[0], ecids[1])
         }
     }
 

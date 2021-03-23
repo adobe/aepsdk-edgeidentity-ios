@@ -65,6 +65,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B691DBBA260985BA00BC6B08 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D43BAB0725BBA4F700B08CC0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D43BAB0F25BBA4F700B08CC0;
+			remoteInfo = AEPEdgeIdentity;
+		};
 		BFF649DF25C160B60012A4C5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D43BAB0725BBA4F700B08CC0 /* Project object */;
@@ -236,7 +243,8 @@
 				B6F27ECF2609146A00C50A04 /* Info.plist */,
 				B6F27ED02609146A00C50A04 /* main.m */,
 			);
-			path = TestAppObjC;
+			name = TestAppObjC;
+			path = SampleApps/TestAppObjC;
 			sourceTree = "<group>";
 		};
 		BF1DABA225D5B77700CCD574 /* Public */ = {
@@ -399,6 +407,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B691DBBB260985BA00BC6B08 /* PBXTargetDependency */,
 			);
 			name = TestAppObjC;
 			productName = TestAppObjC;
@@ -900,6 +909,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B691DBBB260985BA00BC6B08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D43BAB0F25BBA4F700B08CC0 /* AEPEdgeIdentity */;
+			targetProxy = B691DBBA260985BA00BC6B08 /* PBXContainerItemProxy */;
+		};
 		BFF649E025C160B60012A4C5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D43BAB0F25BBA4F700B08CC0 /* AEPEdgeIdentity */;
@@ -950,7 +964,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
-				INFOPLIST_FILE = TestAppObjC/Info.plist;
+				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -970,7 +984,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
-				INFOPLIST_FILE = TestAppObjC/Info.plist;
+				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
