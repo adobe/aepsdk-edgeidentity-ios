@@ -9,7 +9,6 @@
 // OF ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 //
-
 import AEPAssurance
 import AEPCore
 import AEPEdge
@@ -38,7 +37,7 @@ struct ContentView: View {
                 )
 
                 NavigationLink(
-                    destination: CustomIdentiferView(),
+                    destination: CustomIdentifierView(),
                     label: {
                         Text("Update Custom Identity")
                     })
@@ -120,7 +119,7 @@ struct GetIdentitiesView: View {
     }
 }
 
-struct CustomIdentiferView: View {
+struct CustomIdentifierView: View {
     @State var identityItemText: String = ""
     @State var identityNamespaceText: String = ""
     @State var selectedAuthenticatedState: AuthenticatedState = .ambiguous

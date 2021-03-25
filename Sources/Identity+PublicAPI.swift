@@ -77,7 +77,7 @@ import Foundation
     ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
     ///  Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameter map: The identifiers to add or update
-    @objc(updateIdentitiesWith:)
+    @objc(updateIdentities:)
     static func updateIdentities(with map: IdentityMap) {
         guard !map.isEmpty, let identityDict = map.asDictionary() else {
             Log.debug(label: IdentityConstants.FRIENDLY_NAME, "Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")

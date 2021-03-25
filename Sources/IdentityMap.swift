@@ -63,7 +63,7 @@ public class IdentityMap: NSObject, Codable {
     }
 
     /// A list of all namespaces used in this `IdentityMap`.
-    internal var namespaces: [String] {
+    @objc public var namespaces: [String] {
         return items.map({$0.key})
     }
 
