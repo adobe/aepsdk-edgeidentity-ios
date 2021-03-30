@@ -18,6 +18,7 @@ enum IdentityConstants {
     static let FRIENDLY_NAME = "Edge Identity"
     static let EXTENSION_VERSION = "1.0.0-alpha.1"
     static let DATASTORE_NAME = EXTENSION_NAME
+    static let LOG_TAG = FRIENDLY_NAME
 
     enum Default {
         static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"

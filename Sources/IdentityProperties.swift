@@ -16,7 +16,6 @@ import Foundation
 
 /// Represents a type which contains instances variables for this Identity extension
 struct IdentityProperties: Codable {
-    private static let LOG_TAG = "IdentityProperties"
 
     /// List of namespaces which are not allowed to be modified from customer identifier
     private static let reservedNamespaces = [
@@ -52,7 +51,7 @@ struct IdentityProperties: Codable {
                     for item in items {
                         identityMap.remove(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
                     }
-                    Log.debug(label: IdentityProperties.LOG_TAG, "IdentityProperties - Multiple ECID values found when clearing primary ECID. " +
+                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Multiple ECID values found when clearing primary ECID. " +
                                 "Primary ECID must be set to have secondary ECID values. ECID value(s) are cleared \(items)")
                 }
             }
@@ -72,7 +71,7 @@ struct IdentityProperties: Codable {
             }
 
             guard let _ = getPrimaryEcid() else {
-                Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityProperties - Cannot set secondary ECID value as no primary ECID exists.")
+                Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Cannot set secondary ECID value as no primary ECID exists.")
                 return
             }
 
@@ -183,7 +182,7 @@ struct IdentityProperties: Codable {
         for reservedNamespace in IdentityProperties.reservedNamespaces {
             for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
                 if let items = identifiersMap.getItems(withNamespace: namespace) {
-                    Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                     for item in items {
                         filterItems.add(item: item, withNamespace: namespace)
                     }

@@ -131,7 +131,7 @@ public class IdentityMap: NSObject, Codable {
     ///   - asFirstItem: if true, `IdentityItem` is added as the first element in the list, otherwise it is appended to the end of the list
     func add(item: IdentityItem, withNamespace: String, asFirstItem: Bool) {
         if item.id.isEmpty || withNamespace.isEmpty {
-            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityMap - Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "IdentityMap - Ignoring add:item:withNamespace, empty identifiers and namespaces are not allowed.")
             return
         }
 
@@ -174,12 +174,12 @@ public class IdentityMap: NSObject, Codable {
     /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
     static func from(eventData: [String: Any]) -> IdentityMap? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: eventData) else {
-            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityMap - Unable to serialize identity event data.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "IdentityMap - Unable to serialize identity event data.")
             return nil
         }
 
         guard let identityMap = try? JSONDecoder().decode(IdentityMap.self, from: jsonData) else {
-            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityMap - Unable to decode identity data into an IdentityMap.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "IdentityMap - Unable to decode identity data into an IdentityMap.")
             return nil
         }
 
