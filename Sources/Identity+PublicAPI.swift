@@ -80,7 +80,7 @@ import Foundation
     @objc(updateIdentities:)
     static func updateIdentities(with map: IdentityMap) {
         guard !map.isEmpty, let identityDict = map.asDictionary() else {
-            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "Identity - Unable to updateIdentites as IdentityMap is empty or could not be encoded to a dictionary.")
             return
         }
 
@@ -104,7 +104,7 @@ import Foundation
         identities.add(item: item, withNamespace: withNamespace)
 
         guard !identities.isEmpty, let identityDict = identities.asDictionary() else {
-            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "Unable to removeIdentity as IdentityItem is empty or could not be encoded to a dictionary.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "Identity - Unable to removeIdentity as IdentityItem is empty or could not be encoded to a dictionary.")
             return
         }
 
