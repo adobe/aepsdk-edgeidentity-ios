@@ -52,7 +52,7 @@ struct IdentityProperties: Codable {
                     for item in items {
                         identityMap.remove(item: item, withNamespace: IdentityConstants.Namespaces.ECID)
                     }
-                    Log.debug(label: IdentityProperties.LOG_TAG, "Multiple ECID values found when clearing primary ECID. " +
+                    Log.debug(label: IdentityProperties.LOG_TAG, "IdentityProperties - Multiple ECID values found when clearing primary ECID. " +
                                 "Primary ECID must be set to have secondary ECID values. ECID value(s) are cleared \(items)")
                 }
             }
@@ -72,7 +72,7 @@ struct IdentityProperties: Codable {
             }
 
             guard let _ = getPrimaryEcid() else {
-                Log.debug(label: IdentityProperties.LOG_TAG, "Cannot set secondary ECID value as no primary ECID exists.")
+                Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityProperties - Cannot set secondary ECID value as no primary ECID exists.")
                 return
             }
 
@@ -183,7 +183,7 @@ struct IdentityProperties: Codable {
         for reservedNamespace in IdentityProperties.reservedNamespaces {
             for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
                 if let items = identifiersMap.getItems(withNamespace: namespace) {
-                    Log.debug(label: IdentityProperties.LOG_TAG, "Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
                     for item in items {
                         filterItems.add(item: item, withNamespace: namespace)
                     }

@@ -16,7 +16,6 @@ import Foundation
 
 /// Manages the business logic of this Identity extension
 class IdentityState {
-    private let LOG_TAG = "IdentityState"
     private(set) var hasBooted = false
     #if DEBUG
     var identityProperties: IdentityProperties
@@ -42,16 +41,16 @@ class IdentityState {
         if identityProperties.ecid == nil {
             if let ecid = identityProperties.getEcidFromDirectIdentityPersistence() {
                 identityProperties.ecid = ecid.ecidString // get ECID from direct extension
-                Log.debug(label: LOG_TAG, "Bootup - Loading ECID from direct Identity extension '\(ecid)'")
+                Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Loading ECID from direct Identity extension on bootup '\(ecid)'")
             } else {
                 identityProperties.ecid = ECID().ecidString // generate new ECID
-                Log.debug(label: LOG_TAG, "Bootup - Generating new ECID '\(identityProperties.ecid?.description ?? "")'")
+                Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Generating new ECID on bootup '\(identityProperties.ecid?.description ?? "")'")
             }
             identityProperties.saveToPersistence()
         }
 
         hasBooted = true
-        Log.debug(label: LOG_TAG, "Edge Identity has successfully booted up")
+        Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Edge Identity has successfully booted up")
         return true
     }
 
@@ -67,12 +66,12 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared state
     func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         guard let identifiersData = event.data else {
-            Log.debug(label: LOG_TAG, "Failed to update identifiers as no identifiers were found in the event data.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as no identifiers were found in the event data.")
             return
         }
 
         guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
-            Log.debug(label: LOG_TAG, "Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
             return
         }
 
@@ -86,12 +85,12 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared states
     func removeCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
         guard let identifiersData = event.data else {
-            Log.debug(label: LOG_TAG, "Failed to remove identifier as no identifiers were found in the event data.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to remove identifier as no identifiers were found in the event data.")
             return
         }
 
         guard let removeIdentityMap = IdentityMap.from(eventData: identifiersData) else {
-            Log.debug(label: LOG_TAG, "Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
+            Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
             return
         }
 
@@ -131,7 +130,7 @@ class IdentityState {
 
         identityProperties.ecidSecondary = legacyEcid
         identityProperties.saveToPersistence()
-        Log.debug(label: LOG_TAG, "Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
+        Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
         return true
     }
 
