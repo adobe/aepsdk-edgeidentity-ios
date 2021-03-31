@@ -70,7 +70,7 @@ struct IdentityProperties: Codable {
                 identityMap.remove(item: IdentityItem(id: secondaryEcid), withNamespace: IdentityConstants.Namespaces.ECID)
             }
 
-            guard let _ = getPrimaryEcid() else {
+            guard getPrimaryEcid() != nil else {
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Cannot set secondary ECID value as no primary ECID exists.")
                 return
             }
