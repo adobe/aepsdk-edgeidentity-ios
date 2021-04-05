@@ -35,7 +35,6 @@ enum IdentityConstants {
         static let UPDATE_IDENTITIES = "Edge Identity Update Identities"
         static let REMOVE_IDENTITIES = "Edge Identity Remove Identities"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
-        static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
     }
 
