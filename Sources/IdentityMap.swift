@@ -169,7 +169,7 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Decodes a [String: Any] dictionary into an `IdentityMap`
+    /// Decodes a `[String: Any]` dictionary into an `IdentityMap`
     /// - Parameter eventData: the event data representing `IdentityMap`
     /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
     static func from(eventData: [String: Any]) -> IdentityMap? {
