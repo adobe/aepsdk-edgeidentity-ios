@@ -10,7 +10,7 @@
 // governing permissions and limitations under the License.
 //
 
-import AEPCore
+@testable import AEPCore
 @testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
@@ -34,7 +34,9 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecid)
 
         // test
-        let result = state.bootupIfReady()
+        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return nil
+        })
 
         // verify
         XCTAssertTrue(result)
@@ -47,7 +49,9 @@ class IdentityStateTests: XCTestCase {
         state.identityProperties.ecid = ecid.ecidString
 
         // test
-        let result = state.bootupIfReady()
+        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return nil
+        })
 
         // verify
         XCTAssertTrue(result)
@@ -62,7 +66,9 @@ class IdentityStateTests: XCTestCase {
         properties.saveToPersistence() // save to shared data store
 
         // test
-        let result = state.bootupIfReady()
+        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return nil
+        })
 
         //verify
         XCTAssertTrue(result)
@@ -73,9 +79,42 @@ class IdentityStateTests: XCTestCase {
     /// Test that bootup returns false if already booted
     func testBootupIfReadyReturnsFalseWhenBooted() {
         XCTAssertFalse(state.hasBooted)
-        XCTAssertTrue(state.bootupIfReady())
+        XCTAssertTrue(state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return nil
+        }))
         XCTAssertTrue(state.hasBooted)
-        XCTAssertFalse(state.bootupIfReady())
+        XCTAssertFalse(state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return nil
+        }))
+    }
+
+    func testBootupIfReadyReturnsFalseWhenIdentityDirectIsRegistered() {
+        // setup, no ECID set in persistence
+
+        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return SharedStateResult(status: .set, value: [
+                                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                        ]])
+        })
+
+        XCTAssertFalse(state.hasBooted)
+        XCTAssertFalse(result)
+    }
+
+    func testBootupIfReadyGeneratesECIDWhenIdentityDirectIsNotRegistered() {
+        // setup, no ECID set in persistence
+
+        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+            return SharedStateResult(status: .set, value: [
+                                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                            IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
+                                        ]])
+        })
+
+        XCTAssertTrue(state.hasBooted)
+        XCTAssertTrue(result)
+        XCTAssertNotNil(state.identityProperties.ecid)
     }
 
     // MARK: updateLegacyExperienceCloudId(...)
