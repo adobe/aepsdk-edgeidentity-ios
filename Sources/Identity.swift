@@ -36,19 +36,22 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
-
-        // attempt to bootup
-        if state.bootupIfReady() {
-            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
-        }
-
     }
 
     public func onUnregistered() {
     }
 
     public func readyForEvent(_ event: Event) -> Bool {
-        return true
+        if state.hasBooted {
+            return true
+        }
+
+        if state.bootupIfReady(event: event, getSharedState: getSharedState(extensionName:event:barrier:)) {
+            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
+            return true
+        }
+
+        return false
     }
 
     // MARK: Event Listeners
@@ -91,17 +94,17 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-              let stateowner = eventData[IdentityConstants.EventDataKeys.STATE_OWNER] as? String,
-              stateowner == IdentityConstants.SharedStateKeys.IDENTITY_DIRECT else {
+              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+              stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
             return
         }
 
-        guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT, event: event)?.value else {
+        guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event: event)?.value else {
             return
         }
 
         // Get ECID. If doesn't exist then use empty string to clear legacy value
-        let legacyEcid = identitySharedState[IdentityConstants.EventDataKeys.VISITOR_ID_ECID] as? String ?? ""
+        let legacyEcid = identitySharedState[IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID] as? String ?? ""
 
         if state.updateLegacyExperienceCloudId(legacyEcid) {
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: event)

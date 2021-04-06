@@ -36,7 +36,7 @@ class IdentityTests: XCTestCase {
                           type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
                           data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.CONFIGURATION,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
                                         event: event,
                                         data: (["testKey": "testVal"], .set))
 
@@ -188,11 +188,11 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
-                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
+                                        data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -218,9 +218,9 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
                                         data: (["somekey": "someValue"], .set))
 
@@ -248,11 +248,11 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
-                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "currentLegacyEcid"], .set))
+                                        data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "currentLegacyEcid"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -269,7 +269,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT])
+                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -286,11 +286,11 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedStateKeys.CONFIGURATION])
+                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT,
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
-                                        data: ([IdentityConstants.EventDataKeys.VISITOR_ID_ECID: "legacyEcidValue"], .set))
+                                        data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: event)

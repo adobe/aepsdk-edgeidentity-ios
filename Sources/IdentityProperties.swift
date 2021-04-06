@@ -138,7 +138,7 @@ struct IdentityProperties: Codable {
     /// Load the ECID value from the Identity direct extension datastore if available.
     /// - Returns: `ECID` from the Identity direct extension datastore, or nil if the datastore or the ECID are not found
     func getEcidFromDirectIdentityPersistence() -> ECID? {
-        let dataStore = NamedCollectionDataStore(name: IdentityConstants.SharedStateKeys.IDENTITY_DIRECT)
+        let dataStore = NamedCollectionDataStore(name: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME)
         let identityDirectProperties: IdentityDirectProperties? = dataStore.getObject(key: IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES)
         return identityDirectProperties?.ecid
     }

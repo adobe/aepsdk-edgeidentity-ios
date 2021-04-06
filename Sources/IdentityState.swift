@@ -31,7 +31,7 @@ class IdentityState {
 
     /// Completes init for this Identity extension.
     /// - Returns: True if we should share state after bootup, false otherwise
-    func bootupIfReady() -> Bool {
+    func bootupIfReady(event: Event, getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
         if hasBooted { return false }
 
         // load data from local storage
@@ -42,6 +42,9 @@ class IdentityState {
             if let ecid = identityProperties.getEcidFromDirectIdentityPersistence() {
                 identityProperties.ecid = ecid.ecidString // get ECID from direct extension
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Loading ECID from direct Identity extension on bootup '\(ecid)'")
+            } else if isIdentityDirectRegistered(event: event, getSharedState: getSharedState) {
+                Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - bootup direct Identity extention is registered, waiting for its state change.")
+                return false // If no ECID to migrate but Identity direct is registered, wait for Identity direct shared state
             } else {
                 identityProperties.ecid = ECID().ecidString // generate new ECID
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Generating new ECID on bootup '\(identityProperties.ecid?.description ?? "")'")
@@ -141,5 +144,15 @@ class IdentityState {
     private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
         identityProperties.saveToPersistence()
         createXDMSharedState(identityProperties.toXdmData(), event)
+    }
+
+    private func isIdentityDirectRegistered(event: Event, getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
+        if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, event, false)?.value,
+           let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
+           extensions[IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME] as? [String: Any] != nil {
+            return true
+        }
+
+        return false
     }
 }
