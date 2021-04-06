@@ -146,6 +146,11 @@ class IdentityState {
         createXDMSharedState(identityProperties.toXdmData(), event)
     }
 
+    /// Check if the Identity direct extension is registered by checking the EventHub's shared state list of registered extensions.
+    /// - Parameters:
+    ///   - event: the tiggering event
+    ///   - getSharedState: function to get shared states from the EventHub
+    /// - Returns: true if the Identity direct extension is registered with the EventHub
     private func isIdentityDirectRegistered(event: Event, getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
         if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, event, false)?.value,
            let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
