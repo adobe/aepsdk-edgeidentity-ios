@@ -72,7 +72,7 @@ import Foundation
         state.updateCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
     }
 
-    /// Handles remove identity requests to remove customer identififers.
+    /// Handles remove identity requests to remove customer identifiers.
     /// - Parameter event: the identity request event
     private func handleRemoveIdentity(event: Event) {
         state.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
