@@ -26,10 +26,9 @@ class IdentityTests: XCTestCase {
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
         // simulate bootup as mockRuntime bypasses call to readyForEvent
-        let event = Event(name: "Fake Identity Event", type: EventType.edgeIdentity, source: EventSource.requestContent, data: nil)
         identity.state.bootupIfReady(getSharedState: { _, _ in
             return nil
-        })
+        }, createXDMSharedState: { _, _ in })
     }
 
     // MARK: handleIdentifiersRequest

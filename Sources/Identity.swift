@@ -42,16 +42,8 @@ import Foundation
     }
 
     public func readyForEvent(_ event: Event) -> Bool {
-        if state.hasBooted {
-            return true
-        }
-
-        if state.bootupIfReady(getSharedState: getSharedState(extensionName:event:)) {
-            createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
-            return true
-        }
-
-        return false
+        return state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
+                                   createXDMSharedState: createSharedState(data:event:))
     }
 
     // MARK: Event Listeners

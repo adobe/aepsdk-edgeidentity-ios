@@ -34,9 +34,14 @@ class IdentityState {
     /// If an ECID is not loaded from persistence, attempts to migrate an existing ECID from the direct Identity extension, either from its persisted store or from its shared state if the
     /// direct Identity extension is registered. If no ECID is found for migration, then a new ECID is generated. Stores this `IdentityState` to persistence
     /// once an ECID is set.
-    /// - Returns: True if we should share state after bootup, false otherwise
-    func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?) -> SharedStateResult?) -> Bool {
-        if hasBooted { return false }
+    /// - Parameters:
+    ///         - getSharedState: function to get a shared state from the EventHub
+    ///         - createXDMSharedState: function to create a shared state on the EventHub
+    /// - Returns: true if bootup completed, false if bootup is not complete
+    func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?) -> SharedStateResult?,
+                       createXDMSharedState: (_ data: [String: Any], _ event: Event?) -> Void) -> Bool {
+
+        if hasBooted { return true }
 
         // load data from local storage
         identityProperties.loadFromPersistence()
@@ -86,7 +91,8 @@ class IdentityState {
 
         hasBooted = true
         Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Edge Identity has successfully booted up")
-        return true
+        createXDMSharedState(identityProperties.toXdmData(), nil)
+        return hasBooted
     }
 
     /// Update the customer identifiers by merging `updateIdentityMap` with the current identifiers. Any identifier in `updateIdentityMap` which
