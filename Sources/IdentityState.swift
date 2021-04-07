@@ -30,6 +30,10 @@ class IdentityState {
     }
 
     /// Completes init for this Identity extension.
+    /// Loads any persisted properties for this `IdentityState`.
+    /// If an ECID is not loaded from persistence, attempts to migrate an existing ECID from the direct Identity extension, either from its persisted store or from its shared state if the
+    /// direct Identity extension is registered. If no ECID is found for migration, then a new ECID is generated. Stores this `IdentityState` to persistence
+    /// once an ECID is set.
     /// - Returns: True if we should share state after bootup, false otherwise
     func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?) -> SharedStateResult?) -> Bool {
         if hasBooted { return false }
@@ -41,26 +45,42 @@ class IdentityState {
         if identityProperties.ecid == nil {
             let identityDirectSharedState = getIdentityDirectSharedState(getSharedState: getSharedState)
 
+            // Attempt to get ECID from direct Identity persistence to migrate an existing ECID
             if let ecid = identityProperties.getEcidFromDirectIdentityPersistence() {
-                identityProperties.ecid = ecid.ecidString // get ECID from direct extension
+                identityProperties.ecid = ecid.ecidString // migrate ECID from direct Identity persisted store
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Loading ECID from direct Identity extension on bootup '\(ecid)'")
-            } else if identityDirectSharedState.isSet {
-                if let ecid = identityDirectSharedState.ecid {
-                    identityProperties.ecid = ecid
-                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup setting ECID from direct Identity " +
-                                "extension shared state: '\(identityProperties.ecid?.description ?? "")'")
-                } else {
-                    identityProperties.ecid = ECID().ecidString // generate new ECID
-                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Generating new ECID on bootup as direct Identity " +
-                                "extension shared state contained none: '\(identityProperties.ecid?.description ?? "")'")
+            }
+                // If direct Identity has no persisted ECID, check if direct Identity is registered with the SDK
+            else if isIdentityDirectRegistered(getSharedState: getSharedState) {
+                // If the direct Identity extension is registered, attempt to get its shared state
+                if identityDirectSharedState.isSet {
+                    // If the shared state is set, attempt to get the ECID
+                    if let ecid = identityDirectSharedState.ecid {
+                        identityProperties.ecid = ecid // migrate ECID from direct Identity shared state
+                        Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup setting ECID from direct Identity " +
+                            "extension shared state: '\(identityProperties.ecid?.description ?? "")'")
+                    }
+                        // If the shared state is set but does not contain an ECID, generate a new one
+                    else {
+                        identityProperties.ecid = ECID().ecidString
+                        Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Generating new ECID on bootup as direct Identity " +
+                            "extension shared state contained none: '\(identityProperties.ecid?.description ?? "")'")
+                    }
                 }
-            } else if isIdentityDirectRegistered(getSharedState: getSharedState) {
-                Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup detected the direct Identity extention is registered, waiting for its state change.")
-                return false // If no ECID to migrate but Identity direct is registered, wait for Identity direct shared state
-            } else {
+                    // If there is no direct Identity shared state, abort boot-up and try again when direct Identity shares its state
+                else {
+                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup detected the direct Identity " +
+                        "extension is registered, waiting for its state change.")
+                    return false // If no ECID to migrate but Identity direct is registered, wait for Identity direct shared state
+                }
+            }
+                // Generate a new ECID as the direct Identity extension is not registered with the SDK and there was no direct Identity persisted ECID
+            else {
                 identityProperties.ecid = ECID().ecidString // generate new ECID
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Generating new ECID on bootup '\(identityProperties.ecid?.description ?? "")'")
             }
+
+            // Whew! Save the new ECID
             identityProperties.saveToPersistence()
         }
 
@@ -163,8 +183,8 @@ class IdentityState {
     /// - Returns: true if the Identity direct extension is registered with the EventHub
     private func isIdentityDirectRegistered(getSharedState: (_ name: String, _ event: Event?) -> SharedStateResult?) -> Bool {
         if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, nil)?.value,
-           let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
-           extensions[IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME] as? [String: Any] != nil {
+            let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
+            extensions[IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME] as? [String: Any] != nil {
             return true
         }
 

@@ -75,7 +75,7 @@ import Foundation
         state.updateCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
     }
 
-    /// Handles remove identity requests to remove customer identififers.
+    /// Handles remove identity requests to remove customer identifiers.
     /// - Parameter event: the identity request event
     private func handleRemoveIdentity(event: Event) {
         state.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
@@ -94,9 +94,9 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
-              stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
-            return
+            let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+            stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
+                return
         }
 
         guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event: event)?.value else {
