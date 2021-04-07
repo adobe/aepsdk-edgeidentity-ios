@@ -31,7 +31,7 @@ class IdentityState {
 
     /// Completes init for this Identity extension.
     /// - Returns: True if we should share state after bootup, false otherwise
-    func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
+    func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?) -> SharedStateResult?) -> Bool {
         if hasBooted { return false }
 
         // load data from local storage
@@ -161,8 +161,8 @@ class IdentityState {
     /// Check if the Identity direct extension is registered by checking the EventHub's shared state list of registered extensions.
     /// - Parameter: getSharedState: function to get shared states from the EventHub
     /// - Returns: true if the Identity direct extension is registered with the EventHub
-    private func isIdentityDirectRegistered(getSharedState: (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
-        if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, nil, false)?.value,
+    private func isIdentityDirectRegistered(getSharedState: (_ name: String, _ event: Event?) -> SharedStateResult?) -> Bool {
+        if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, nil)?.value,
            let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
            extensions[IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME] as? [String: Any] != nil {
             return true
@@ -175,8 +175,8 @@ class IdentityState {
     /// - Parameter getSharedState: function to get shared states from the EventHub
     /// - Returns: `isSet` true if a shared state is set for the direct Identity extension
     ///            `ecid` string value of the shared direct Identity ECID, or nil if no ECID was found in the shared state
-    private func getIdentityDirectSharedState(getSharedState: (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> (isSet: Bool, ecid: String?) {
-        guard let sharedStateResult = getSharedState(IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, nil, false) else {
+    private func getIdentityDirectSharedState(getSharedState: (_ name: String, _ event: Event?) -> SharedStateResult?) -> (isSet: Bool, ecid: String?) {
+        guard let sharedStateResult = getSharedState(IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, nil) else {
             return (false, nil)
         }
 

@@ -34,7 +34,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecid)
 
         // test
-        let result = state.bootupIfReady(getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _ in
             return nil
         })
 
@@ -49,7 +49,7 @@ class IdentityStateTests: XCTestCase {
         state.identityProperties.ecid = ecid.ecidString
 
         // test
-        let result = state.bootupIfReady(getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _ in
             return nil
         })
 
@@ -66,7 +66,7 @@ class IdentityStateTests: XCTestCase {
         properties.saveToPersistence() // save to shared data store
 
         // test
-        let result = state.bootupIfReady(getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _ in
             return nil
         })
 
@@ -84,7 +84,7 @@ class IdentityStateTests: XCTestCase {
         addEcidToIdentityDirectPersistence(ecid: legacyEcid)
 
         // test
-        let result = state.bootupIfReady(getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _ in
             return nil
         })
 
@@ -96,11 +96,11 @@ class IdentityStateTests: XCTestCase {
     /// Test that bootup returns false if already booted
     func testBootupIfReadyReturnsFalseWhenBooted() {
         XCTAssertFalse(state.hasBooted)
-        XCTAssertTrue(state.bootupIfReady(getSharedState: {_, _, _ in
+        XCTAssertTrue(state.bootupIfReady(getSharedState: {_, _ in
             return nil
         }))
         XCTAssertTrue(state.hasBooted)
-        XCTAssertFalse(state.bootupIfReady(getSharedState: {_, _, _ in
+        XCTAssertFalse(state.bootupIfReady(getSharedState: {_, _ in
             return nil
         }))
     }
@@ -108,7 +108,7 @@ class IdentityStateTests: XCTestCase {
     func testBootupIfReadyReturnsFalseWhenIdentityDirectIsRegistered() {
         // setup, no ECID set in persistence
 
-        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+        let result = state.bootupIfReady(getSharedState: {name, _ in
             if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                 return SharedStateResult(status: .set, value: [
                                             IdentityConstants.SharedState.Hub.EXTENSIONS: [
@@ -126,7 +126,7 @@ class IdentityStateTests: XCTestCase {
     func testBootupIfReadyGeneratesECIDWhenIdentityDirectIsNotRegistered() {
         // setup, no ECID set in persistence
 
-        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+        let result = state.bootupIfReady(getSharedState: {name, _ in
             if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                 return SharedStateResult(status: .set, value: [
                                             IdentityConstants.SharedState.Hub.EXTENSIONS: [
@@ -146,7 +146,7 @@ class IdentityStateTests: XCTestCase {
         // setup, no ECID set in persistence
 
         // Bootup after Identity direct state change and Identity direct is registered
-        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+        let result = state.bootupIfReady(getSharedState: {name, _ in
             if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                 return SharedStateResult(status: .set, value: [
                                             IdentityConstants.SharedState.Hub.EXTENSIONS: [
@@ -166,7 +166,7 @@ class IdentityStateTests: XCTestCase {
         // setup, no ECID set in persistence
 
         // Bootup after Identity direct state change and Identity direct is registered
-        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+        let result = state.bootupIfReady(getSharedState: {name, _ in
             if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                 return SharedStateResult(status: .set, value: [
                                             IdentityConstants.SharedState.Hub.EXTENSIONS: [

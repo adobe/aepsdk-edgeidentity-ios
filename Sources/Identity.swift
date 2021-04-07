@@ -46,7 +46,7 @@ import Foundation
             return true
         }
 
-        if state.bootupIfReady(getSharedState: getSharedState(extensionName:event:barrier:)) {
+        if state.bootupIfReady(getSharedState: getSharedState(extensionName:event:)) {
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: nil)
             return true
         }
