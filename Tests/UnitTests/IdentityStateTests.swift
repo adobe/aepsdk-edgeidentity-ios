@@ -581,11 +581,4 @@ private extension Event {
     static func fakeIdentityEvent() -> Event {
         return Event(name: "Fake Identity Event", type: EventType.edgeIdentity, source: EventSource.requestContent, data: nil)
     }
-
-    static func identityDirectStateChange() -> Event {
-        return Event(name: "Fake Identity Direct State Change",
-                     type: EventType.hub,
-                     source: EventSource.sharedState,
-                     data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
-    }
 }
