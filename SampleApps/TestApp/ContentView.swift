@@ -11,7 +11,6 @@
 //
 import AEPAssurance
 import AEPCore
-import AEPEdge
 import AEPEdgeIdentity
 import AEPIdentity
 import SwiftUI
