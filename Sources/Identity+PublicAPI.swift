@@ -34,9 +34,9 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
-                completion(nil, AEPError.unexpected)
-                return
+                let identityMap = IdentityMap.from(eventData: data) else {
+                    completion(nil, AEPError.unexpected)
+                    return
             }
 
             guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
@@ -66,9 +66,9 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
-                completion(nil, AEPError.unexpected)
-                return
+                let identityMap = IdentityMap.from(eventData: data) else {
+                    completion(nil, AEPError.unexpected)
+                    return
             }
 
             completion(identityMap, .none)
