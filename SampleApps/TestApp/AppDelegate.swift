@@ -27,10 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
         MobileCore.configureWith(appId: LAUNCH_ENVIRONMENT_FILE_ID)
-        MobileCore.registerExtensions([Identity.self, Edge.self])
-        AEPAssurance.registerExtension()
+        MobileCore.registerExtensions([Identity.self, Edge.self, AEPAssurance.self])
 
-        ACPCore.start { }
         return true
     }
 

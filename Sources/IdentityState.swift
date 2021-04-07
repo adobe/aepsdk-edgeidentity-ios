@@ -31,7 +31,7 @@ class IdentityState {
 
     /// Completes init for this Identity extension.
     /// - Returns: True if we should share state after bootup, false otherwise
-    func bootupIfReady(event: Event, getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
+    func bootupIfReady(getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
         if hasBooted { return false }
 
         // load data from local storage
@@ -39,11 +39,23 @@ class IdentityState {
 
         // Get new ECID on first launch
         if identityProperties.ecid == nil {
+            let identityDirectSharedState = getIdentityDirectSharedState(getSharedState: getSharedState)
+
             if let ecid = identityProperties.getEcidFromDirectIdentityPersistence() {
                 identityProperties.ecid = ecid.ecidString // get ECID from direct extension
                 Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Loading ECID from direct Identity extension on bootup '\(ecid)'")
-            } else if isIdentityDirectRegistered(event: event, getSharedState: getSharedState) {
-                Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - bootup direct Identity extention is registered, waiting for its state change.")
+            } else if identityDirectSharedState.isSet {
+                if let ecid = identityDirectSharedState.ecid {
+                    identityProperties.ecid = ecid
+                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup setting ECID from direct Identity " +
+                                "extension shared state: '\(identityProperties.ecid?.description ?? "")'")
+                } else {
+                    identityProperties.ecid = ECID().ecidString // generate new ECID
+                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Generating new ECID on bootup as direct Identity " +
+                                "extension shared state contained none: '\(identityProperties.ecid?.description ?? "")'")
+                }
+            } else if isIdentityDirectRegistered(getSharedState: getSharedState) {
+                Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Bootup detected the direct Identity extention is registered, waiting for its state change.")
                 return false // If no ECID to migrate but Identity direct is registered, wait for Identity direct shared state
             } else {
                 identityProperties.ecid = ECID().ecidString // generate new ECID
@@ -147,12 +159,10 @@ class IdentityState {
     }
 
     /// Check if the Identity direct extension is registered by checking the EventHub's shared state list of registered extensions.
-    /// - Parameters:
-    ///   - event: the tiggering event
-    ///   - getSharedState: function to get shared states from the EventHub
+    /// - Parameter: getSharedState: function to get shared states from the EventHub
     /// - Returns: true if the Identity direct extension is registered with the EventHub
-    private func isIdentityDirectRegistered(event: Event, getSharedState: @escaping (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
-        if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, event, false)?.value,
+    private func isIdentityDirectRegistered(getSharedState: (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> Bool {
+        if let registeredExtensionsWithHub = getSharedState(IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, nil, false)?.value,
            let extensions = registeredExtensionsWithHub[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any],
            extensions[IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME] as? [String: Any] != nil {
             return true
@@ -160,4 +170,17 @@ class IdentityState {
 
         return false
     }
+
+    /// Get the latest direct Identity shared state.
+    /// - Parameter getSharedState: function to get shared states from the EventHub
+    /// - Returns: `isSet` true if a shared state is set for the direct Identity extension
+    ///            `ecid` string value of the shared direct Identity ECID, or nil if no ECID was found in the shared state
+    private func getIdentityDirectSharedState(getSharedState: (_ name: String, _ event: Event?, _ barrier: Bool) -> SharedStateResult?) -> (isSet: Bool, ecid: String?) {
+        guard let sharedStateResult = getSharedState(IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, nil, false) else {
+            return (false, nil)
+        }
+
+        return (sharedStateResult.status == .set, sharedStateResult.value?[IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID] as? String)
+    }
+
 }

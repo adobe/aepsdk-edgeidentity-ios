@@ -34,7 +34,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecid)
 
         // test
-        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _, _ in
             return nil
         })
 
@@ -49,7 +49,7 @@ class IdentityStateTests: XCTestCase {
         state.identityProperties.ecid = ecid.ecidString
 
         // test
-        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _, _ in
             return nil
         })
 
@@ -66,7 +66,7 @@ class IdentityStateTests: XCTestCase {
         properties.saveToPersistence() // save to shared data store
 
         // test
-        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+        let result = state.bootupIfReady(getSharedState: {_, _, _ in
             return nil
         })
 
@@ -76,14 +76,31 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual(properties.ecid, state.identityProperties.ecid)
     }
 
+    /// Test that bootup loads properties from Identity direct persistence
+    func testBootupIfReadyLoadsFromIdentityDirectPersistence() {
+        // setup, no ECID in Edge Identity persistence
+
+        let legacyEcid = ECID()
+        addEcidToIdentityDirectPersistence(ecid: legacyEcid)
+
+        // test
+        let result = state.bootupIfReady(getSharedState: {_, _, _ in
+            return nil
+        })
+
+        //verify
+        XCTAssertTrue(result)
+        XCTAssertEqual(legacyEcid.ecidString, state.identityProperties.ecid)
+    }
+
     /// Test that bootup returns false if already booted
     func testBootupIfReadyReturnsFalseWhenBooted() {
         XCTAssertFalse(state.hasBooted)
-        XCTAssertTrue(state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+        XCTAssertTrue(state.bootupIfReady(getSharedState: {_, _, _ in
             return nil
         }))
         XCTAssertTrue(state.hasBooted)
-        XCTAssertFalse(state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
+        XCTAssertFalse(state.bootupIfReady(getSharedState: {_, _, _ in
             return nil
         }))
     }
@@ -91,11 +108,15 @@ class IdentityStateTests: XCTestCase {
     func testBootupIfReadyReturnsFalseWhenIdentityDirectIsRegistered() {
         // setup, no ECID set in persistence
 
-        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
-            return SharedStateResult(status: .set, value: [
-                                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
-                                        ]])
+        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+            if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                return SharedStateResult(status: .set, value: [
+                                            IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                            ]])
+            }
+
+            return SharedStateResult(status: .none, value: [:])
         })
 
         XCTAssertFalse(state.hasBooted)
@@ -105,14 +126,58 @@ class IdentityStateTests: XCTestCase {
     func testBootupIfReadyGeneratesECIDWhenIdentityDirectIsNotRegistered() {
         // setup, no ECID set in persistence
 
-        let result = state.bootupIfReady(event: Event.fakeIdentityEvent(), getSharedState: {_, _, _ in
-            return SharedStateResult(status: .set, value: [
-                                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                                            IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
-                                        ]])
+        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+            if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                return SharedStateResult(status: .set, value: [
+                                            IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
+                                            ]])
+            }
+
+            return SharedStateResult(status: .none, value: [:])
         })
 
         XCTAssertTrue(state.hasBooted)
+        XCTAssertTrue(result)
+        XCTAssertNotNil(state.identityProperties.ecid)
+    }
+
+    func testBootupIfReadySetECIDFromIdentityDirectSharedState() {
+        // setup, no ECID set in persistence
+
+        // Bootup after Identity direct state change and Identity direct is registered
+        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+            if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                return SharedStateResult(status: .set, value: [
+                                            IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                            ]])
+            }
+            // shared state is set but no ECID
+            return SharedStateResult(status: .set, value: ["mid": "1234"])
+        })
+
+        // expect bootup to return true and new ECID is generated
+        XCTAssertTrue(result)
+        XCTAssertEqual("1234", state.identityProperties.ecid)
+    }
+
+    func testBootupIfReadyGeneratesECIDWhenIdentityDirectSharedStateHasNoECID() {
+        // setup, no ECID set in persistence
+
+        // Bootup after Identity direct state change and Identity direct is registered
+        let result = state.bootupIfReady(getSharedState: {name, _, _ in
+            if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                return SharedStateResult(status: .set, value: [
+                                            IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                            ]])
+            }
+            // shared state is set but no ECID
+            return SharedStateResult(status: .set, value: [:])
+        })
+
+        // expect bootup to return true and new ECID is generated
         XCTAssertTrue(result)
         XCTAssertNotNil(state.identityProperties.ecid)
     }
@@ -429,10 +494,23 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNotEqual(props.ecid, state.identityProperties.ecid)
     }
 
+    private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
+        let data: [String: ECID?] = ["ecid": ecid]
+        let jsonData = try? JSONEncoder().encode(data)
+        mockDataStore.dict["identity.properties"] = jsonData
+    }
+
 }
 
 private extension Event {
     static func fakeIdentityEvent() -> Event {
         return Event(name: "Fake Identity Event", type: EventType.edgeIdentity, source: EventSource.requestContent, data: nil)
+    }
+
+    static func identityDirectStateChange() -> Event {
+        return Event(name: "Fake Identity Direct State Change",
+                     type: EventType.hub,
+                     source: EventSource.sharedState,
+                     data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
     }
 }
