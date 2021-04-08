@@ -43,7 +43,7 @@ import Foundation
 
     public func readyForEvent(_ event: Event) -> Bool {
         return state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
-                                   createXDMSharedState: createSharedState(data:event:))
+                                   createXDMSharedState: createXDMSharedState(data:event:))
     }
 
     // MARK: Event Listeners
