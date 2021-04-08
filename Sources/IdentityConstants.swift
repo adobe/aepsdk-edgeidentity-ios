@@ -24,9 +24,22 @@ enum IdentityConstants {
         static let ZERO_ADVERTISING_ID = "00000000-0000-0000-0000-000000000000"
     }
 
-    enum SharedStateKeys {
-        static let CONFIGURATION = "com.adobe.module.configuration"
-        static let IDENTITY_DIRECT = "com.adobe.module.identity"
+    enum SharedState {
+        static let STATE_OWNER = "stateowner"
+
+        enum Configuration {
+            static let SHARED_OWNER_NAME = "com.adobe.module.configuration"
+        }
+
+        enum IdentityDirect {
+            static let SHARED_OWNER_NAME = "com.adobe.module.identity"
+            static let VISITOR_ID_ECID = "mid"
+        }
+
+        enum Hub {
+            static let SHARED_OWNER_NAME = "com.adobe.module.eventhub"
+            static let EXTENSIONS = "extensions"
+        }
     }
 
     enum EventNames {
@@ -35,13 +48,7 @@ enum IdentityConstants {
         static let UPDATE_IDENTITIES = "Edge Identity Update Identities"
         static let REMOVE_IDENTITIES = "Edge Identity Remove Identities"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
-        static let CONSENT_REQUEST_AD_ID = "Consent Request for Ad ID"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
-    }
-
-    enum EventDataKeys {
-        static let VISITOR_ID_ECID = "mid"
-        static let STATE_OWNER = "stateowner"
     }
 
     enum DataStoreKeys {

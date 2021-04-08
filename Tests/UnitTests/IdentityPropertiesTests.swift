@@ -59,8 +59,8 @@ class IdentityPropertiesTests: XCTestCase {
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] ],
                 "custom": [ ["id": "identifier", "authenticatedState": "ambiguous", "primary": 0] ]
-            ]
-            ]
+                ]
+        ]
 
         XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }
@@ -82,8 +82,8 @@ class IdentityPropertiesTests: XCTestCase {
         let expectedResult: [String: Any] =
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] ]
-            ]
-            ]
+                ]
+        ]
 
         XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }
@@ -106,7 +106,7 @@ class IdentityPropertiesTests: XCTestCase {
             [ "identityMap": [
                 "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
                           ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
-            ]]
+                ]]
 
         XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }
@@ -129,7 +129,7 @@ class IdentityPropertiesTests: XCTestCase {
             [ "identityMap": [
                 "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
                           ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
-            ]]
+                ]]
 
         XCTAssertEqual(expectedResult as NSObject, xdmData as NSObject)
     }

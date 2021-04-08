@@ -18,7 +18,8 @@ import Foundation
 @objc public extension Identity {
 
     /// Returns the Experience Cloud ID, or an `AEPError` if any occurred. An empty string is returned if the Experience Cloud ID was previously cleared.
-    /// - Parameter completion: closure which will be invoked once Experience Cloud ID is available, along with an 'AEPError'' if any occurred
+    /// - Parameter completion: invoked once the Experience Cloud ID is available, or
+    ///                         an `AEPError` if an unexpected error occurs or the request timed out.
     @objc(getExperienceCloudId:)
     static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
@@ -33,9 +34,9 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
-                completion(nil, AEPError.unexpected)
-                return
+                let identityMap = IdentityMap.from(eventData: data) else {
+                    completion(nil, AEPError.unexpected)
+                    return
             }
 
             guard let items = identityMap.getItems(withNamespace: IdentityConstants.Namespaces.ECID), let ecidItem = items.first else {
@@ -47,9 +48,10 @@ import Foundation
         }
     }
 
-    /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if any occurred. If there are no identifiers stored
-    /// in the `Identity` extension, then an empty `IdentityMap` is returned.
-    /// - Parameter completion: closure which will be invoked once the identifiers are available, along with an 'AEPError' if any occurred
+    /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if an unexpected error occurs or the request timed out.
+    /// If there are no identifiers stored in the `Identity` extension, then an empty `IdentityMap` is returned.
+    /// - Parameter completion: invoked once the identifiers are available, or
+    ///                         an `AEPError` if an unexpected error occurs or the request timed out.
     @objc(getIdentities:)
     static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
@@ -64,18 +66,18 @@ import Foundation
             }
 
             guard let data = responseEvent.data?[IdentityConstants.XDMKeys.IDENTITY_MAP] as? [String: Any],
-                  let identityMap = IdentityMap.from(eventData: data) else {
-                completion(nil, AEPError.unexpected)
-                return
+                let identityMap = IdentityMap.from(eventData: data) else {
+                    completion(nil, AEPError.unexpected)
+                    return
             }
 
             completion(identityMap, .none)
         }
     }
 
-    /// Updates the currently known `IdentityMap` within the SDK and XDM shared state. The Identity extension will merge the received identifiers
-    ///  with the previously saved one in an additive manner, no identifiers will be removed using this API.
-    ///  Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
+    /// Updates the currently known `IdentityMap` within the SDK. The Identity extension will merge the received identifiers
+    /// with the previously saved one in an additive manner, no identifiers will be removed using this API.
+    /// Identifiers which have an empty  `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameter map: The identifiers to add or update
     @objc(updateIdentities:)
     static func updateIdentities(with map: IdentityMap) {
@@ -92,12 +94,11 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
-    /// Removes the identity from the stored client-side `IdentityMap` and XDM shared state. The Identity extension will stop sending this identifier.
+    /// Removes the identity from the stored client-side `IdentityMap`. The Identity extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
-    /// Identifiers which have an empty `id` or empty `namespace` are not allowed and are ignored.
     /// - Parameters:
     ///   - item: The identity to remove.
-    ///   - withNamespace: The namespace the identity to remove is under.
+    ///   - withNamespace: The namespace of the identity to remove.
     @objc(removeIdentityItem:withNamespace:)
     static func removeIdentity(item: IdentityItem, withNamespace: String) {
         let identities = IdentityMap()

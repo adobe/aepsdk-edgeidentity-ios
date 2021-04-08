@@ -69,7 +69,7 @@ public class IdentityMap: NSObject, Codable {
     public override init() {}
 
     /// Adds an `IdentityItem` to this map. If an item is added which shares the same `withNamespace` and `item.id` as an item
-    /// already in the map, then the new item replaces the existing item. Empty `withNamepace` or items with an empty `item.id` are not allowed and are ignored.
+    /// already in the map, then the new item replaces the existing item. Empty `withNamespace` or items with an empty `item.id` are not allowed and are ignored.
     /// - Parameters:
     ///   - item: The identity as an `IdentityItem` object
     ///   - namespace: The namespace for this identity
@@ -124,7 +124,7 @@ public class IdentityMap: NSObject, Codable {
 
     /// Append an `IdentityItem` to this map, with option to insert at the front of items list.
     /// If an item is added which shares the same `withNamespace` and `item.id` as an item already in the map, then the new item replaces
-    /// the existing item. Empty `withNamepace` or items with an empty `item.id` are not allowed and are ignored.
+    /// the existing item. Empty `withNamespace` or items with an empty `item.id` are not allowed and are ignored.
     /// - Parameters:
     ///   - item: The identity as an `IdentityItem` object
     ///   - namespace: The namespace for this identity
@@ -159,7 +159,7 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Remove identites in `map` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
+    /// Remove identities in `map` from this `IdentityMap`. Identities are removed which match the same namesapce and id.
     /// - Parameter map: Identities to remove from this `IdentityMap`
     func remove(map: IdentityMap) {
         for (namespace, items) in map.items {
@@ -169,7 +169,7 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
-    /// Decodes a [String: Any] dictionary into an `IdentityMap`
+    /// Decodes a `[String: Any]` dictionary into an `IdentityMap`
     /// - Parameter eventData: the event data representing `IdentityMap`
     /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format
     static func from(eventData: [String: Any]) -> IdentityMap? {

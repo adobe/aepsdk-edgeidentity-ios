@@ -10,7 +10,7 @@
 // governing permissions and limitations under the License.
 //
 
-import AEPCore
+@testable import AEPCore
 @testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
@@ -34,7 +34,18 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.ecid)
 
         // test
-        let result = state.bootupIfReady()
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+        let result = state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertNotNil(sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
 
         // verify
         XCTAssertTrue(result)
@@ -47,7 +58,18 @@ class IdentityStateTests: XCTestCase {
         state.identityProperties.ecid = ecid.ecidString
 
         // test
-        let result = state.bootupIfReady()
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+        let result = state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertEqual(ecid.ecidString, sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
 
         // verify
         XCTAssertTrue(result)
@@ -62,7 +84,18 @@ class IdentityStateTests: XCTestCase {
         properties.saveToPersistence() // save to shared data store
 
         // test
-        let result = state.bootupIfReady()
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+        let result = state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertEqual(properties.ecid, sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
 
         //verify
         XCTAssertTrue(result)
@@ -70,12 +103,158 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual(properties.ecid, state.identityProperties.ecid)
     }
 
-    /// Test that bootup returns false if already booted
-    func testBootupIfReadyReturnsFalseWhenBooted() {
+    /// Test that bootup loads properties from Identity direct persistence
+    func testBootupIfReadyLoadsFromIdentityDirectPersistence() {
+        // setup, no ECID in Edge Identity persistence
+
+        let legacyEcid = ECID()
+        addEcidToIdentityDirectPersistence(ecid: legacyEcid)
+
+        // test
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+        let result = state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertEqual(legacyEcid.ecidString, sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
+
+        //verify
+        XCTAssertTrue(result)
+        XCTAssertEqual(legacyEcid.ecidString, state.identityProperties.ecid)
+    }
+
+    /// Test that bootup returns true if already booted, and does not create a shared state
+    func testBootupIfReadyReturnsTrueWhenBooted() {
         XCTAssertFalse(state.hasBooted)
-        XCTAssertTrue(state.bootupIfReady())
+        XCTAssertTrue(state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {_, _ in }))
         XCTAssertTrue(state.hasBooted)
-        XCTAssertFalse(state.bootupIfReady())
+        XCTAssertTrue(state.bootupIfReady(
+            getSharedState: {_, _ in
+                return nil
+            },
+            createXDMSharedState: {_, _ in
+                XCTFail("BootupIfReady should not set XDM shared state if already booted.")
+            }))
+    }
+
+    func testBootupIfReadyReturnsFalseWhenIdentityDirectIsRegistered() {
+        // setup, no ECID set in persistence
+
+        let result = state.bootupIfReady(
+            getSharedState: {name, _ in
+                if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                    return SharedStateResult(status: .set, value: [
+                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                        ]])
+                }
+
+                return SharedStateResult(status: .none, value: [:])
+            },
+            createXDMSharedState: {_, _ in
+                XCTFail("BootupIfReady not expected to set XDM shared state.")
+            })
+
+        XCTAssertFalse(state.hasBooted)
+        XCTAssertFalse(result)
+    }
+
+    func testBootupIfReadyGeneratesECIDWhenIdentityDirectIsNotRegistered() {
+        // setup, no ECID set in persistence
+
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+        let result = state.bootupIfReady(
+            getSharedState: {name, _ in
+                if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                    return SharedStateResult(status: .set, value: [
+                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                            IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
+                        ]])
+                }
+
+                return SharedStateResult(status: .none, value: [:])
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertNotNil(sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
+
+        XCTAssertTrue(state.hasBooted)
+        XCTAssertTrue(result)
+        XCTAssertNotNil(state.identityProperties.ecid)
+    }
+
+    func testBootupIfReadySetECIDFromIdentityDirectSharedState() {
+        // setup, no ECID set in persistence
+
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+
+        // Bootup after Identity direct state change and Identity direct is registered
+        let result = state.bootupIfReady(
+            getSharedState: {name, _ in
+                if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                    return SharedStateResult(status: .set, value: [
+                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                        ]])
+                }
+                // shared state is set but no ECID
+                return SharedStateResult(status: .set, value: ["mid": "1234"])
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertEqual("1234", sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
+
+        // expect bootup to return true and new ECID is generated
+        XCTAssertTrue(result)
+        XCTAssertEqual("1234", state.identityProperties.ecid)
+    }
+
+    func testBootupIfReadyGeneratesECIDWhenIdentityDirectSharedStateHasNoECID() {
+        // setup, no ECID set in persistence
+
+        let expectation = XCTestExpectation(description: "createXDMSharedState callback")
+
+        // Bootup after Identity direct state change and Identity direct is registered
+        let result = state.bootupIfReady(
+            getSharedState: {name, _ in
+                if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
+                    return SharedStateResult(status: .set, value: [
+                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                        ]])
+                }
+                // shared state is set but no ECID
+                return SharedStateResult(status: .set, value: [:])
+            },
+            createXDMSharedState: {data, _ in
+                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                XCTAssertNotNil(sharedEcid)
+                expectation.fulfill()
+            })
+
+        wait(for: [expectation], timeout: 1)
+
+        // expect bootup to return true and new ECID is generated
+        XCTAssertTrue(result)
+        XCTAssertNotNil(state.identityProperties.ecid)
     }
 
     // MARK: updateLegacyExperienceCloudId(...)
@@ -376,11 +555,11 @@ class IdentityStateTests: XCTestCase {
         let responseEventExpectation = XCTestExpectation(description: "Event should be dispatched after reseting identities")
         state.resetIdentifiers(event: event,
                                createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
-                               }, eventDispatcher: { event in
-                                XCTAssertEqual(EventType.edgeIdentity, event.type)
-                                XCTAssertEqual(EventSource.resetComplete, event.source)
-                                responseEventExpectation.fulfill()
-                               })
+        }, eventDispatcher: { event in
+            XCTAssertEqual(EventType.edgeIdentity, event.type)
+            XCTAssertEqual(EventSource.resetComplete, event.source)
+            responseEventExpectation.fulfill()
+        })
 
         wait(for: [xdmSharedStateExpectation, responseEventExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -388,6 +567,12 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "space"))
         XCTAssertNotNil(state.identityProperties.ecid)
         XCTAssertNotEqual(props.ecid, state.identityProperties.ecid)
+    }
+
+    private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
+        let data: [String: ECID?] = ["ecid": ecid]
+        let jsonData = try? JSONEncoder().encode(data)
+        mockDataStore.dict["identity.properties"] = jsonData
     }
 
 }

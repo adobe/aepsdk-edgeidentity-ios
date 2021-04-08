@@ -178,7 +178,7 @@ class IdentityMapTests: XCTestCase {
             [
                 "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false] ],
                 "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]
-            ]
+        ]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
@@ -198,7 +198,7 @@ class IdentityMapTests: XCTestCase {
                     ["id": "id", "authenticatedState": "ambiguous", "primary": false],
                     ["id": "123", "authenticatedState": "ambiguous", "primary": false]
                 ]
-            ]
+        ]
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
 
