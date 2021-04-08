@@ -26,9 +26,11 @@ class IdentityTests: XCTestCase {
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
         // simulate bootup as mockRuntime bypasses call to readyForEvent
-        identity.state.bootupIfReady(getSharedState: { _, _ in
-            return nil
-        }, createXDMSharedState: { _, _ in })
+        let event = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(event))
+
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
+        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
     }
 
     // MARK: handleIdentifiersRequest
