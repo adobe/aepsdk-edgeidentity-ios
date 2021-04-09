@@ -41,7 +41,7 @@ clean:
 	(rm -rf build)
 
 build-app:
-	make -C SampleApps/$(APP_NAME) build-shallow
+	#make -C SampleApps/$(APP_NAME) build-shallow
 
 archive:
 	xcodebuild archive -workspace $(PROJECT_NAME).xcworkspace -scheme $(SCHEME_NAME_XCFRAMEWORK) -archivePath "./build/ios.xcarchive" -sdk iphoneos -destination="iOS" SKIP_INSTALL=NO BUILD_LIBRARIES_FOR_DISTRIBUTION=YES

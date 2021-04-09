@@ -13,13 +13,13 @@ on:
         required: true
         default: 'yes'
 
-      release_AEPIdentityEdge:
-        description: 'release AEPIdentityEdge to Cocoapods ("no" to skip)'
+      release_AEPEdgeIdentity:
+        description: 'release AEPEdgeIdentity to Cocoapods ("no" to skip)'
         required: true
         default: 'yes'
 
 jobs:
-  release_identityedge:
+  release_EdgeIdentity:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -62,12 +62,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish Pods - AEPIdentityEdge
-      if: ${{ github.event.inputs.release_AEPIdentityEdge == 'yes' }}
+    - name: Publish Pods - AEPEdgeIdentity
+      if: ${{ github.event.inputs.release_AEPEdgeIdentity == 'yes' }}
       run: |
         set -eo pipefail
-        pod trunk push AEPIdentityEdge.podspec --allow-warnings --synchronous --swift-version=5.1
+        pod trunk push AEPEdgeIdentity.podspec --allow-warnings --synchronous --swift-version=5.1
         pod repo update
       env:
-        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }
-}
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
