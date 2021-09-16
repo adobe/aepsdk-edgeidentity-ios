@@ -86,9 +86,9 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-            let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
-            stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
-                return
+              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+              stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
+            return
         }
 
         guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event: event)?.value else {
