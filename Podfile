@@ -28,7 +28,6 @@ target 'TestApp' do
   pod 'AEPIdentity'
   pod 'AEPLifecycle'
   pod 'AEPSignal'
-  pod 'ACPCore', :git => 'https://github.com/adobe/aep-sdk-compatibility-ios.git', :branch => 'main'
   pod 'AEPAssurance'
 end
 

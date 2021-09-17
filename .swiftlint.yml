@@ -21,7 +21,7 @@ excluded: # paths to ignore during linting
 - Carthage
 - SampleApps/*/Pods
 - Pods
-
+- .build
 empty_count: 
     severity: warning
 force_cast: warning
