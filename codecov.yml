@@ -16,6 +16,10 @@ coverage:
     - "./Tests/**/*"
     - "./Tests/.*"
     - "./SampleApps"
+    - "./build"    
+    - "Makefile"
+    - "Podfile"
+    - "Podfile.lock"
 
 parsers:
   gcov:
@@ -29,4 +33,3 @@ comment:
   layout: "header, diff"
   behavior: default
   require_changes: no
-
