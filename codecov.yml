@@ -16,10 +16,7 @@ coverage:
     - "./Tests/**/*"
     - "./Tests/.*"
     - "./SampleApps"
-    - "./build"    
-    - "Makefile"
-    - "Podfile"
-    - "Podfile.lock"
+    - "./build"
 
 parsers:
   gcov:
