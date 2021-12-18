@@ -97,7 +97,7 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        //verify
+        // verify
         XCTAssertTrue(result)
         XCTAssertNotNil(state.identityProperties.ecid)
         XCTAssertEqual(properties.ecid, state.identityProperties.ecid)
@@ -124,7 +124,7 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        //verify
+        // verify
         XCTAssertTrue(result)
         XCTAssertEqual(legacyEcid.ecidString, state.identityProperties.ecid)
     }
@@ -133,18 +133,18 @@ class IdentityStateTests: XCTestCase {
     func testBootupIfReadyReturnsTrueWhenBooted() {
         XCTAssertFalse(state.hasBooted)
         XCTAssertTrue(state.bootupIfReady(
-            getSharedState: {_, _ in
-                return nil
-            },
-            createXDMSharedState: {_, _ in }))
+                        getSharedState: {_, _ in
+                            return nil
+                        },
+                        createXDMSharedState: {_, _ in }))
         XCTAssertTrue(state.hasBooted)
         XCTAssertTrue(state.bootupIfReady(
-            getSharedState: {_, _ in
-                return nil
-            },
-            createXDMSharedState: {_, _ in
-                XCTFail("BootupIfReady should not set XDM shared state if already booted.")
-            }))
+                        getSharedState: {_, _ in
+                            return nil
+                        },
+                        createXDMSharedState: {_, _ in
+                            XCTFail("BootupIfReady should not set XDM shared state if already booted.")
+                        }))
     }
 
     func testBootupIfReadyReturnsFalseWhenIdentityDirectIsRegistered() {
@@ -154,9 +154,9 @@ class IdentityStateTests: XCTestCase {
             getSharedState: {name, _ in
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
-                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
-                        ]])
+                                                IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                                ]])
                 }
 
                 return SharedStateResult(status: .none, value: [:])
@@ -177,9 +177,9 @@ class IdentityStateTests: XCTestCase {
             getSharedState: {name, _ in
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
-                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                            IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
-                        ]])
+                                                IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                    IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME: [:]
+                                                ]])
                 }
 
                 return SharedStateResult(status: .none, value: [:])
@@ -207,9 +207,9 @@ class IdentityStateTests: XCTestCase {
             getSharedState: {name, _ in
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
-                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
-                        ]])
+                                                IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                                ]])
                 }
                 // shared state is set but no ECID
                 return SharedStateResult(status: .set, value: ["mid": "1234"])
@@ -237,9 +237,9 @@ class IdentityStateTests: XCTestCase {
             getSharedState: {name, _ in
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
-                        IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                            IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
-                        ]])
+                                                IdentityConstants.SharedState.Hub.EXTENSIONS: [
+                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
+                                                ]])
                 }
                 // shared state is set but no ECID
                 return SharedStateResult(status: .set, value: [:])
@@ -555,11 +555,11 @@ class IdentityStateTests: XCTestCase {
         let responseEventExpectation = XCTestExpectation(description: "Event should be dispatched after reseting identities")
         state.resetIdentifiers(event: event,
                                createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
-        }, eventDispatcher: { event in
-            XCTAssertEqual(EventType.edgeIdentity, event.type)
-            XCTAssertEqual(EventSource.resetComplete, event.source)
-            responseEventExpectation.fulfill()
-        })
+                               }, eventDispatcher: { event in
+                                XCTAssertEqual(EventType.edgeIdentity, event.type)
+                                XCTAssertEqual(EventSource.resetComplete, event.source)
+                                responseEventExpectation.fulfill()
+                               })
 
         wait(for: [xdmSharedStateExpectation, responseEventExpectation], timeout: 2)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence

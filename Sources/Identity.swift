@@ -43,7 +43,7 @@ import Foundation
 
     public func readyForEvent(_ event: Event) -> Bool {
         return state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
-                                   createXDMSharedState: createSharedState(data:event:))
+                                   createXDMSharedState: createXDMSharedState(data:event:))
     }
 
     // MARK: Event Listeners
@@ -86,9 +86,9 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-            let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
-            stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
-                return
+              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+              stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
+            return
         }
 
         guard let identitySharedState = getSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event: event)?.value else {
