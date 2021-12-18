@@ -1,36 +1,28 @@
 PODS:
-  - ACPCore (2.9.9):
-    - AEPCore
-    - AEPIdentity
-    - AEPLifecycle
-    - AEPRulesEngine
-    - AEPServices
-    - AEPSignal
-  - AEPAssurance (1.1.0):
-    - ACPCore (>= 2.9.0)
-    - AEPAssurance/xcframeworks (= 1.1.0)
-  - AEPAssurance/xcframeworks (1.1.0):
-    - ACPCore (>= 2.9.0)
-  - AEPCore (3.1.0):
-    - AEPRulesEngine (= 1.0.0)
-    - AEPServices (= 3.1.0)
-  - AEPIdentity (3.1.0):
-    - AEPCore (= 3.1.0)
-  - AEPLifecycle (3.1.0):
-    - AEPCore (= 3.1.0)
-  - AEPRulesEngine (1.0.0)
-  - AEPServices (3.1.0)
-  - AEPSignal (3.1.0):
-    - AEPCore (= 3.1.0)
+  - AEPAssurance (3.0.0):
+    - AEPCore (>= 3.1.0)
+    - AEPServices (>= 3.1.0)
+  - AEPCore (3.3.1):
+    - AEPRulesEngine (= 1.0.1)
+    - AEPServices (= 3.3.1)
+  - AEPIdentity (3.3.1):
+    - AEPCore (= 3.3.1)
+  - AEPLifecycle (3.3.1):
+    - AEPCore (= 3.3.1)
+  - AEPRulesEngine (1.0.1)
+  - AEPServices (3.3.1)
+  - AEPSignal (3.3.1):
+    - AEPCore (= 3.3.1)
+  - SwiftLint (0.44.0)
 
 DEPENDENCIES:
-  - ACPCore (from `https://github.com/adobe/aep-sdk-compatibility-ios.git`, branch `main`)
   - AEPAssurance
   - AEPCore
   - AEPIdentity
   - AEPLifecycle
   - AEPServices
   - AEPSignal
+  - SwiftLint (= 0.44.0)
 
 SPEC REPOS:
   trunk:
@@ -41,27 +33,18 @@ SPEC REPOS:
     - AEPRulesEngine
     - AEPServices
     - AEPSignal
-
-EXTERNAL SOURCES:
-  ACPCore:
-    :branch: main
-    :git: https://github.com/adobe/aep-sdk-compatibility-ios.git
-
-CHECKOUT OPTIONS:
-  ACPCore:
-    :commit: deec3800bce117f7f760eb6644af4559489c2aae
-    :git: https://github.com/adobe/aep-sdk-compatibility-ios.git
+    - SwiftLint
 
 SPEC CHECKSUMS:
-  ACPCore: 67e4b855bf16cfb6a63024a4ddb73d15c0fd30e5
-  AEPAssurance: c9c21b7e57bf993db210766631db2ef3732d4fa4
-  AEPCore: 026568b04d8c302ad801a6b4ed6ec3c160817ef6
-  AEPIdentity: 2ca611ed7f2bf081657b311cbffb210900558fa8
-  AEPLifecycle: 59b2de8c96a93647a258a982f1d5b2e16a425360
-  AEPRulesEngine: 8bbc694fce6900cd33b2496c7d4b33ee2eeffc46
-  AEPServices: cc1ec2987185ab01d62f6d41be0bb94a1b892efb
-  AEPSignal: 68dce891ed648057d0282b137040a5766a95c963
+  AEPAssurance: 18068627111e366a851dc2166239f22b665101bd
+  AEPCore: fc1398728b6b2a4dcc8dc96455f69ec144e087c0
+  AEPIdentity: 40aedf425fc7cc63dde579135b8c1c65497a42d2
+  AEPLifecycle: dc131d6744a55d71bc9009d65f3b3428645cbd23
+  AEPRulesEngine: 5075ed294026a12e37bd26fe260f74604d205354
+  AEPServices: c49e7b6ef17ec9f874b015f68ac7d2436235282f
+  AEPSignal: 2d0dd4775c95797bf118300b74a1d9efcdbf8650
+  SwiftLint: e96c0a8c770c7ebbc4d36c55baf9096bb65c4584
 
-PODFILE CHECKSUM: d275e65cc7906dbb161a9cb0e1ca5773cea36543
+PODFILE CHECKSUM: 998b4a8b4d3c95683f7f6f806ef3f2928fc5d84d
 
 COCOAPODS: 1.10.1
