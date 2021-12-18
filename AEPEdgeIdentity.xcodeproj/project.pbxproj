@@ -765,7 +765,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ${SRCROOT}/.swiftlint.yml Sources\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n    ./Pods/SwiftLint/swiftlint lint --config ${SRCROOT}/.swiftlint.yml Sources\nelse\n    echo \"warning: SwiftLint is not installed, please run the pod install command from the project root directory.\"\nfi\n";
 		};
 		D43BAC2125BF4A3A00B08CC0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -782,7 +782,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ${SRCROOT}/.swiftlint.yml --lenient Tests/UnitTests\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n    ./Pods/SwiftLint/swiftlint lint --config ${SRCROOT}/.swiftlint.yml --lenient Tests/UnitTests\nelse\n    echo \"warning: SwiftLint is not installed, please run the pod install command from the project root directory.\"\nfi\n";
 		};
 		D43BAC2225BF4A5C00B08CC0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -799,7 +799,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ${SRCROOT}/.swiftlint.yml --lenient Tests/FunctionalTests\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n    ./Pods/SwiftLint/swiftlint lint --config ${SRCROOT}/.swiftlint.yml --lenient Tests/FunctionalTests\nelse\n    echo \"warning: SwiftLint is not installed, please run the pod install command from the project root directory.\"\nfi\n";
 		};
 		D43BAC2325BF4A7F00B08CC0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -816,7 +816,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint lint --config ${SRCROOT}/.swiftlint.yml SampleApps/TestApp\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\n    ./Pods/SwiftLint/swiftlint lint --config ${SRCROOT}/.swiftlint.yml SampleApps/TestApp\nelse\n    echo \"SwiftLint is not installed, please run the pod install command from the project root directory.\"\nfi\n";
 		};
 		F69A5533A32BE7971B2EDFDF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

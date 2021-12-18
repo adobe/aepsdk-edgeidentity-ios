@@ -6,6 +6,8 @@ use_frameworks!
 workspace 'AEPEdgeIdentity'
 project 'AEPEdgeIdentity.xcodeproj'
 
+pod 'SwiftLint', '0.44.0'
+
 target 'AEPEdgeIdentity' do
   pod 'AEPCore'
   pod 'AEPServices'

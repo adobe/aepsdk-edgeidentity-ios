@@ -16,6 +16,7 @@ coverage:
     - "./Tests/**/*"
     - "./Tests/.*"
     - "./SampleApps"
+    - "./build"
 
 parsers:
   gcov:
@@ -29,4 +30,3 @@ comment:
   layout: "header, diff"
   behavior: default
   require_changes: no
-
