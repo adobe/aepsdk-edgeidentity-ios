@@ -54,7 +54,7 @@ import Foundation
     private func handleRequestContent(event: Event) {
         state.updateAdvertisingIdentifier(event: event,
                                           createXDMSharedState: createXDMSharedState(data:event:),
-                                          dispatchEvent: dispatch(event:))
+                                          eventDispatcher: dispatch(event:))
     }
     
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
@@ -95,7 +95,7 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+              let stateowner = eventData[IdentityConstants.EventDataKeys.STATE_OWNER] as? String,
               stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
             return
         }

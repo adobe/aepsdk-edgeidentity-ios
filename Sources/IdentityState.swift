@@ -104,16 +104,16 @@ class IdentityState {
     ///   - dispatchEvent: function which dispatchs events to the event hub
     func updateAdvertisingIdentifier(event: Event,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
-                                     dispatchEvent: (Event) -> Void) {
+                                     eventDispatcher: (Event) -> Void) {
 
         // update adid if changed and extract the new adid value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
         if adIdChanged, let adId = event.adId {
-            identityEdgeProperties.advertisingIdentifier = adId
+            identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
-                let val = adId.isEmpty ? IdentityEdgeConstants.XDMKeys.Consent.NO : IdentityEdgeConstants.XDMKeys.Consent.YES
-                dispatchAdIdConsentRequestEvent(val: val, dispatchEvent: dispatchEvent)
+                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
+                dispatchAdIdConsentRequestEvent(val: val, eventDispatcher: eventDispatcher)
             }
 
             saveToPersistence(and: createXDMSharedState, using: event)
@@ -175,12 +175,12 @@ class IdentityState {
     func resetIdentifiers(event: Event,
                           createXDMSharedState: ([String: Any], Event) -> Void,
                           eventDispatcher: (Event) -> Void) {
-        let shouldDispatchConsent = identityEdgeProperties.advertisingIdentifier != nil && !(identityEdgeProperties.advertisingIdentifier?.isEmpty ?? true)
+        let shouldDispatchConsent = identityProperties.advertisingIdentifier != nil && !(identityProperties.advertisingIdentifier?.isEmpty ?? true)
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
         if shouldDispatchConsent {
-            dispatchAdIdConsentRequestEvent(val: IdentityEdgeConstants.XDMKeys.Consent.NO, dispatchEvent: dispatchEvent)
+            dispatchAdIdConsentRequestEvent(val: IdentityConstants.XDMKeys.Consent.NO, eventDispatcher: eventDispatcher)
         }
         
         saveToPersistence(and: createXDMSharedState, using: event)
@@ -212,14 +212,14 @@ class IdentityState {
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
         guard let newAdID = newAdID else { return (false, false) }
 
-        let existingAdId = identityEdgeProperties.advertisingIdentifier ?? ""
+        let existingAdId = identityProperties.advertisingIdentifier ?? ""
 
         // did the advertising identifier change?
         if (!newAdID.isEmpty && newAdID != existingAdId)
             || (newAdID.isEmpty && !existingAdId.isEmpty) {
             // Now we know the value changed, but did it change to/from null?
             // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
-            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityEdgeConstants.Default.ZERO_ADVERTISING_ID {
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
                 return (true, true)
             }
 
@@ -234,16 +234,16 @@ class IdentityState {
     /// - Parameters:
     ///   -  val: The new adId consent value, either "y" or "n"
     ///   - dispatchEvent: a function which sends an event to the event hub
-    private func dispatchAdIdConsentRequestEvent(val: String, dispatchEvent: (Event) -> Void) {
-        let event = Event(name: IdentityEdgeConstants.EventNames.CONSENT_REQUEST_AD_ID,
-                          type: EventType.consent,
+    private func dispatchAdIdConsentRequestEvent(val: String, eventDispatcher: (Event) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
+                          type: EventType.consent, // should this be .edgeConsent?
                           source: EventSource.requestContent,
-                          data: [IdentityEdgeConstants.XDMKeys.Consent.CONSENTS:
-                                    [IdentityEdgeConstants.XDMKeys.Consent.AD_ID:
-                                        [IdentityEdgeConstants.XDMKeys.Consent.VAL: val]
+                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
+                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
+                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
                                     ]
                           ])
-        dispatchEvent(event)
+        eventDispatcher(event)
     }
     
     /// Save `identityProperties` to persistence and create an XDM shared state.
