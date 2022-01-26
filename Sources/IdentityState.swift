@@ -101,7 +101,7 @@ class IdentityState {
     /// - Parameters:
     ///   - event: event containing a new ADID value.
     ///   - createXDMSharedState: function which creates new XDM shared state
-    ///   - dispatchEvent: function which dispatchs events to the event hub
+    ///   - eventDispatcher: function which dispatchs events to the event hub
     func updateAdvertisingIdentifier(event: Event,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      eventDispatcher: (Event) -> Void) {
@@ -233,11 +233,11 @@ class IdentityState {
     /// new advertising tracking preferences.
     /// - Parameters:
     ///   -  val: The new adId consent value, either "y" or "n"
-    ///   - dispatchEvent: a function which sends an event to the event hub
+    ///   - eventDispatcher: a function which sends an event to the event hub
     private func dispatchAdIdConsentRequestEvent(val: String, eventDispatcher: (Event) -> Void) {
-        let event = Event(name: IdentityConstants.EventNames.CONSENT_REQUEST_AD_ID,
-                          type: EventType.consent, // should this be .edgeConsent?
-                          source: EventSource.requestContent,
+        let event = Event(name: IdentityConstants.EventNames.CONSENT_UPDATE_REQUEST_AD_ID,
+                          type: EventType.edgeConsent, // should this be .edgeConsent? used to be .consent
+                          source: EventSource.updateConsent,
                           data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
                                     [IdentityConstants.XDMKeys.Consent.AD_ID:
                                         [IdentityConstants.XDMKeys.Consent.VAL: val]
