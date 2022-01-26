@@ -27,6 +27,9 @@ class IdentityEdgeTests: XCTestCase {
 
     // MARK: handleIdentityRequest
     func testGenericIdentityRequestSetsAdId() {
+        // Save previous log filter value
+        let savedLogFilterValue = Log.logFilter
+        Log.logFilter = .trace
         var props = IdentityProperties()
         props.ecid = ECID()
         props.advertisingIdentifier = "oldAdId"
@@ -55,6 +58,7 @@ class IdentityEdgeTests: XCTestCase {
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
 
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty) // no Consent event dispatched
+        Log.logFilter = savedLogFilterValue
     }
 
     func testGenericIdentityRequestClearsAdId() {
@@ -81,6 +85,7 @@ class IdentityEdgeTests: XCTestCase {
                     "ECID": [["id": "\(props.ecid ?? ECID())", "authenticationState": "ambiguous", "primary": 1]]
                 ]
             ]
+        
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
 

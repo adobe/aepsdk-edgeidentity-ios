@@ -15,7 +15,7 @@ import Foundation
 
 class TestableExtensionRuntime: ExtensionRuntime {
     func getHistoricalEvents(_ requests: [EventHistoryRequest], enforceOrder: Bool, handler: @escaping ([EventHistoryResult]) -> Void) {
-        <#code#>
+        // no-op
     }
     
     var listeners: [String: EventListener] = [:]
