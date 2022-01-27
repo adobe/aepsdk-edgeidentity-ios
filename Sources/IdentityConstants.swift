@@ -25,9 +25,6 @@ enum IdentityConstants {
     }
 
     enum SharedState {
-//        static let STATE_OWNER = "stateowner"
-//        static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
-
         enum Configuration {
             static let SHARED_OWNER_NAME = "com.adobe.module.configuration"
         }
