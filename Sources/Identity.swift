@@ -32,6 +32,9 @@ import Foundation
 
     public func onRegistered() {
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
+        
+        registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
+        
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
@@ -48,6 +51,14 @@ import Foundation
 
     // MARK: Event Listeners
 
+    /// Handles events to set the advertising identifier. Called by listener registered with event hub.
+    /// - Parameter event: event containing `advertisingIdentifier` data
+    private func handleRequestContent(event: Event) {
+        state.updateAdvertisingIdentifier(event: event,
+                                          createXDMSharedState: createXDMSharedState(data:event:),
+                                          eventDispatcher: dispatch(event:))
+    }
+    
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
@@ -86,7 +97,7 @@ import Foundation
     /// - Parameter event: shared state change event
     private func handleHubSharedState(event: Event) {
         guard let eventData = event.data,
-              let stateowner = eventData[IdentityConstants.SharedState.STATE_OWNER] as? String,
+              let stateowner = eventData[IdentityConstants.EventDataKeys.STATE_OWNER] as? String,
               stateowner == IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME else {
             return
         }

@@ -94,6 +94,32 @@ class IdentityState {
         createXDMSharedState(identityProperties.toXdmData(), nil)
         return hasBooted
     }
+    
+    /// When the advertising identifier from the `event` is different from the current value, it updates the persisted value and creates
+    /// new shared state and XDM shared state. A consent request event is dispatched when advertising tracking preferences change.
+    /// If privacy is optedout the call is ignored
+    /// - Parameters:
+    ///   - event: event containing a new ADID value.
+    ///   - createXDMSharedState: function which creates new XDM shared state
+    ///   - eventDispatcher: function which dispatchs events to the event hub
+    func updateAdvertisingIdentifier(event: Event,
+                                     createXDMSharedState: ([String: Any], Event) -> Void,
+                                     eventDispatcher: (Event) -> Void) {
+
+        // update adid if changed and extract the new adid value
+        let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
+        if adIdChanged, let adId = event.adId {
+            identityProperties.advertisingIdentifier = adId
+
+            if shouldUpdateConsent {
+                let val = adId.isEmpty ? IdentityConstants.XDMKeys.Consent.NO : IdentityConstants.XDMKeys.Consent.YES
+                dispatchAdIdConsentRequestEvent(val: val, eventDispatcher: eventDispatcher)
+            }
+
+            saveToPersistence(and: createXDMSharedState, using: event)
+        }
+
+    }
 
     /// Update the customer identifiers by merging `updateIdentityMap` with the current identifiers. Any identifier in `updateIdentityMap` which
     /// has the same id in the same namespace will update the current identifier.
@@ -141,6 +167,7 @@ class IdentityState {
 
     /// Clears all identities and regenerates a new ECID value.
     /// Saves identities to persistence and creates a new XDM shared state and dispatches a new` resetComplete` event after operation completes.
+    /// Dispatches Consent request event setting `adId` to 'no' if previous advertising identifier is nil or empty
     /// - Parameters:
     ///   - event: event which triggered the reset call
     ///   - createXDMSharedState: function which creates new XDM shared states
@@ -148,10 +175,14 @@ class IdentityState {
     func resetIdentifiers(event: Event,
                           createXDMSharedState: ([String: Any], Event) -> Void,
                           eventDispatcher: (Event) -> Void) {
-
+        let shouldDispatchConsent = identityProperties.advertisingIdentifier != nil && !(identityProperties.advertisingIdentifier?.isEmpty ?? true)
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
+        if shouldDispatchConsent {
+            dispatchAdIdConsentRequestEvent(val: IdentityConstants.XDMKeys.Consent.NO, eventDispatcher: eventDispatcher)
+        }
+        
         saveToPersistence(and: createXDMSharedState, using: event)
 
         let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
@@ -175,6 +206,46 @@ class IdentityState {
         return true
     }
 
+    /// Determines if we should update the advertising identifier with `newAdID` and if the advertising tracking consent has changed.
+    /// - Parameter newAdID: the new ad id
+    /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
+    private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
+        guard let newAdID = newAdID else { return (false, false) }
+
+        let existingAdId = identityProperties.advertisingIdentifier ?? ""
+
+        // did the advertising identifier change?
+        if (!newAdID.isEmpty && newAdID != existingAdId)
+            || (newAdID.isEmpty && !existingAdId.isEmpty) {
+            // Now we know the value changed, but did it change to/from null?
+            // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
+            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+                return (true, true)
+            }
+
+            return (true, false)
+        }
+
+        return (false, false)
+    }
+
+    /// Dispatch a consent request `Event` with `EventType.consent` and `EventSource.requestContent` which contains the consent value specifying
+    /// new advertising tracking preferences.
+    /// - Parameters:
+    ///   -  val: The new adId consent value, either "y" or "n"
+    ///   - eventDispatcher: a function which sends an event to the event hub
+    private func dispatchAdIdConsentRequestEvent(val: String, eventDispatcher: (Event) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.CONSENT_UPDATE_REQUEST_AD_ID,
+                          type: EventType.edgeConsent, // should this be .edgeConsent? used to be .consent
+                          source: EventSource.updateConsent,
+                          data: [IdentityConstants.XDMKeys.Consent.CONSENTS:
+                                    [IdentityConstants.XDMKeys.Consent.AD_ID:
+                                        [IdentityConstants.XDMKeys.Consent.VAL: val]
+                                    ]
+                          ])
+        eventDispatcher(event)
+    }
+    
     /// Save `identityProperties` to persistence and create an XDM shared state.
     /// - Parameters:
     ///   - createXDMSharedState: function which creates an XDM shared state
