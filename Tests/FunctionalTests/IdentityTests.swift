@@ -10,19 +10,24 @@
 // governing permissions and limitations under the License.
 //
 @testable import AEPCore
-@testable import AEPIdentity
+@testable import AEPEdgeIdentity
 import AEPServices
 import XCTest
 
 class IdentityEdgeTests: XCTestCase {
-    var identityEdge: Identity!
+    var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
 
     override func setUp() {
+        continueAfterFailure = false
+        let savedLogFilterValue = Log.logFilter
+        Log.logFilter = .trace
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
-        identityEdge = Identity(runtime: mockRuntime)
+        identity = Identity(runtime: mockRuntime)
+        identity.onRegistered()
+        
     }
 
     // MARK: handleIdentityRequest
@@ -31,27 +36,32 @@ class IdentityEdgeTests: XCTestCase {
         let savedLogFilterValue = Log.logFilter
         Log.logFilter = .trace
         var props = IdentityProperties()
-        props.ecid = ECID()
+        props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
+        
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
 
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
 
-        identityEdge.onRegistered() // trigger boot sequence
+        
+        // no longer calls bootupIfReady
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertEqual("adId", identityEdge.state?.identityProperties.advertisingIdentifier)
+        XCTAssertEqual("adId", identity.state.identityProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid ?? ECID())", "authenticationState": "ambiguous", "primary": 1]],
-                    "IDFA": [["id": "adId", "authenticationState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]],
+                    "IDFA": [["id": "adId", "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
@@ -63,39 +73,43 @@ class IdentityEdgeTests: XCTestCase {
 
     func testGenericIdentityRequestClearsAdId() {
         var props = IdentityProperties()
-        props.ecid = ECID()
+        props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
         props.saveToPersistence()
+        
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
 
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
-        identityEdge.onRegistered() // trigger boot sequence
         // test
         mockRuntime.simulateComingEvent(event: event)
 
         // verify
-        XCTAssertNil(identityEdge.state?.identityProperties.advertisingIdentifier)
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
 
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": "\(props.ecid ?? ECID())", "authenticationState": "ambiguous", "primary": 1]]
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
         
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
-
-        let expectedConsent: [String: Any] =
-            [
-                "consents": [
-                    "adId": ["val": "n"]
-                ]
-            ]
-        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
-        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
+        
     }
+    // TODO: more e2e tests that trigger different states
+    // consent integration, dispatching consent event correctly (test above will not trigger this behavior)
+    // need trigger consent y & consent n
+    // need test for not sending out consent in the case of having existing adid & updating to new one (consent hasnt changed, dont need to emit event)
+    // if persisted adid is blank & pass in all 0, shouldnt dispatch (treat all 0 as a blank string; that is, value hasn't changed, and adid should be treated logically as nil)
+    // test to make sure you cant set IDFA directly using update APIs or remove (should already exist, verify - updatecustomidentifiers, removeidentiteswithreservednamespaces)
+        // only way to update ADID should be setADID APIs 
+    // current tests show that old ad id is set/cleared correctly
+    // - only testing that setting various values updates correctly; can be done through unit testing through identity properties
 }
