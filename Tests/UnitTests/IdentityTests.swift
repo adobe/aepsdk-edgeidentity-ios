@@ -71,7 +71,7 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent)
         XCTAssertNotNil(responseEvent?.data)
     }
-    
+
     // MARK: handleRequestContent
     /// Tests that when identity receives a generic identity request content event with an advertising ID, that the ID is updated
     func testGenericIdentityRequestWithAdId() {

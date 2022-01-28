@@ -49,7 +49,7 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
     }
-    
+
     enum EventDataKeys {
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
         static let STATE_OWNER = "stateowner"
@@ -76,7 +76,8 @@ enum IdentityConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
-            static let AD_ID = "adId"
+            static let ID_TYPE = "idType"
+            static let AD_ID = "adID"
             static let VAL = "val"
             static let YES = "y"
             static let NO = "n"

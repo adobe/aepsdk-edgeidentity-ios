@@ -56,7 +56,7 @@ import Foundation
                                           createXDMSharedState: createXDMSharedState(data:event:),
                                           eventDispatcher: dispatch(event:))
     }
-    
+
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {

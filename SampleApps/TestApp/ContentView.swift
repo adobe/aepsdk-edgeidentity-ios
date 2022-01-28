@@ -34,12 +34,12 @@ struct ContentView: View {
                         Text("Assurance")
                     }
                 )
-                
+
                 NavigationLink(
-                   destination: AdvertisingIdentifierView(),
-                   label: {
-                       Text("Set Advertising Identifier")
-                   })
+                    destination: AdvertisingIdentifierView(),
+                    label: {
+                        Text("Set Advertising Identifier")
+                    })
 
                 NavigationLink(
                     destination: CustomIdentifierView(),

@@ -82,8 +82,8 @@ struct IdentityProperties: Codable {
             }
         }
     }
-    
-    /// The IDFA from retrieved Apple APIs
+
+    /// The current Ad ID (IDFA) set with the Identity extension
     var advertisingIdentifier: String? {
         get {
             return getAdvertisingIdentifier()
@@ -193,7 +193,7 @@ struct IdentityProperties: Codable {
 
         return nil
     }
-    
+
     /// Get the advertising identifier from the properties map. Assumes only one `IdentityItem` under the "IDFA" namespace.
     /// - Returns: the advertising identifier or nil if not found
     private func getAdvertisingIdentifier() -> String? {
