@@ -23,7 +23,7 @@ extension Event {
     /// - Returns: the extracted AdId, or `nil` if the Event is not an AdId event,
     var adId: String? {
         if isAdIdEvent {
-            // Sanitize `nil` String value
+            // Sanity check; Sanitize `nil` String value
             guard let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String else {
                 return ""
             }
@@ -38,6 +38,9 @@ extension Event {
     }
     
     /// Checks if the Event is an AdId event, based on the presence of the `ADVERTISING_IDENTIFIER` key and corresponding `String` value type at the top level of `data`.
+    ///
+    /// Because the `Any` type anonymizes the original classes of nil values, all checks against optional types pass if the actual value is `nil`.
+    /// Currently, only non-optional String values trigger updating the AdID as the value is compared to the non-optional `String` class
     var isAdIdEvent: Bool {
         if data?.keys.contains(IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER) ?? false {
             if data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] is String {
