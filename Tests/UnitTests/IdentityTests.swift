@@ -102,21 +102,21 @@ class IdentityTests: XCTestCase {
     }
     
     /// Tests that when identity receives a generic identity request content event with a `nil` advertising ID, that the ID is removed
-//    func testGenericIdentityRequestWithNilAdIdWithValidId() {
-//        // setup
-//        identity.state.identityProperties.advertisingIdentifier = "AdID"
-//        let event = Event(name: "Test Request Content",
-//                          type: EventType.genericIdentity,
-//                          source: EventSource.requestContent,
-//                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: NSNull()] as [String: Any])
-//        // test
-//        mockRuntime.simulateComingEvent(event: event)
-//
-//        // verify
-//        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
-//    }
+    func testGenericIdentityRequestWithNilAdIdWithValidId() {
+        // setup
+        identity.state.identityProperties.advertisingIdentifier = "AdID"
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: Optional<String>.none as Any] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
 
-    /// Tests that when identity receives a generic identity request content event without an advertising ID, that the ID is not changed
+        // verify
+        XCTAssertNotNil(identity.state.identityProperties.advertisingIdentifier)
+    }
+
+    /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is not changed
     func testGenericIdentityRequestWithoutAdIdWithValidId() {
         // setup
         identity.state.identityProperties.advertisingIdentifier = "AdID"
@@ -131,7 +131,7 @@ class IdentityTests: XCTestCase {
         XCTAssertEqual("AdID", identity.state.identityProperties.advertisingIdentifier)
     }
     
-    /// Tests that when identity receives a generic identity request content event without an advertising ID, that the ID is not changed
+    /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is not changed
     func testGenericIdentityRequestWithoutAdIdWithoutValidId() {
         // setup
         let event = Event(name: "Test Request Content",

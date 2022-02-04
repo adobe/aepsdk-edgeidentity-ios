@@ -25,7 +25,6 @@
 		43E2977FF5B6CE67BFA18068 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */; };
 		4C4B7D8C27A0CA2F00C0CE25 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8B27A0CA2F00C0CE25 /* IdentityTests.swift */; };
 		4C4B7D8E27A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
-		4C4B7D8F27A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
@@ -890,7 +889,6 @@
 				BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */,
 				BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */,
 				BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */,
-				4C4B7D8F27A0CAC900C0CE25 /* Event+Identity.swift in Sources */,
 				BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 				D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */,
 				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,

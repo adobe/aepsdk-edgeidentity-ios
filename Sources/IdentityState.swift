@@ -104,7 +104,7 @@ class IdentityState {
     func updateAdvertisingIdentifier(event: Event,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      eventDispatcher: (Event) -> Void) {
-
+        
         // update adid if changed and extract the new adid value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
         if adIdChanged {
@@ -210,26 +210,21 @@ class IdentityState {
     /// - Parameter newAdID: the new ad id
     /// - Returns: A tuple indicating if the ad id has changed, and if the consent should be updated
     private func shouldUpdateAdId(newAdID: String?) -> (adIdChanged: Bool, updateConsent: Bool) {
+        // After sanitization of event.adId, nil means event is not an AdID event
         guard let newAdID = newAdID else { return (false, false) }
-
         let existingAdId = identityProperties.advertisingIdentifier ?? ""
 
         // did the advertising identifier change?
-        if (!newAdID.isEmpty && newAdID != existingAdId)
-            || (newAdID.isEmpty && !existingAdId.isEmpty) {
-            // Now we know the value changed, but did it change to/from null?
-            // Handle case where existingAdId loaded from persistence with all zeros and new value is not empty.
-            if newAdID.isEmpty || existingAdId.isEmpty || existingAdId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+        if (!newAdID.isEmpty && newAdID != existingAdId) || (newAdID.isEmpty && !existingAdId.isEmpty) {
+            if newAdID.isEmpty || existingAdId.isEmpty {
                 return (true, true)
             }
-
             return (true, false)
         }
-
         return (false, false)
     }
 
-    /// Dispatch a consent request `Event` with `EventType.consent` and `EventSource.requestContent` which contains the consent value specifying
+    /// Dispatch a consent request `Event` with `EventType.edgeConsent` and `EventSource.updateConsent` which contains the consent value specifying
     /// new advertising tracking preferences.
     /// - Parameters:
     ///   -  val: The new adId consent value, either "y" or "n"

@@ -15,13 +15,35 @@ import Foundation
 
 extension Event {
 
-    /// Reads the advertising from the event data
+    /// Reads the advertising ID from the event data
+    ///
+    /// Performs a sanitization of values, converting `nil`, `""`, and `IdentityConstants.Default.ZERO_ADVERTISING_ID` into `""`
+    /// Provides a built-in check of first verifying that the Event is an AdId event using `isAdIdEvent`before attempting to access the value and perform sanitization
+    ///
+    /// - Returns: the extracted AdId, or `nil` if the Event is not an AdId event,
     var adId: String? {
-        let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String
-        if adId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
-            return ""
+        if isAdIdEvent {
+            // Sanitize `nil` String value
+            guard let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String else {
+                return ""
+            }
+            // Sanitize all-zero ID value
+            if adId == IdentityConstants.Default.ZERO_ADVERTISING_ID {
+                return ""
+            }
+            return adId
+        } else {
+            return nil
         }
-
-        return adId
+    }
+    
+    /// Checks if the Event is an AdId event, based on the presence of the `ADVERTISING_IDENTIFIER` key and corresponding `String` value type at the top level of `data`.
+    var isAdIdEvent: Bool {
+        if data?.keys.contains(IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER) ?? false {
+            if data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] is String {
+                return true
+            }
+        }
+        return false
     }
 }
