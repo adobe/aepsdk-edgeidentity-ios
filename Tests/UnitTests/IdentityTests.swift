@@ -101,7 +101,7 @@ class IdentityTests: XCTestCase {
         XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
     }
     
-    /// Tests that when identity receives a generic identity request content event with a `nil` advertising ID, that the ID is removed
+    /// Tests that when identity receives a generic identity request content event with a `nil` advertising ID, that the ID is not changed
     func testGenericIdentityRequestWithNilAdIdWithValidId() {
         // setup
         identity.state.identityProperties.advertisingIdentifier = "AdID"

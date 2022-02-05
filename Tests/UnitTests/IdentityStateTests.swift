@@ -567,21 +567,14 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation, dispatchedEventsExpectation], timeout: 2)
         
-        // Tuples allow for event type and source to be explicitly paired
-        // Update consent event
-        // Reset identity request
-        var eventCheck = [
-            (type: EventType.edgeConsent, source: EventSource.updateConsent),
-            (type: EventType.edgeIdentity, source: EventSource.resetComplete)
-        ]
-        
-        for event in dispatchedEvents {
-            if let foundIndex = eventCheck.firstIndex(where: { $0.type == event.type && $0.source == event.source }) {
-                eventCheck.remove(at: foundIndex)
-            }
-        }
-        
-        XCTAssertTrue(eventCheck.isEmpty)
+        // Verify Event type and source pairs, and the correct ordering
+        // 1. Update consent event
+        // 2. Reset identity request
+        XCTAssertEqual(2, dispatchedEvents.count)
+        XCTAssertEqual(EventType.edgeConsent, dispatchedEvents[0].type)
+        XCTAssertEqual(EventSource.updateConsent, dispatchedEvents[0].source)
+        XCTAssertEqual(EventType.edgeIdentity, dispatchedEvents[1].type)
+        XCTAssertEqual(EventSource.resetComplete, dispatchedEvents[1].source)
         
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityProperties.advertisingIdentifier)
@@ -724,9 +717,9 @@ class IdentityStateTests: XCTestCase {
     }
 
     /// Test ad ID call is ignored if passing nil
-    func testUpdateAdvertisingIdentifierPassingNilIsIgnored() {
-        assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "oldAdId", newAdId: nil, expectedAdId: "oldAdId")
-    }
+//    func testUpdateAdvertisingIdentifierPassingNilIsIgnored() {
+//        assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "oldAdId", newAdId: nil, expectedAdId: "oldAdId")
+//    }
 
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
         // setup
