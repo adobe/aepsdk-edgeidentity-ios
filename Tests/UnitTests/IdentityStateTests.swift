@@ -716,11 +716,6 @@ class IdentityStateTests: XCTestCase {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil, expectedConsent: "n")
     }
 
-    /// Test ad ID call is ignored if passing nil
-//    func testUpdateAdvertisingIdentifierPassingNilIsIgnored() {
-//        assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "oldAdId", newAdId: nil, expectedAdId: "oldAdId")
-//    }
-
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
         // setup
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
