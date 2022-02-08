@@ -176,12 +176,11 @@ class IdentityState {
                           createXDMSharedState: ([String: Any], Event) -> Void,
                           eventDispatcher: (Event) -> Void) {
         let shouldDispatchConsent = identityProperties.advertisingIdentifier != nil && !(identityProperties.advertisingIdentifier?.isEmpty ?? true)
-        identityProperties.clear()
-        identityProperties.ecid = ECID().ecidString
-
         if shouldDispatchConsent {
             dispatchAdIdConsentRequestEvent(val: IdentityConstants.XDMKeys.Consent.NO, eventDispatcher: eventDispatcher)
         }
+        identityProperties.clear()
+        identityProperties.ecid = ECID().ecidString
 
         saveToPersistence(and: createXDMSharedState, using: event)
 
