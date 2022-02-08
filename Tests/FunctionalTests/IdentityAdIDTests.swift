@@ -30,7 +30,6 @@ class IdentityAdIDTests: XCTestCase {
     // MARK: handleIdentityRequest
     /// Test ad ID is updated from old to new valid value, and consent true is dispatched
     func testGenericIdentityRequest_whenValidAdId_thenNewValidAdId() {
-        // Save previous log filter value
         var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
@@ -66,7 +65,6 @@ class IdentityAdIDTests: XCTestCase {
     
     /// Test ad ID stays the same with same new valid value, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenSameValidAdId() {
-        // Save previous log filter value
         var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"

@@ -703,12 +703,6 @@ class IdentityStateTests: XCTestCase {
     }
 
     // Starting from all-zeros
-    /// Test ad ID is updated from all zeros to valid value and consent is not dispatched.
-    /// This is a special case because all-zero in persistence should not be possible because all incoming ad ID values should be sanitized to ""
-    func testUpdateAdvertisingIdentifier_whenAllZeros_thenChangedToValid() {
-        assertUpdateAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
-    }
-    
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched
     func testUpdateAdvertisingIdentifier_whenAllZeros_thenChangedToEmpty() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: nil, expectedConsent: "n")
