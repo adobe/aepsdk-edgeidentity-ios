@@ -651,68 +651,71 @@ class IdentityStateTests: XCTestCase {
     }
 
     // MARK: updateAdvertisingIdentifier(...)
+    // Starting from nil
     /// Test ad ID is updated from nil to valid value on first call, and consent true is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesNilWithValidId() {
+    func testUpdateAdvertisingIdentifier_whenNil_thenChangedToValid() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: nil, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
     }
 
     /// Test ad ID is updated from nil to empty on first call, and consent false is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesNilWithEmptyId() {
+    func testUpdateAdvertisingIdentifier_whenNil_thenChangedToEmpty() {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: nil, newAdId: "", expectedAdId: nil)
     }
 
     /// Test ad ID is updated from nil to empty on first call when all zeros is passed, and consent false is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesNilWithZeros() {
+    func testUpdateAdvertisingIdentifier_whenNil_thenChangedToAllZeros() {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: nil, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil)
     }
-
+    // Starting from ""
     /// Test ad ID is updated from empty to valid value and consent true is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesEmptyWithValidId() {
+    func testUpdateAdvertisingIdentifier_whenEmpty_thenChangedToValid() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "", newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
     }
 
     /// Test ad ID call is ignored when old and new values are empty
-    func testUpdateAdvertisingIdentifierDoesNotUpdatesEmptyWithEmpty() {
+    func testUpdateAdvertisingIdentifier_whenEmpty_thenSameValue() {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: "", expectedAdId: nil)
     }
 
     /// Test ad ID call is ignored when old and new values are empty; passing all zeros is converted to empty string
-    func testUpdateAdvertisingIdentifierDoesNotUpdatesEmptyWithEZeros() {
+    func testUpdateAdvertisingIdentifier_whenEmpty_thenChangedToAllZeros() {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil)
     }
-
+    // Starting from valid
     /// Test ad ID is updated from old value to new value, and no consent event is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesValidWithNewValidId() {
+    func testUpdateAdvertisingIdentifier_whenValid_thenChangedToNewValid() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: "oldAdId", newAdId: "adId", expectedAdId: "adId")
     }
 
     /// Test ad ID is not updated when old and new values are the same
-    func testUpdateAdvertisingIdentifierDoesNotUpdatesValidWithSameValidId() {
+    func testUpdateAdvertisingIdentifier_whenValid_thenSameValue() {
         assertUpdateAdvertisingIdentifierIsNotUpdated(persistedAdId: "adId", newAdId: "adId", expectedAdId: "adId")
     }
 
     /// Test ad ID is updated from valid value to empty string and consent false is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesValidWithEmptyId() {
+    func testUpdateAdvertisingIdentifier_whenValid_thenChangedToEmpty() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: "", expectedAdId: nil, expectedConsent: "n")
     }
 
     /// Test ad ID is updaed from valid value to empty string when all zeros is passed, and consent false is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesValidWithZeros() {
+    func testUpdateAdvertisingIdentifier_whenValid_thenChangedToAllZeros() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: "oldAdId", newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil, expectedConsent: "n")
     }
 
-    /// Test ad ID is updaed from all zeros to valid value and consent true is dispatched
-//    func testUpdateAdvertisingIdentifierUpdatesZerosWithValidId() {
-//        assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId", expectedConsent: "y")
-//    }
-
+    // Starting from all-zeros
+    /// Test ad ID is updated from all zeros to valid value and consent is not dispatched.
+    /// This is a special case because all-zero in persistence should not be possible because all incoming ad ID values should be sanitized to ""
+    func testUpdateAdvertisingIdentifier_whenAllZeros_thenChangedToValid() {
+        assertUpdateAdvertisingIdentifierIsUpdatedWithoutConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "adId", expectedAdId: "adId")
+    }
+    
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched
-    func testUpdateAdvertisingIdentifierUpdatesZerosWithEmptyId() {
+    func testUpdateAdvertisingIdentifier_whenAllZeros_thenChangedToEmpty() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: "", expectedAdId: nil, expectedConsent: "n")
     }
 
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched; passing all zeros is converted to empty string
-    func testUpdateAdvertisingIdentifierUpdatesZerosWithZeros() {
+    func testUpdateAdvertisingIdentifier_whenAllZeros_thenSameValue() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil, expectedConsent: "n")
     }
 

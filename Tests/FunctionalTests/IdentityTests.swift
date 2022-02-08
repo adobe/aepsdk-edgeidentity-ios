@@ -21,20 +21,16 @@ class IdentityEdgeTests: XCTestCase {
 
     override func setUp() {
         continueAfterFailure = false
-        let savedLogFilterValue = Log.logFilter
-        Log.logFilter = .trace
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
         mockRuntime = TestableExtensionRuntime()
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
-
     }
 
     // MARK: handleIdentityRequest
-    func testGenericIdentityRequestSetsAdId() {
+    /// Test ad ID is updated from old to new valid value, and consent true is dispatched
+    func testGenericIdentityRequest_whenValidAdId_thenNewValidAdId() {
         // Save previous log filter value
-        let savedLogFilterValue = Log.logFilter
-        Log.logFilter = .trace
         var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
@@ -49,7 +45,6 @@ class IdentityEdgeTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adId"])
 
-        // no longer calls bootupIfReady
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -67,10 +62,80 @@ class IdentityEdgeTests: XCTestCase {
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
 
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty) // no Consent event dispatched
-        Log.logFilter = savedLogFilterValue
+    }
+    
+    /// Test ad ID stays the same with same new valid value, and consent event is not dispatched
+    func testGenericIdentityRequest_whenValidAdId_thenSameValidAdId() {
+        // Save previous log filter value
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.advertisingIdentifier = "oldAdId"
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "oldAdId"])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("oldAdId", identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]],
+                    "IDFA": [["id": "oldAdId", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+
+        XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty) // no Consent event dispatched
+    }
+    
+    /// Test ad ID stays the same with non-ad ID event, and consent event is not dispatched
+    func testGenericIdentityRequest_whenValidAdId_thenNoAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.advertisingIdentifier = "oldAdId"
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: ["somekey": "someValue"])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("oldAdId", identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]],
+                    "IDFA": [["id": "oldAdId", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
     }
 
-    func testGenericIdentityRequestClearsAdId() {
+    /// Test ad ID is updated from valid to nil, and consent event is dispatched
+    func testGenericIdentityRequest_whenValidAdId_thenEmptyAdId() {
         var props = IdentityProperties()
         props.ecid = ECID().ecidString
         props.advertisingIdentifier = "oldAdId"
@@ -100,15 +165,168 @@ class IdentityEdgeTests: XCTestCase {
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
-
     }
-    // TODO: more e2e tests that trigger different states
-    // consent integration, dispatching consent event correctly (test above will not trigger this behavior)
-    // need trigger consent y & consent n
-    // need test for not sending out consent in the case of having existing adid & updating to new one (consent hasnt changed, dont need to emit event)
-    // if persisted adid is blank & pass in all 0, shouldnt dispatch (treat all 0 as a blank string; that is, value hasn't changed, and adid should be treated logically as nil)
-    // test to make sure you cant set IDFA directly using update APIs or remove (should already exist, verify - updatecustomidentifiers, removeidentiteswithreservednamespaces)
-    // only way to update ADID should be setADID APIs
-    // current tests show that old ad id is set/cleared correctly
-    // - only testing that setting various values updates correctly; can be done through unit testing through identity properties
+    
+    /// Test ad ID is updated from valid to nil, and consent event is dispatched
+    func testGenericIdentityRequest_whenValidAdId_thenAllZerosId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.advertisingIdentifier = "oldAdId"
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+    }
+    
+    // MARK: - Starting from no ad ID
+    /// Test ad ID is updated from nil to valid, and consent event is dispatched
+    func testGenericIdentityRequest_whenNoAdId_thenNewValidAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "AdId"])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("AdId", identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]],
+                    "IDFA": [["id": "AdId", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+    }
+    
+    /// Test ad ID remains nil with non-ad ID event, and consent event is not dispatched
+    func testGenericIdentityRequest_whenNoAdId_thenNoAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: ["somekey": "someValue"])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+    }
+    
+    /// Test ad ID remains nil with nil ad ID event, and consent event is not dispatched
+    func testGenericIdentityRequest_whenNoAdId_thenEmptyAdId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+    }
+    
+    /// Test ad ID remains nil with nil ad ID event, and consent event is not dispatched
+    func testGenericIdentityRequest_whenNoAdId_thenAllZerosId() {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.saveToPersistence()
+
+        // simulate bootup as mockRuntime bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+
+        let event = Event(name: "Test Generic Identity",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
+
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
+
+        let expectedIdentity: [String: Any] =
+            [
+                "identityMap": [
+                    "ECID": [["id": "\(props.ecid ?? "")", "authenticatedState": "ambiguous", "primary": 0]]
+                ]
+            ]
+
+        XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
+        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+    }
 }
