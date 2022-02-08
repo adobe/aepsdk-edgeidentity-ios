@@ -215,7 +215,7 @@ class IdentityState {
         let existingAdId = identityProperties.advertisingIdentifier ?? ""
 
         // did the advertising identifier change?
-        if (!newAdID.isEmpty && newAdID != existingAdId) || (newAdID.isEmpty && !existingAdId.isEmpty) {
+        if newAdID != existingAdId {
             if newAdID.isEmpty || existingAdId.isEmpty {
                 return (true, true)
             }

@@ -14,7 +14,7 @@
 import AEPServices
 import XCTest
 
-class IdentityEdgeTests: XCTestCase {
+class IdentityAdIDTests: XCTestCase {
     var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
@@ -165,6 +165,19 @@ class IdentityEdgeTests: XCTestCase {
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count) // bootup + request content event
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+        
+        let expectedConsent: [String: Any] =
+            [
+                "consents": [
+                    "adID": [
+                        "val": "n",
+                        "idType": "IDFA"
+                    ]
+                ]
+            ]
+        XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
+        XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
+        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
     }
     
     /// Test ad ID is updated from valid to nil, and consent event is dispatched
