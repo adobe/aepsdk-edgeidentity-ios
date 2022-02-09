@@ -20,7 +20,7 @@ extension Event {
     /// Performs a sanitization of values, converting `nil`, `""`, and `IdentityConstants.Default.ZERO_ADVERTISING_ID` into `""`
     /// Recommended to use `isAdIdEvent` check before using this value
     /// - Returns: the extracted AdId, or `nil` if the Event is not an AdId event,
-    var adId: String? {
+    var adId: String {
         // Sanity check; Sanitize `nil` String value
         guard let adId = data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] as? String else {
             return ""
