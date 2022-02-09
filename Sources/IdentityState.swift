@@ -108,7 +108,7 @@ class IdentityState {
         // update adid if changed and extract the new adid value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
         if adIdChanged {
-            let adId = event.adId ?? ""
+            let adId = event.adId
             identityProperties.advertisingIdentifier = adId
 
             if shouldUpdateConsent {
