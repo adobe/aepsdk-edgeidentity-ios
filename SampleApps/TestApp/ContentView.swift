@@ -36,6 +36,12 @@ struct ContentView: View {
                 )
 
                 NavigationLink(
+                    destination: AdvertisingIdentifierView(),
+                    label: {
+                        Text("Set Advertising Identifier")
+                    })
+
+                NavigationLink(
                     destination: CustomIdentifierView(),
                     label: {
                         Text("Update Custom Identity")
@@ -115,6 +121,38 @@ struct GetIdentitiesView: View {
             }
         }
 
+    }
+}
+
+struct AdvertisingIdentifierView: View {
+    @State var adIdText: String = ""
+
+    var body: some View {
+        VStack {
+            HStack {
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier(adIdText)
+                }) {
+                    Text("Set AdId")
+                }.padding()
+                TextField("Enter Ad ID", text: $adIdText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .fixedSize()
+                    .autocapitalization(.none)
+            }
+            HStack {
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier(nil)
+                }) {
+                    Text("Set AdId as nil")
+                }.padding()
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
+                }) {
+                    Text("Set AdId as zeros")
+                }.padding()
+            }
+        }
     }
 }
 
