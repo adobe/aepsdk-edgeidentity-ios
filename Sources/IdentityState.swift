@@ -175,13 +175,9 @@ class IdentityState {
     func resetIdentifiers(event: Event,
                           createXDMSharedState: ([String: Any], Event) -> Void,
                           eventDispatcher: (Event) -> Void) {
-        let shouldDispatchConsent = identityProperties.advertisingIdentifier != nil && !(identityProperties.advertisingIdentifier?.isEmpty ?? true)
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
-        if shouldDispatchConsent {
-            dispatchAdIdConsentRequestEvent(val: IdentityConstants.XDMKeys.Consent.NO, eventDispatcher: eventDispatcher)
-        }
         saveToPersistence(and: createXDMSharedState, using: event)
 
         let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
