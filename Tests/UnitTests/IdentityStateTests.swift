@@ -555,12 +555,12 @@ class IdentityStateTests: XCTestCase {
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
 
         let dispatchedEventsExpectation = XCTestExpectation(description: "Expected dispatched events")
-        dispatchedEventsExpectation.expectedFulfillmentCount = 2
+        dispatchedEventsExpectation.expectedFulfillmentCount = 1
         var dispatchedEvents: [Event] = []
         state.resetIdentifiers(event: event,
                                createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
                                }, eventDispatcher: { event in
-                                   // With props.advertisingIdentifier defined at reset time, both edgeConsent and edgeIdentity hits are registered
+                                   // Only edgeIdentity event should be dispatched; consent is not handled as part of the reset flow
                                    dispatchedEvents += [event]
                                    dispatchedEventsExpectation.fulfill()
                                })
@@ -570,11 +570,11 @@ class IdentityStateTests: XCTestCase {
         // Verify Event type and source pairs, and the correct ordering
         // 1. Update consent event
         // 2. Reset identity request
-        XCTAssertEqual(2, dispatchedEvents.count)
-        XCTAssertEqual(EventType.edgeConsent, dispatchedEvents[0].type)
-        XCTAssertEqual(EventSource.updateConsent, dispatchedEvents[0].source)
-        XCTAssertEqual(EventType.edgeIdentity, dispatchedEvents[1].type)
-        XCTAssertEqual(EventSource.resetComplete, dispatchedEvents[1].source)
+        XCTAssertEqual(1, dispatchedEvents.count)
+//        XCTAssertEqual(EventType.edgeConsent, dispatchedEvents[0].type)
+//        XCTAssertEqual(EventSource.updateConsent, dispatchedEvents[0].source)
+        XCTAssertEqual(EventType.edgeIdentity, dispatchedEvents[0].type)
+        XCTAssertEqual(EventSource.resetComplete, dispatchedEvents[0].source)
         
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
         XCTAssertNil(state.identityProperties.advertisingIdentifier)
@@ -582,10 +582,6 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "space"))
         XCTAssertNotNil(state.identityProperties.ecid)
         XCTAssertNotEqual(props.ecid, state.identityProperties.ecid)
-
-        let consentEvent = dispatchedEvents.first(where: { $0.type == EventType.edgeConsent && $0.source == EventSource.updateConsent })
-        XCTAssertNotNil(consentEvent)
-        XCTAssertEqual(IdentityConstants.XDMKeys.Consent.NO, ((consentEvent?.data?[IdentityConstants.XDMKeys.Consent.CONSENTS] as? [String: Any])?[IdentityConstants.XDMKeys.Consent.AD_ID] as? [String: Any])?[IdentityConstants.XDMKeys.Consent.VAL] as? String)
     }
 
     private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
