@@ -567,12 +567,9 @@ class IdentityStateTests: XCTestCase {
 
         wait(for: [xdmSharedStateExpectation, dispatchedEventsExpectation], timeout: 2)
         
-        // Verify Event type and source pairs, and the correct ordering
-        // 1. Update consent event
-        // 2. Reset identity request
+        // Verify Event type and source pairs
+        // Reset identity request
         XCTAssertEqual(1, dispatchedEvents.count)
-//        XCTAssertEqual(EventType.edgeConsent, dispatchedEvents[0].type)
-//        XCTAssertEqual(EventSource.updateConsent, dispatchedEvents[0].source)
         XCTAssertEqual(EventType.edgeIdentity, dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.resetComplete, dispatchedEvents[0].source)
         
