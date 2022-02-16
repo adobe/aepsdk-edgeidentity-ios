@@ -14,6 +14,11 @@ import AEPCore
 import AEPEdgeIdentity
 import AEPIdentity
 import SwiftUI
+import AdSupport
+import AppTrackingTransparency
+import AEPEdgeConsent
+
+
 
 class RegisteredExtensions: ObservableObject {
     @Published var isEdgeIdentityRegistered: Bool = true
@@ -126,9 +131,107 @@ struct GetIdentitiesView: View {
 
 struct AdvertisingIdentifierView: View {
     @State var adIdText: String = ""
+    @State var adID: UUID? = nil
+    @State var resultText: String = ""
+    
+    /// Updates user consent preference by calling Edge Consent extension
+    func updateConsent(consentGiven: Bool) {
+        let collectConsent = ["collect": ["val": consentGiven ? "y" : "n"]]
+        let currentConsents = ["consents": collectConsent]
+        Consent.update(with: currentConsents)
+    }
+    
+    /// Provides the advertisingIdentifier for the given environment, assuming tracking authorization is provided
+    ///
+    /// Simulators will never provide a valid UUID, regardless of authorization; in the case of successful authorization on simulator, a random placeholder UUID will be generated
+    func getAdvertisingIdentifierForEnvironment() -> UUID {
+        #if targetEnvironment(simulator)
+        print("Simulator environment detected")
+        print("Simulator cannot retrieve valid advertising identifier; random UUID value generated as example value instead.")
+        return UUID()
+        #else
+        print("Non-simulator environment detected")
+        print(ASIdentifierManager.shared().advertisingIdentifier)
+        return ASIdentifierManager.shared().advertisingIdentifier
+        #endif
+    }
+    
+    /// Requests tracking authorization from the user; prompt will only be shown once per app install, as per Apple rules
+    ///
+    /// It is possible to change tracking permissions at the Settings app level. Change in permissions will terminate the app
+    /// It is also possible for system-wide tracking to be off but individual permissions granted
+    /// If Allow Apps to Request to Track was on and is turned off, a system prompt appears asking if previously provided individual tracking permissions should be kept or all turned off
+    func requestTrackingAuthorization() {
+        /// Based on Apple documentation for `ASIdentifierManager.shared().advertisingIdentifier`, iOS 14.5+ is the cutoff for required permissions request to use IDFA
+        /// however, based on testing with iOS 14.0.1 simulator, `isAdvertisingTrackingEnabled` is false on fresh app install, even if device has device level tracking enabled; prompt is never given and app does not show up in Privacy -> Tracking app list
+        // Requires Xcode 12 and AppTrackingTransparency framework
+        if #available(iOS 14, *) {
+            print("Using requestTrackingAuthorization")
+            // TODO: should Core be notified in every case?
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch status {
+                // Tracking authorization dialog was shown and authorization given
+                case .authorized:
+                    print("Authorized")
+                    resultText = "Authorized"
+                    // IDFA now accessible
+                    self.adID = getAdvertisingIdentifierForEnvironment()
+                    // Update consent
+                    updateConsent(consentGiven: true)
+                    // Set IDFA in Core
+                    MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
+                    
+                // Tracking authorization dialog was shown and permission is denied
+                case .denied:
+                    print("Denied")
+                    resultText = "Denied"
+                    
+                    updateConsent(consentGiven: false)
+                    MobileCore.setAdvertisingIdentifier("")
+                // Tracking authorization dialog has not been shown
+                case .notDetermined:
+                    print("Not Determined")
+                    resultText = "Not Determined"
+                // Tracking authorization dialog is not allowed to be shown
+                case .restricted:
+                    print("Restricted")
+                    resultText = "Restricted"
+                @unknown default:
+                    print("Unknown")
+                    resultText = "Unknown"
+                }
+            }
+        } else {
+            // ATTrackingManager only available in iOS 14+
+            print("ASIdentifierManager.shared().isAdvertisingTrackingEnabled: \(ASIdentifierManager.shared().isAdvertisingTrackingEnabled)")
+            print("Advertising identifier: \(ASIdentifierManager.shared().advertisingIdentifier)")
+            print("Getting IDFA directly")
+            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+                self.adID = getAdvertisingIdentifierForEnvironment()
+                resultText = "Tracking enabled"
+                
+                updateConsent(consentGiven: true)
+                MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
+                
+            } else {
+                resultText = "Tracking disabled"
+                
+                updateConsent(consentGiven: false)
+                MobileCore.setAdvertisingIdentifier("")
+            }
+        }
+    }
 
     var body: some View {
         VStack {
+            VStack {
+                Button("Request Permission for IDFA", action: {
+                    requestTrackingAuthorization()
+                })
+                Text(resultText)
+                Text("\(adID?.uuidString ?? "")")
+            }
+            
             HStack {
                 Button(action: {
                     MobileCore.setAdvertisingIdentifier(adIdText)

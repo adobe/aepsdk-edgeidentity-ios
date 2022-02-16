@@ -12,6 +12,8 @@
 
 import AEPAssurance
 import AEPCore
+import AEPEdge
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPServices
 import Compression
@@ -19,13 +21,16 @@ import UIKit
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // TODO: Set up the Environment File ID from your Launch property for the preferred environment
-    private let LAUNCH_ENVIRONMENT_FILE_ID = ""
+    private let LAUNCH_ENVIRONMENT_FILE_ID = "3805cb8645dd/88c777c4d663/launch-10d089bd7138-development"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
         MobileCore.configureWith(appId: LAUNCH_ENVIRONMENT_FILE_ID)
-        MobileCore.registerExtensions([Identity.self, Assurance.self])
+        MobileCore.registerExtensions([Assurance.self,
+                                       Consent.self,
+                                       Edge.self,
+                                       Identity.self])
 
         return true
     }
