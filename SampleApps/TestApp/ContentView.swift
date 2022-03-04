@@ -134,17 +134,6 @@ struct AdvertisingIdentifierView: View {
     @State var adID: UUID? = nil
     @State var resultText: String = ""
     
-    /// Updates user's ad ID consent preference by calling the Edge Consent extension
-    ///
-    /// Note: Both the `val` and `idType` keys should be defined in the dictionary
-    func updateConsent(consentGiven: Bool) {
-        print("Setting ad ID consent to: \(consentGiven ? "y" : "n")")
-        let collectConsent = ["adID": ["val": consentGiven ? "y" : "n",
-                                       "idType": "IDFA"]]
-        let currentConsents = ["consents": collectConsent]
-        Consent.update(with: currentConsents)
-    }
-    
     func getConsents() {
         Consent.getConsents() { consents, error in
             if let consents = consents {
@@ -185,15 +174,17 @@ struct AdvertisingIdentifierView: View {
                     resultText = "Authorized"
                     // IDFA now accessible
                     self.adID = getAdvertisingIdentifierForEnvironment()
-                    // Update ad ID consent
-                    updateConsent(consentGiven: true)
-                    // Set IDFA using Core API, which will be routed to Edge Identity extension
+                    
+                    // Set IDFA using Core API, which will be routed to Edge Identity extension.
+                    // Note that this will automatically update ad ID consent (consent event dispatched)
+                    // to "y" but only if the ad ID is not nil, all-zeros, or ""; in the case of the simulator it will be all-zeros.
+                    // Set the ad ID manually after getting authorization to get consent updated properly
                     MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
                     
                 // Tracking authorization dialog was shown and permission is denied
                 case .denied:
                     resultText = "Denied"
-                    updateConsent(consentGiven: false)
+//                    updateConsent(consentGiven: false)
                     MobileCore.setAdvertisingIdentifier("")
                 // Tracking authorization dialog has not been shown
                 case .notDetermined:
@@ -217,13 +208,11 @@ struct AdvertisingIdentifierView: View {
                 self.adID = getAdvertisingIdentifierForEnvironment()
                 resultText = "Tracking enabled"
                 
-                updateConsent(consentGiven: true)
                 MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
                 
             } else {
                 resultText = "Tracking disabled"
                 
-                updateConsent(consentGiven: false)
                 MobileCore.setAdvertisingIdentifier("")
             }
             print("Tracking authorization status is '\(resultText)'.")
