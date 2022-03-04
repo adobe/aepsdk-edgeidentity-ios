@@ -28,6 +28,7 @@
 		4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
+		4CC3D10727D2CFD70055ACC6 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */; };
 		969BD00DE9BC2B23CA13749C /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
 		B6F27EC32609146800C50A04 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EC22609146800C50A04 /* SceneDelegate.m */; };
@@ -113,6 +114,7 @@
 		4ADECD91E29628B33C7D45F5 /* Pods-UnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.release.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityAdIDTests.swift; sourceTree = "<group>"; };
 		4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
+		4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 		4EC5B471416D7ABA4A62D49C /* Pods-AEPIdentityEdge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdge.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdge/Pods-AEPIdentityEdge.release.xcconfig"; sourceTree = "<group>"; };
 		56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		65142CB35FAC27B4E14836AC /* Pods-TestApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestApp.release.xcconfig"; path = "Target Support Files/Pods-TestApp/Pods-TestApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CC3D10727D2CFD70055ACC6 /* AppTrackingTransparency.framework in Frameworks */,
 				004DF6198BD3329E598B8FAB /* Pods_TestApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -226,6 +229,7 @@
 		0B5B2ACABDDBE64CBBCE2D00 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */,
 				AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */,
 				B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */,
 				FC6D2266840DFF6DD80E5243 /* Pods_AEPEdgeIdentity.framework */,
