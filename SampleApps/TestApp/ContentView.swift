@@ -9,16 +9,14 @@
 // OF ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 //
+import AdSupport
 import AEPAssurance
 import AEPCore
 import AEPEdgeIdentity
 import AEPIdentity
-import SwiftUI
-import AdSupport
-import AppTrackingTransparency
 import AEPEdgeConsent
-
-
+import AppTrackingTransparency
+import SwiftUI
 
 class RegisteredExtensions: ObservableObject {
     @Published var isEdgeIdentityRegistered: Bool = true
@@ -131,7 +129,7 @@ struct GetIdentitiesView: View {
 
 struct AdvertisingIdentifierView: View {
     @State var adIdText: String = ""
-    @State var adID: UUID? = nil
+    @State var adID: UUID?
     @State var resultText: String = ""
     
     func getConsents() {
@@ -149,7 +147,11 @@ struct AdvertisingIdentifierView: View {
     /// Simulators will never provide a valid UUID, regardless of authorization; use the set ad ID flow to test a specific ad ID.
     func getAdvertisingIdentifierForEnvironment() -> UUID {
         #if targetEnvironment(simulator)
-        print("Simulator environment detected. Please note that simulators cannot retrieve valid advertising identifier from the ASIdentifierManager (as specified by Apple); an all-zeros UUID will be retrieved even if authorization is provided. If you want to use a specific ad ID, you can use the set ad ID flow.")
+        print("""
+            Simulator environment detected. Please note that simulators cannot retrieve valid advertising identifier
+            from the ASIdentifierManager (as specified by Apple); an all-zeros UUID will be retrieved even if
+            authorization is provided. If you want to use a specific ad ID, you can use the set ad ID flow.
+            """)
         #endif
         print("Advertising identifier: \(ASIdentifierManager.shared().advertisingIdentifier)")
         return ASIdentifierManager.shared().advertisingIdentifier

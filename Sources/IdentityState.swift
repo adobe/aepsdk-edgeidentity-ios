@@ -104,8 +104,7 @@ class IdentityState {
     func updateAdvertisingIdentifier(event: Event,
                                      createXDMSharedState: ([String: Any], Event) -> Void,
                                      eventDispatcher: (Event) -> Void) {
-        
-        // update adid if changed and extract the new adid value
+        // Update ad ID if changed, and extract the new ad ID value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
         if adIdChanged {
             let adId = event.adId
