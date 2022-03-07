@@ -27,25 +27,6 @@ class IdentityAdIDTests: XCTestCase {
         identity.onRegistered()
     }
     
-    // MARK: Test helpers
-    /// Sets up the IdentityProperties with the desired advertising identifier
-    func setupIdentity(withAdID: String?) -> String {
-        var props = IdentityProperties()
-        props.ecid = ECID().ecidString
-        props.advertisingIdentifier = withAdID
-        props.saveToPersistence()
-        
-        // Simulate bootup as mockRuntime.simulateComingEvent bypasses call to readyForEvent
-        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
-        XCTAssertTrue(identity.readyForEvent(testEvent))
-        
-        guard let propsECID = props.ecid else {
-            XCTFail("ECID saved to Identity properties is not valid")
-            return ""
-        }
-        return propsECID
-    }
-    
     func createGenericIdentityRequestEvent(withData: [String: Any]?) -> Event {
         let event = Event(name: "Test Generic Identity",
                           type: EventType.genericIdentity,
@@ -58,7 +39,8 @@ class IdentityAdIDTests: XCTestCase {
     /// Test ad ID is updated from old to new valid value, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenNewValidAdId() {
         let newAdID = "adID"
-        let propsECID = setupIdentity(withAdID: "initialAdID")
+        setupIdentity(withAdID: "initialAdID")
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: newAdID])
 
         // Test
@@ -87,7 +69,8 @@ class IdentityAdIDTests: XCTestCase {
     /// Test ad ID stays the same with same new valid value, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenSameValidAdId() {
         let initialAdID = "initialAdID"
-        let propsECID = setupIdentity(withAdID: initialAdID)
+        setupIdentity(withAdID: initialAdID)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: initialAdID])
         
         // Test
@@ -112,7 +95,8 @@ class IdentityAdIDTests: XCTestCase {
     /// Test ad ID stays the same with non-ad ID event, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenNoAdId() {
         let initialAdID = "initialAdID"
-        let propsECID = setupIdentity(withAdID: initialAdID)
+        setupIdentity(withAdID: initialAdID)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: ["somekey": "someValue"])
 
         // Test
@@ -137,7 +121,8 @@ class IdentityAdIDTests: XCTestCase {
     /// Test ad ID is updated from valid to nil, and consent event is dispatched
     func testGenericIdentityRequest_whenValidAdId_thenEmptyAdId() {
         let initialAdID = "initialAdID"
-        let propsECID = setupIdentity(withAdID: initialAdID)
+        setupIdentity(withAdID: initialAdID)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
         
         // Test
@@ -173,7 +158,8 @@ class IdentityAdIDTests: XCTestCase {
     
     /// Test ad ID is updated from valid to nil, and consent event is dispatched
     func testGenericIdentityRequest_whenValidAdId_thenAllZerosId() {
-        let propsECID = setupIdentity(withAdID: "initialAdID")
+        setupIdentity(withAdID: "initialAdID")
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
 
         // Test
@@ -210,7 +196,8 @@ class IdentityAdIDTests: XCTestCase {
     /// Test ad ID is updated from nil to valid, and consent event is dispatched
     func testGenericIdentityRequest_whenNoAdId_thenNewValidAdId() {
         let newAdID = "adID"
-        let propsECID = setupIdentity(withAdID: nil)
+        setupIdentity(withAdID: nil)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: newAdID])
         
         // Test
@@ -246,7 +233,8 @@ class IdentityAdIDTests: XCTestCase {
     
     /// Test ad ID remains nil with non-ad ID event, and consent event is not dispatched
     func testGenericIdentityRequest_whenNoAdId_thenNoAdId() {
-        let propsECID = setupIdentity(withAdID: nil)
+        setupIdentity(withAdID: nil)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: ["somekey": "someValue"])
 
         // Test
@@ -269,7 +257,8 @@ class IdentityAdIDTests: XCTestCase {
     
     /// Test ad ID remains nil with empty string ad ID event, and consent event is not dispatched
     func testGenericIdentityRequest_whenNoAdId_thenEmptyAdId() {
-        let propsECID = setupIdentity(withAdID: nil)
+        setupIdentity(withAdID: nil)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
         
         // Test
@@ -292,7 +281,8 @@ class IdentityAdIDTests: XCTestCase {
     
     /// Test ad ID remains nil with all-zero ad ID event, and consent event is not dispatched
     func testGenericIdentityRequest_whenNoAdId_thenAllZerosId() {
-        let propsECID = setupIdentity(withAdID: nil)
+        setupIdentity(withAdID: nil)
+        let propsECID = getECIDFromIdentityProperties()
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
         
         // Test
@@ -311,5 +301,26 @@ class IdentityAdIDTests: XCTestCase {
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
         XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
+    }
+    
+    // MARK: Test helpers
+    /// Sets up the IdentityProperties with the desired advertising identifier
+    private func setupIdentity(withAdID: String?) {
+        var props = IdentityProperties()
+        props.ecid = ECID().ecidString
+        props.advertisingIdentifier = withAdID
+        props.saveToPersistence()
+        
+        // Simulate bootup as mockRuntime.simulateComingEvent bypasses call to readyForEvent
+        let testEvent = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
+        XCTAssertTrue(identity.readyForEvent(testEvent))
+    }
+    
+    private func getECIDFromIdentityProperties() -> String {
+        guard let propsECID = identity.state.identityProperties.ecid else {
+            XCTFail("ECID saved to Identity properties is not valid")
+            return ""
+        }
+        return propsECID
     }
 }

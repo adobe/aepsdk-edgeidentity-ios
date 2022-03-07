@@ -186,7 +186,6 @@ struct AdvertisingIdentifierView: View {
                 // Tracking authorization dialog was shown and permission is denied
                 case .denied:
                     resultText = "Denied"
-//                    updateConsent(consentGiven: false)
                     MobileCore.setAdvertisingIdentifier("")
                 // Tracking authorization dialog has not been shown
                 case .notDetermined:
