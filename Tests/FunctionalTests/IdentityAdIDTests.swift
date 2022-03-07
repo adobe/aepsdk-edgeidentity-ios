@@ -35,6 +35,36 @@ class IdentityAdIDTests: XCTestCase {
         return event
     }
     
+    func testAdIDEmpty_whenInt() {
+        let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: 1])
+        XCTAssertEqual(event.adId, "")
+    }
+    
+    func testAdIDEmpty_whenDouble() {
+        let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: 1.1])
+        XCTAssertEqual(event.adId, "")
+    }
+    
+    func testAdIDEmpty_whenAllZeros() {
+        let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
+        XCTAssertEqual(event.adId, "")
+    }
+    
+    func testAdIDValid_whenValid() {
+        let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adID"])
+        XCTAssertEqual(event.adId, "adID")
+    }
+    
+    func testIsAdIDEventTrue_whenKeyPresent() {
+        let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "adID"])
+        XCTAssertTrue(event.isAdIdEvent)
+    }
+    
+    func testIsAdIDEventFalse_whenKeyAbsent() {
+        let event = createGenericIdentityRequestEvent(withData: ["somekey": "someValue"])
+        XCTAssertFalse(event.isAdIdEvent)
+    }
+    
     // MARK: - Starting from valid ad ID
     /// Test ad ID is updated from old to new valid value, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenNewValidAdId() {
