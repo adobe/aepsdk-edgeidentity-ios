@@ -65,6 +65,15 @@ class IdentityAdIDTests: XCTestCase {
         XCTAssertFalse(event.isAdIdEvent)
     }
     
+    func testIsAdIDEventFalse_whenNoData() {
+        let event = Event(name: "Test Generic Identity",
+                                      type: EventType.genericIdentity,
+                                      source: EventSource.requestContent,
+                                      data: nil)
+        XCTAssertFalse(event.isAdIdEvent)
+    }
+    
+    
     // MARK: - Starting from valid ad ID
     /// Test ad ID is updated from old to new valid value, and consent event is not dispatched
     func testGenericIdentityRequest_whenValidAdId_thenNewValidAdId() {
