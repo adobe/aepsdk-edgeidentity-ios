@@ -12,6 +12,8 @@
 
 import AEPAssurance
 import AEPCore
+import AEPEdge
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPServices
 import Compression
@@ -25,7 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
         MobileCore.configureWith(appId: LAUNCH_ENVIRONMENT_FILE_ID)
-        MobileCore.registerExtensions([Identity.self, Assurance.self])
+        MobileCore.registerExtensions([Assurance.self,
+                                       Consent.self,
+                                       Edge.self,
+                                       Identity.self])
 
         return true
     }
