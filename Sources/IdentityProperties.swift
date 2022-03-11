@@ -213,7 +213,15 @@ struct IdentityProperties: Codable {
         for reservedNamespace in IdentityProperties.reservedNamespaces {
             for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
                 if let items = identifiersMap.getItems(withNamespace: namespace) {
-                    Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    if [IdentityConstants.Namespaces.IDFA, IdentityConstants.Namespaces.GAID].contains(namespace) {
+                        let logMessage = """
+                        IdentityProperties - Adding/Updating identifiers in namespace ‘\(namespace)’ is
+                        not allowed through this API; use MobileCore.setAdvertisingIdentifier instead.
+                        """
+                        Log.debug(label: IdentityConstants.LOG_TAG, logMessage)
+                    } else {
+                        Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
+                    }
                     for item in items {
                         filterItems.add(item: item, withNamespace: namespace)
                     }
