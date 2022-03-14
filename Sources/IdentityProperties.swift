@@ -214,7 +214,8 @@ struct IdentityProperties: Codable {
             for namespace in identifiersMap.namespaces where namespace.caseInsensitiveCompare(reservedNamespace) == .orderedSame {
                 if let items = identifiersMap.getItems(withNamespace: namespace) {
                     if [IdentityConstants.Namespaces.IDFA, IdentityConstants.Namespaces.GAID].contains(namespace) {
-                        let logMessage = "IdentityProperties - Modifying identifiers in namespace '\(namespace)' is not allowed through this API; use MobileCore.setAdvertisingIdentifier instead."
+                        let logMessage = "IdentityProperties - Modifying identifiers in namespace '\(namespace)' not allowed through this API;"
+                        + " use MobileCore.setAdvertisingIdentifier instead."
                         Log.warning(label: IdentityConstants.LOG_TAG, logMessage)
                     } else {
                         Log.debug(label: IdentityConstants.LOG_TAG, "IdentityProperties - Adding/Updating identifiers in namespace '\(namespace)' is not allowed.")
