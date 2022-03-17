@@ -306,7 +306,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -336,7 +336,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -366,7 +366,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -390,7 +390,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.updateCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -412,7 +412,7 @@ class IdentityStateTests: XCTestCase {
                           data: nil)
 
         state.updateCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
+                                        resolveXDMSharedState: { _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
         XCTAssertEqual(1, state.identityProperties.identityMap.getItems(withNamespace: "space")?.count)
@@ -441,7 +441,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.removeCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -461,9 +461,8 @@ class IdentityStateTests: XCTestCase {
                           type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: nil)
-
         state.removeCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in XCTFail("XDM Shared state should not be updated") })
+                                        resolveXDMSharedState: { _ in XCTFail("XDM Shared state should not be updated") })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
         XCTAssertEqual(1, state.identityProperties.identityMap.getItems(withNamespace: "space")?.count)
@@ -494,7 +493,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.removeCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
@@ -526,7 +525,7 @@ class IdentityStateTests: XCTestCase {
 
         let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
         state.removeCustomerIdentifiers(event: event,
-                                        createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         wait(for: [xdmSharedStateExpectation], timeout: 1)
         XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence

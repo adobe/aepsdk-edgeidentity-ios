@@ -64,13 +64,17 @@ import Foundation
     /// Handles update identity requests to add/update customer identifiers.
     /// - Parameter event: the identity request event
     private func handleUpdateIdentity(event: Event) {
-        state.updateCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+        // [MOB-16019] Adding pending shared state to avoid race condition between updating and reading identity map
+        let resolver = createPendingXDMSharedState(event: event)
+        state.updateCustomerIdentifiers(event: event, resolveXDMSharedState: resolver)
     }
 
     /// Handles remove identity requests to remove customer identifiers.
     /// - Parameter event: the identity request event
     private func handleRemoveIdentity(event: Event) {
-        state.removeCustomerIdentifiers(event: event, createXDMSharedState: createXDMSharedState(data:event:))
+        // [MOB-16019] Adding pending shared state to avoid race condition between updating and reading identity map
+        let resolver = createPendingXDMSharedState(event: event)
+        state.removeCustomerIdentifiers(event: event, resolveXDMSharedState: resolver)
     }
 
     /// Handles `EventType.edgeIdentity` request reset events.
