@@ -108,11 +108,13 @@ class IdentityState {
     func updateCustomerIdentifiers(event: Event, resolveXDMSharedState: ([String: Any]) -> Void) {
         guard let identifiersData = event.data else {
             Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as no identifiers were found in the event data.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
             Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
@@ -127,11 +129,13 @@ class IdentityState {
     func removeCustomerIdentifiers(event: Event, resolveXDMSharedState: ([String: Any]) -> Void) {
         guard let identifiersData = event.data else {
             Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Failed to remove identifier as no identifiers were found in the event data.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         guard let removeIdentityMap = IdentityMap.from(eventData: identifiersData) else {
             Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 

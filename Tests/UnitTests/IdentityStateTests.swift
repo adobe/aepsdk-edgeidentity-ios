@@ -398,7 +398,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("custom", state.identityProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
-    func testUpdateCustomerIdentifiersNoEventDataDoesNotUpdateState() {
+    func testUpdateCustomerIdentifiersNoEventDataResolvesState() {
         let currentIdentities = IdentityMap()
         currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
         var props = IdentityProperties()
@@ -411,8 +411,9 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.updateIdentity,
                           data: nil)
 
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.updateCustomerIdentifiers(event: event,
-                                        resolveXDMSharedState: { _ in XCTFail("XDM Shared state should not be updated") })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
         XCTAssertEqual(1, state.identityProperties.identityMap.getItems(withNamespace: "space")?.count)
@@ -461,8 +462,9 @@ class IdentityStateTests: XCTestCase {
                           type: EventType.edgeIdentity,
                           source: EventSource.updateIdentity,
                           data: nil)
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.removeCustomerIdentifiers(event: event,
-                                        resolveXDMSharedState: { _ in XCTFail("XDM Shared state should not be updated") })
+                                        resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
         XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
         XCTAssertEqual(1, state.identityProperties.identityMap.getItems(withNamespace: "space")?.count)
