@@ -150,13 +150,13 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared states
     ///   - eventDispatcher: function which dispatches a new `Event`
     func resetIdentifiers(event: Event,
-                          createXDMSharedState: ([String: Any], Event) -> Void,
+                          resolveXDMSharedState: ([String: Any]) -> Void,
                           eventDispatcher: (Event) -> Void) {
 
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
-        saveToPersistence(and: createXDMSharedState, using: event)
+        saveToPersistence(and: resolveXDMSharedState)
 
         let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
                           type: EventType.edgeIdentity,
@@ -177,15 +177,6 @@ class IdentityState {
         identityProperties.saveToPersistence()
         Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Identity direct ECID updated to '\(legacyEcid)', updating the IdentityMap")
         return true
-    }
-
-    /// Save `identityProperties` to persistence and create the XDM shared state.
-    /// - Parameters:
-    ///   - createXDMSharedState: function which creates the XDM shared state
-    ///   - event: the event used to share the XDM state
-    private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
-        identityProperties.saveToPersistence()
-        createXDMSharedState(identityProperties.toXdmData(), event)
     }
 
     /// Save `identityProperties` to persistence and resolves the XDM shared state.

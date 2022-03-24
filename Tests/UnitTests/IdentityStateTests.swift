@@ -493,7 +493,7 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.removeCustomerIdentifiers(event: event,
                                         resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
@@ -525,7 +525,7 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.removeCustomerIdentifiers(event: event,
                                         resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
@@ -552,11 +552,10 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.requestReset,
                           data: nil)
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         let responseEventExpectation = XCTestExpectation(description: "Event should be dispatched after reseting identities")
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
-                               }, eventDispatcher: { event in
+                               resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() }, eventDispatcher: { event in
                                 XCTAssertEqual(EventType.edgeIdentity, event.type)
                                 XCTAssertEqual(EventSource.resetComplete, event.source)
                                 responseEventExpectation.fulfill()

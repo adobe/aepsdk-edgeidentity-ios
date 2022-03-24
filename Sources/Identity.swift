@@ -80,8 +80,9 @@ import Foundation
     /// Handles `EventType.edgeIdentity` request reset events.
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
+        let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: createXDMSharedState(data:event:),
+                               resolveXDMSharedState: resolver,
                                eventDispatcher: dispatch(event:))
     }
 
