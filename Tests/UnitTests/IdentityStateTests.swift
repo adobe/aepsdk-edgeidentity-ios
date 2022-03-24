@@ -440,7 +440,7 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.removeIdentity,
                           data: customerIdentities.asDictionary())
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.removeCustomerIdentifiers(event: event,
                                         resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
 
@@ -450,7 +450,7 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
-    func testRemoveCustomerIdentifiersNoEventDataDoesNotUpdateState() {
+    func testRemoveCustomerIdentifiersNoEventDataResolvesSharedState() {
         let currentIdentities = IdentityMap()
         currentIdentities.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
         var props = IdentityProperties()
