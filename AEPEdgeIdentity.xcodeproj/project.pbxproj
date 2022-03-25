@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		004DF6198BD3329E598B8FAB /* Pods_TestApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE39896A5E0D0C2B397EDD3 /* Pods_TestApp.framework */; };
+		2ECF038227ED68AC00B3C1DC /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */; };
 		43E2977FF5B6CE67BFA18068 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */; };
 		969BD00DE9BC2B23CA13749C /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
@@ -105,6 +106,7 @@
 /* Begin PBXFileReference section */
 		21194EEA9E974D4025B62CB7 /* Pods-FunctionalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunctionalTests.release.xcconfig"; path = "Target Support Files/Pods-FunctionalTests/Pods-FunctionalTests.release.xcconfig"; sourceTree = "<group>"; };
 		211C042081BAB03AF0C00D2D /* Pods_TestAppObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestAppObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		4ADECD91E29628B33C7D45F5 /* Pods-UnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.release.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		4EC5B471416D7ABA4A62D49C /* Pods-AEPIdentityEdge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdge.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdge/Pods-AEPIdentityEdge.release.xcconfig"; sourceTree = "<group>"; };
 		56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				BFF6492025BFD1CB0012A4C5 /* IdentityProperties.swift */,
 				BFF6492C25C087720012A4C5 /* IdentityState.swift */,
 				D43BAB1425BBA4F700B08CC0 /* Info.plist */,
+				2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -864,6 +867,7 @@
 				BFF6491B25BFD1990012A4C5 /* ECID.swift in Sources */,
 				BFF6492125BFD1CB0012A4C5 /* IdentityProperties.swift in Sources */,
 				D43BAB6A25BBAF6100B08CC0 /* Identity.swift in Sources */,
+				2ECF038227ED68AC00B3C1DC /* Event+Identity.swift in Sources */,
 				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -48,6 +48,31 @@ import Foundation
         }
     }
 
+    // Gets Visitor ID Service identifiers in URL query string form for consumption in hybrid mobile apps.
+    /// - Parameter completion: invoked with a value containing the visitor identifiers as a query string upon completion of the service request or
+    ///                         an `AEPError` if an unexpected error occurs or the request timed out.
+    @objc(getUrlVariables:)
+    static func getUrlVariables(completion: @escaping (String?, Error?) -> Void) {
+        let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_URL_VARIABLES,
+                          type: EventType.edgeIdentity,
+                          source: EventSource.requestIdentity,
+                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        MobileCore.dispatch(event: event) { responseEvent in
+            guard let responseEvent = responseEvent else {
+                completion(nil, AEPError.callbackTimeout)
+                return
+            }
+
+            guard let urlVariables = responseEvent.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String else {
+                completion(nil, AEPError.unexpected)
+                return
+            }
+
+            completion(urlVariables, .none)
+        }
+    }
+
     /// Returns all  identifiers, including customer identifiers which were previously added, or an `AEPError` if an unexpected error occurs or the request timed out.
     /// If there are no identifiers stored in the `Identity` extension, then an empty `IdentityMap` is returned.
     /// - Parameter completion: invoked once the identifiers are available, or

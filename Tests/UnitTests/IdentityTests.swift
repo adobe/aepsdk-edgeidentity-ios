@@ -72,6 +72,67 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set that we dispatch a response event with the UrlVariables string
+    func testEdgeIdentityRequestIdentifiersGetUrlVariablesHappy() {
+        // setup
+        let testECID = ECID()
+        identity.state.identityProperties.ecid = testECID.ecidString
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertNotNil(responseEvent)
+        let urlVariablesString = responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String ?? ""
+        XCTAssertFalse(urlVariablesString.isEmpty)
+
+        let expectedUrlVariableTSString = "adobe_mc=TS%3"
+        let expectedUrlVariableIdentifiersString = "%7C" + "MCMID" + "%3D" + testECID.ecidString + "%7C" + "MCORGID" + "%3D" + "test-org-id%40AdobeOrg"
+        XCTAssertTrue(urlVariablesString.contains(expectedUrlVariableTSString))
+        XCTAssertTrue(urlVariablesString.contains(expectedUrlVariableIdentifiersString))
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will not dispatch a response event
+    func testEdgeIdentityRequestIdentifiersGetUrlVariablesWithoutOrgId() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: (["test": "value"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertNil(responseEvent)
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing configuration shared state will not dispatch a response event
+    func testEdgeIdentityRequestIdentifiersGetUrlVariablesWithoutConfigurationSharedState() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertNil(responseEvent)
+    }
+
     // MARK: handleUpdateIdentity
 
     /// Tests when Identity receives an update identity event with valid data the customer identifiers are updated

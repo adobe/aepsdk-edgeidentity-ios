@@ -11,6 +11,7 @@
 //
 
 import AEPCore
+import AEPServices
 import Foundation
 
 @objc(AEPMobileEdgeIdentity) public class Identity: NSObject, Extension {
@@ -48,9 +49,43 @@ import Foundation
 
     // MARK: Event Listeners
 
-    /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
+    /// Handles events requesting for identifiers. Called by listener registered with event hub.
     /// - Parameter event: the identity request event
     private func handleIdentityRequest(event: Event) {
+        if event.urlVariables {
+            processGetUrlVariablesRequest(event: event)
+        } else {
+            processGetIdentifiersRequest(event: event)
+        }
+    }
+
+    /// Handles events requesting for url variables. Dispatches response event containing the url variables string.
+    /// - Parameter event: the identity request event
+    func processGetUrlVariablesRequest(event: Event) {
+        guard let configurationSharedState = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.value else { return }
+
+        // if config doesn't have org id we cannot proceed.
+        guard let orgId = configurationSharedState[IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID] as? String, !orgId.isEmpty else {
+            Log.trace(label: friendlyName, "\(#function) - Cannot process getUrlVariables request Identity event, experienceCloud.org is invalid or missing in configuration ")
+            return
+        }
+
+        let properties = state.identityProperties
+        let urlVariables = Self.generateURLVariablesPayload(configSharedState: configurationSharedState, identityProperties: properties)
+
+        let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_URL_VARIABLES,
+                                                      type: EventType.edgeIdentity,
+                                                      source: EventSource.responseIdentity,
+                                                      data: [IdentityConstants.EventDataKeys.URL_VARIABLES: urlVariables])
+
+        // dispatch identity response event with shared state data
+        dispatch(event: responseEvent)
+    }
+
+    /// Handles events requesting for identifiers. Dispatches response event containing the identifiers.
+    /// - Parameter event: the identity request event
+    func processGetIdentifiersRequest(event: Event) {
+        // handle getECID or getIdentifiers API
         let xdmData = state.identityProperties.toXdmData(true)
         let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                       type: EventType.edgeIdentity,
@@ -101,5 +136,42 @@ import Foundation
         if state.updateLegacyExperienceCloudId(legacyEcid) {
             createXDMSharedState(data: state.identityProperties.toXdmData(), event: event)
         }
+    }
+
+    // MARK: GetUrlVariables helpers
+
+    /// Helper function to generate url variables in format acceptable by the AEP web SDK
+    static func generateURLVariablesPayload(configSharedState: [String: Any], identityProperties: IdentityProperties) -> String {
+        // append timestamp
+        var theIdString = appendParameterToUrlVariablesString(original: "", key: IdentityConstants.URLKeys.TIMESTAMP_KEY, value: String(Int(Date().timeIntervalSince1970)))
+
+        // append ecid
+        if let ecid = identityProperties.ecid {
+            theIdString = appendParameterToUrlVariablesString(original: theIdString, key: IdentityConstants.URLKeys.MARKETING_CLOUD_ID_KEY, value: ecid)
+        }
+
+        // append org id
+        if let orgId = configSharedState[IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID] as? String {
+            theIdString = appendParameterToUrlVariablesString(original: theIdString, key: IdentityConstants.URLKeys.MARKETING_CLOUD_ORG_ID, value: orgId)
+        }
+
+        // encode adobe_mc string and append to the url
+        let urlFragment = "\(IdentityConstants.URLKeys.PAYLOAD_KEY)=\(URLEncoder.encode(value: theIdString))"
+
+        return urlFragment
+    }
+
+    /// Helper function to append key value to the url variable string
+    private static func appendParameterToUrlVariablesString(original: String, key: String, value: String) -> String {
+        if key.isEmpty || value.isEmpty {
+            return original
+        }
+
+        let newUrlVar = "\(key)=\(value)"
+        if original.isEmpty {
+            return newUrlVar
+        }
+
+        return "\(original)|\(newUrlVar)"
     }
 }
