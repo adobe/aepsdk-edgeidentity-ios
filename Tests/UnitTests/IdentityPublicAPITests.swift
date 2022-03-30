@@ -85,7 +85,7 @@ class IdentityAPITests: XCTestCase {
     }
 
     /// Tests that getIdentities returns an error if the response event data contains no ecid
-    func testGetExperienceCloudIdReturnsErrorIfResponseContainsDataWithoutECID() {
+    func testGetExperienceCloudIdReturnsEmptyStringIfResponseContainsDataWithoutECIDValues() {
         // setup
         let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
         expectation.assertForOverFulfill = true
@@ -93,14 +93,14 @@ class IdentityAPITests: XCTestCase {
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
-                                                          data: ["identityMap": [[:]]])
+                                                          data: ["identityMap": ["ECID": []]])
             MobileCore.dispatch(event: responseEvent)
         }
 
         // test
-        Identity.getExperienceCloudId { _, error in
-            XCTAssertNotNil(error)
-            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+        Identity.getExperienceCloudId { ecid, error in
+            XCTAssertNil(error)
+            XCTAssertEqual("", ecid)
             expectation.fulfill()
         }
 
@@ -172,7 +172,7 @@ class IdentityAPITests: XCTestCase {
     }
 
     /// Tests that updateIdentifiers dispatches an identity update identity event
-    func testUpdateIdentifiers() {
+    func testUpdateIdentities() {
         // setup
         let expectation = XCTestExpectation(description: "updateIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
@@ -189,6 +189,19 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that updateIdentifiers dispatches an identity update identity event
+    func testUpdateIdentitiesWithEmptyValuesShouldNotDispatchEvent() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity) { _ in
+            XCTFail("updateIdentities should not dispatch an event")
+        }
+
+        // test
+        let map = IdentityMap()
+        map.add(item: IdentityItem(id: ""), withNamespace: "")
+        Identity.updateIdentities(with: map)
+    }
+
     /// Tests that removeIdentity dispatches an identity remove identity event
     func testRemoveIdentity() {
         // setup
@@ -203,5 +216,16 @@ class IdentityAPITests: XCTestCase {
 
         // verify
         wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that removeIdentity dispatches an identity remove identity event
+    func testRemoveIdentityWithEmptyValuesShouldNotDispatchEvent() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity) { _ in
+            XCTFail("removeIdentity should not dispatch an event")
+        }
+
+        // test
+        Identity.removeIdentity(item: IdentityItem(id: ""), withNamespace: "")
     }
 }
