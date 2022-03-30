@@ -84,6 +84,30 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that getIdentities returns an error if the response event data contains no ecid
+    func testGetExperienceCloudIdReturnsErrorIfResponseContainsDataWithoutECID() {
+        // setup
+        let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseIdentity,
+                                                          data: ["identityMap": [[:]]])
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getExperienceCloudId { _, error in
+            XCTAssertNotNil(error)
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
     /// Tests that getIdentities dispatches an identity request identity event
     func testGetIdentities() {
         // setup
