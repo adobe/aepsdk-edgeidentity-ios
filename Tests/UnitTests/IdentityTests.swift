@@ -73,7 +73,7 @@ class IdentityTests: XCTestCase {
     }
 
     /// Tests that when identity receives an edge identity request identity event with urlVariables flag set that we dispatch a response event with the UrlVariables string
-    func testEdgeIdentityRequestIdentifiersGetUrlVariablesHappy() {
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_returnsProperUrlString() {
         // setup
         let testECID = ECID()
         identity.state.identityProperties.ecid = testECID.ecidString
@@ -100,7 +100,7 @@ class IdentityTests: XCTestCase {
     }
 
     /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will not dispatch a response event
-    func testEdgeIdentityRequestIdentifiersGetUrlVariablesWithoutOrgId() {
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenOrgIdMissing_returnsNil() {
         // setup
         let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
                                          type: EventType.edgeIdentity,
@@ -108,6 +108,27 @@ class IdentityTests: XCTestCase {
                                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
 
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: (["test": "value"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertNil(responseEvent)
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will not dispatch a response event
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenECIDNotGenerated_returnsNil() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        // simulate ecid not being generated
+        identity.state.identityProperties.ecid = nil
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
 
         // test
         mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
