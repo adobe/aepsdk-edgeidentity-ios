@@ -90,13 +90,10 @@ enum IdentityConstants {
     }
 
     enum URLKeys {
-        static let ORGID = "d_orgid"
-        static let ECID = "d_mid"
         static let TIMESTAMP_KEY = "TS"
         static let MARKETING_CLOUD_ORG_ID = "MCORGID"
         static let MARKETING_CLOUD_ID_KEY = "MCMID"
         static let PAYLOAD_KEY = "adobe_mc"
-
     }
 
 }

@@ -48,9 +48,15 @@ import Foundation
         }
     }
 
-    // Gets Visitor ID Service identifiers in URL query string form for consumption in hybrid mobile apps.
-    /// - Parameter completion: invoked with a value containing the visitor identifiers as a query string upon completion of the service request or
-    ///                         an `AEPError` if an unexpected error occurs or the request timed out.
+    /// Returns the identifiers in URL query parameter format for consumption in hybrid mobile applications.
+    /// There is no leading & or ? punctuation as the caller is responsible for placing the variables in their resulting URL in the correct locations.
+    /// If an error occurs while retrieving the URL variables, the completion handler is called with a nil value and AEPError instance.
+    /// Otherwise, the ecoded string is returned, for ex: `"adobe_mc=TS%3DTIMESTAMP_VALUE%7CMCMID%3DYOUR_ECID%7CMCORGID%3D9YOUR_EXPERIENCE_CLOUD_ID"`
+    /// The `adobe_mc` attribute is an URL encoded list that contains:
+    ///     - TS: a timestamp taken when the request was made
+    ///     - MCMID: Experience Cloud ID (ECID)
+    ///     - MCORGID: Experience Cloud Org ID
+    /// - Parameter completion: invoked with a value containing the identifiers in query parameter format or an AEPError if an unexpected error occurs or the request times out.
     @objc(getUrlVariables:)
     static func getUrlVariables(completion: @escaping (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_URL_VARIABLES,

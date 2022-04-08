@@ -90,6 +90,8 @@ class IdentityTests: XCTestCase {
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
         XCTAssertNotNil(responseEvent)
+        XCTAssertEqual(EventType.edgeIdentity, responseEvent?.type)
+        XCTAssertEqual(EventSource.responseIdentity, responseEvent?.source)
         let urlVariablesString = responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String ?? ""
         XCTAssertFalse(urlVariablesString.isEmpty)
 
@@ -117,7 +119,7 @@ class IdentityTests: XCTestCase {
         XCTAssertNil(responseEvent)
     }
 
-    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will not dispatch a response event
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing ecid will not dispatch a response event
     func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenECIDNotGenerated_returnsNil() {
         // setup
         let getUrlVariablesEvent = Event(name: "Test Request Identifiers",

@@ -188,7 +188,7 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    /// Tests that getUrlVariables returns an error if the response event contains no data
+    /// Tests that getUrlVariables returns urlVariables string when response contains urlVariables data
     func testGetUrlVariables_ifResponseContainsURLVariablesString_returnsProperString() {
         // setup
         let expectedURLVariablesString = "adobe_mc=sample_url_string"
