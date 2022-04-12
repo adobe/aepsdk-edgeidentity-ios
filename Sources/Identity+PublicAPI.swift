@@ -44,7 +44,7 @@ import Foundation
                 return
             }
 
-            completion(ecidItem.id, .none)
+            completion(ecidItem.id, nil)
         }
     }
 
@@ -70,12 +70,12 @@ import Foundation
                 return
             }
 
-            guard let urlVariables = responseEvent.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String else {
+            guard let urlVariables = responseEvent.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, !urlVariables.isEmpty else {
                 completion(nil, AEPError.unexpected)
                 return
             }
 
-            completion(urlVariables, .none)
+            completion(urlVariables, nil)
         }
     }
 
@@ -102,7 +102,7 @@ import Foundation
                 return
             }
 
-            completion(identityMap, .none)
+            completion(identityMap, nil)
         }
     }
 

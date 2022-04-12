@@ -86,14 +86,13 @@ enum IdentityConstants {
 
     enum ConfigurationKeys {
         static let EXPERIENCE_CLOUD_ORGID = "experienceCloud.org"
-        static let GLOBAL_CONFIG_PRIVACY = "global.privacy"
     }
 
     enum URLKeys {
-        static let TIMESTAMP_KEY = "TS"
+        static let TIMESTAMP = "TS"
         static let MARKETING_CLOUD_ORG_ID = "MCORGID"
-        static let MARKETING_CLOUD_ID_KEY = "MCMID"
-        static let PAYLOAD_KEY = "adobe_mc"
+        static let MARKETING_CLOUD_ID = "MCMID"
+        static let PAYLOAD = "adobe_mc"
     }
 
 }

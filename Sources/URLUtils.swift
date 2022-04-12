@@ -13,7 +13,7 @@ import AEPServices
 import Foundation
 
 /// Provides functions to append visitor information to a URL
-enum URLAppender {
+enum URLUtils {
 
     /// Helper function to generate url variables in format acceptable by the AEP web SDK (Alloy)
     /// - Parameters:
@@ -23,16 +23,16 @@ enum URLAppender {
     /// - Returns: a string formatted with the visitor id payload
     static func generateURLVariablesPayload(ts: String, ecid: String, orgId: String) -> String {
         // append timestamp
-        var theIdString = appendParameterToUrlVariablesString(original: "", key: IdentityConstants.URLKeys.TIMESTAMP_KEY, value: ts)
+        var theIdString = appendParameterToUrlVariablesString(original: "", key: IdentityConstants.URLKeys.TIMESTAMP, value: ts)
 
         // append ecid
-        theIdString = appendParameterToUrlVariablesString(original: theIdString, key: IdentityConstants.URLKeys.MARKETING_CLOUD_ID_KEY, value: ecid)
+        theIdString = appendParameterToUrlVariablesString(original: theIdString, key: IdentityConstants.URLKeys.MARKETING_CLOUD_ID, value: ecid)
 
         // append org id
         theIdString = appendParameterToUrlVariablesString(original: theIdString, key: IdentityConstants.URLKeys.MARKETING_CLOUD_ORG_ID, value: orgId)
 
         // encode adobe_mc string and append to the url
-        let urlFragment = "\(IdentityConstants.URLKeys.PAYLOAD_KEY)=\(URLEncoder.encode(value: theIdString))"
+        let urlFragment = "\(IdentityConstants.URLKeys.PAYLOAD)=\(URLEncoder.encode(value: theIdString))"
 
         return urlFragment
     }

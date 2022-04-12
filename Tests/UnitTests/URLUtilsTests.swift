@@ -13,16 +13,16 @@
 @testable import AEPEdgeIdentity
 import XCTest
 
-class URLAppenderTests: XCTestCase {
+class URLUtilsTests: XCTestCase {
 
     func test_generateURLVariablesPayload_validStringValuesPassed_returnsStringWith_TS_ECID_ORGID() {
-        let payload = URLAppender.generateURLVariablesPayload(ts: "TEST-TS", ecid: "TEST_ECID", orgId: "TEST_ORGID")
+        let payload = URLUtils.generateURLVariablesPayload(ts: "TEST-TS", ecid: "TEST_ECID", orgId: "TEST_ORGID")
 
         XCTAssertEqual("adobe_mc=TS%3DTEST-TS%7CMCMID%3DTEST_ECID%7CMCORGID%3DTEST_ORGID", payload)
     }
 
     func test_generateURLVariablesPayload_emptyValuesPassed_returnsStringWithURLPrefixOnly() {
-        let payload = URLAppender.generateURLVariablesPayload(ts: "", ecid: "", orgId: "")
+        let payload = URLUtils.generateURLVariablesPayload(ts: "", ecid: "", orgId: "")
 
         XCTAssertEqual("adobe_mc=", payload)
     }

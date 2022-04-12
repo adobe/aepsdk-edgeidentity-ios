@@ -101,7 +101,7 @@ class IdentityTests: XCTestCase {
         XCTAssertTrue(urlVariablesString.contains(expectedUrlVariableIdentifiersString))
     }
 
-    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will not dispatch a response event
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will dispatch a response event with empty url variables string
     func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenOrgIdMissing_returnsNil() {
         // setup
         let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
@@ -116,10 +116,11 @@ class IdentityTests: XCTestCase {
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
-        XCTAssertNil(responseEvent)
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
+
     }
 
-    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing ecid will not dispatch a response event
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing ecid will dispatch a response event with empty url variables string
     func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenECIDNotGenerated_returnsNil() {
         // setup
         let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
@@ -137,10 +138,10 @@ class IdentityTests: XCTestCase {
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
-        XCTAssertNil(responseEvent)
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
     }
 
-    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing configuration shared state will not dispatch a response event
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing configuration shared state will dispatch a response event with empty url variables string
     func testEdgeIdentityRequestIdentifiersGetUrlVariablesWithoutConfigurationSharedState() {
         // setup
         let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
@@ -153,7 +154,7 @@ class IdentityTests: XCTestCase {
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
-        XCTAssertNil(responseEvent)
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
     }
 
     // MARK: handleUpdateIdentity
