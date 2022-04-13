@@ -12,10 +12,10 @@
 import AEPServices
 import Foundation
 
-/// Provides functions to append visitor information to a URL
+/// Provides utility functions to generate the URL variables string
 enum URLUtils {
 
-    /// Helper function to generate url variables in format acceptable by the AEP web SDK (Alloy)
+    /// Helper function to generate url variables in format acceptable by the AEP web SDKs
     /// - Parameters:
     ///   - ts: timestamp string denoting time when url variables request was made
     ///   - orgId: Experience Cloud Org identifier string set in the configuration
