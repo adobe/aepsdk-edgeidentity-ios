@@ -90,8 +90,8 @@ enum IdentityConstants {
 
     enum URLKeys {
         static let TIMESTAMP = "TS"
-        static let MARKETING_CLOUD_ORG_ID = "MCORGID"
-        static let MARKETING_CLOUD_ID = "MCMID"
+        static let EXPERIENCE_CLOUD_ORG_ID = "MCORGID"
+        static let EXPERIENCE_CLOUD_ID = "MCMID"
         static let PAYLOAD = "adobe_mc"
     }
 
