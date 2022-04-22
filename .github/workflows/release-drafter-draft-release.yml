@@ -13,10 +13,10 @@ on:
         required: true
         default: 'yes'
 
-      create_as_draft:
-        description: 'create as draft release? ("no" to create real release)'
+      create_full_release:
+        description: 'create as full release? ("no" to create draft release)'
         required: true
-        default: 'yes'
+        default: 'no'
 
 jobs:
   create_release:
@@ -29,8 +29,8 @@ jobs:
         name: v${{ github.event.inputs.tag }}
         tag: ${{ github.event.inputs.tag }}
         version: ${{ github.event.inputs.tag }}
-        publish: ${{ github.event.inputs.create_as_draft == 'no' }}
-        config-name: release-drafter-draft-release-config.yml
+        publish: ${{ github.event.inputs.create_full_release == 'yes' }}
+        config-name: release-drafter.yml
         
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

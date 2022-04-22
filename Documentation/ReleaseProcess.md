@@ -10,7 +10,7 @@ It is possible to have the tool output a draft release version to verify the out
 # Changelog text and style configuration
 The Release Drafter tool uses a yaml config file to control the style of output. This config controls changelog text level elements; to control GitHub release level elements (tags, release name, draft/full release status, etc.), see [GitHub release configuration](#github-release-configuration).
 
-By default, the Release Drafter action looks at the repository's ~/.github/ directory (NOT the same level as the workflow itself; one level above) for a file with the name `release-drafter.yml`. If a different filename is desired, an argurment can be added to the `with` parameters (other `with` parameters not included in example snippet for brevity):  
+By default, the Release Drafter action looks for its configuration at `.github/release-drafter.yml` (note this is one level up from the action's own `workflows` directory). To use a different config filename, specify the `config-name` as in the example below:
 ```yaml
 - uses: release-drafter/release-drafter@v5
   with:
@@ -35,7 +35,20 @@ categories:
     label: 'chore'
 ```
 
-Note that in the default configuration of the tool, unlabeled PRs are grouped together. The categories of PRs follow the same order as in the config yaml file, with the unlabeled category starting first, followed by the defined `categories` order.
+Note that in the default configuration of the tool, unlabeled PRs are grouped together. The categories of PRs follow the same order as in the config yaml file, with the unlabeled category starting first, followed by the defined `categories` order. If unlabeled PRs are not desired in the changelog, explicitly define the full set of labels that should be included by using the `include-labels` property at the top level of the config file:
+
+```yaml
+include-labels:
+  - 'bug'
+  - 'bugfix'
+  - 'buildscripts'
+  - 'deprecated'
+  - 'documentation'
+  - 'enhancement'
+  - 'feature'
+  - 'fix'
+  - 'maintenance'
+```
 
 ## How to control changelog output template
 See the available environment variables for changelog output populated by the tool: [Template Variables](https://github.com/release-drafter/release-drafter#template-variables)
@@ -46,24 +59,25 @@ template: |
   ## Changes
 
   $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
 ```
 
 Note that the elements of the changelog itself are broken into smaller standard units by the tool; for example, each PR is represented by a "change" entity, and the format for a single change entry is controlled by the `change-template` property. 
 
 At the top level of the config yaml:
 ```yaml
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-template: '$TITLE (#$NUMBER) @$AUTHOR'
 ```
-Given a PR whose author username is @timkimadobe and a title like:
+Given a PR whose author is `@username` with title:
 ```
 New API allows for deleting user data #6 
 ```
 
-Results in output like:
+The resulting output is:
 ```
-- New API allows for deleting user data @timkimadobe (#6)
+New API allows for deleting user data (#6) @username
 ```
-You can see that the title text is inserted into the provided format wherever the `$TITLE` variable is defined, along with the `$AUTHOR` and `$NUMBER` (PR number). The tool only provides the raw text values, so if you want to leverage GitHub's own automatic linking to users and/or PRs, include the special prefixes accordingly using the required format.
 
 See the reference for all standard changelog entities: [Configuration Objects](https://github.com/release-drafter/release-drafter#configuration-options)
 
