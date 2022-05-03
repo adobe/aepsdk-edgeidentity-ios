@@ -59,6 +59,7 @@ struct GetIdentitiesView: View {
     @State var ecidEdgeIdentityText: String = ""
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
+    @State var urlVariablesText: String = ""
 
     var body: some View {
         VStack {
@@ -77,9 +78,25 @@ struct GetIdentitiesView: View {
                 Text("Get ECID")
             }
 
+            Button(action: {
+                self.urlVariablesText = ""
+
+                AEPEdgeIdentity.Identity.getUrlVariables { urlVariablesString, _ in
+                    self.urlVariablesText = urlVariablesString ?? "URLVariables not generated"
+                }
+            }) {
+                Text("Get URLVariables")
+            }
+
             Text("edge : \(ecidEdgeIdentityText)" + (ecidIdentityText.isEmpty ? "" : "\ndirect: \(ecidIdentityText)"))
-                .font(.system(size: 12))
-                .padding()
+                .font(.system(size: 10))
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(5)
+
+            Text("urlString : \(urlVariablesText)")
+                .font(.system(size: 10))
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(5)
 
             HStack {
                 Button(action: {

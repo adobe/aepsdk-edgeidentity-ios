@@ -17,6 +17,7 @@
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *lblextensionVersion;
 @property (weak, nonatomic) IBOutlet UILabel *lblECID;
+@property (weak, nonatomic) IBOutlet UILabel *lblUrlVariables;
 @property (weak, nonatomic) IBOutlet UIButton *btnUpdateIdentities;
 @property (weak, nonatomic) IBOutlet UITextView *txtAllIdentities;
 
@@ -35,6 +36,15 @@
     [AEPMobileEdgeIdentity getExperienceCloudId:^(NSString *ecid, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblECID setText:ecid];
+        });
+    }];
+}
+
+- (IBAction)btnGetUrlVariablesClicked:(id)sender {
+    [AEPMobileEdgeIdentity getUrlVariables:^(NSString *urlVariables, NSError *error){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.lblUrlVariables setText:urlVariables];
+
         });
     }];
 }
