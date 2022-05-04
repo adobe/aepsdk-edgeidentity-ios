@@ -45,6 +45,17 @@ import AEPEdge
 import AEPEdgeIdentity
 ```
 
+4. Register the Identity for Edge Extension with MobileCore:
+```swift
+// AppDelegate.swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  MobileCore.registerExtensions([Identity.self, Edge.self], {
+     MobileCore.configureWith(appId: "yourLaunchEnvironmentID")
+   })
+   ...
+}
+```
+
 ## API reference
 
 | APIs                                           |
@@ -128,7 +139,7 @@ This method was added in Edge Identity version 2.0.0.
 {% endhint %}
 
 
-This API returns the identifiers in URL query parameter format for consumption in **hybrid mobile applications**. There is no leading & or ? punctuation as the caller is responsible for placing the variables in their resulting URL in the correct locations. If an error occurs while retrieving the URL variables, the completion handler is called with a nil value and AEPError instance. Otherwise, the encoded string is returned, for ex: `"adobe_mc=TS%3DTIMESTAMP_VALUE%7CMCMID%3DYOUR_ECID%7CMCORGID%3D9YOUR_EXPERIENCE_CLOUD_ID"`
+This API returns the identifiers in URL query parameter format for consumption in **hybrid mobile applications**. There is no leading & or ? punctuation as the caller is responsible for placing the variables in their resulting URL in the correct locations. If an error occurs while retrieving the URL variables, the completion handler is called with a nil value and AEPError instance. Otherwise, the encoded string is returned, for example: `"adobe_mc=TS%3DTIMESTAMP_VALUE%7CMCMID%3DYOUR_ECID%7CMCORGID%3D9YOUR_EXPERIENCE_CLOUD_ID"`
 
 * The `adobe_mc` attribute is an URL encoded list that contains:
   * `MCMID` - Experience Cloud ID \(ECID\)
