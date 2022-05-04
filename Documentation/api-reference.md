@@ -22,39 +22,40 @@ The following instructions are for configuring an application using Adobe Experi
 
 1. Add the Mobile Core and Edge extensions to your project using CocoaPods. Add following pods in your `Podfile`:
 
-   ```ruby
-   use_frameworks!
-   target 'YourTargetApp' do
-       pod 'AEPCore'
-       pod 'AEPEdge'
-       pod 'AEPEdgeIdentity'
-   end
-   ```
+  ```ruby
+  use_frameworks!
+  target 'YourTargetApp' do
+     pod 'AEPCore'
+     pod 'AEPEdge'
+     pod 'AEPEdgeIdentity'
+  end
+  ```
+  
 2. Install cocoapods dependencies. Replace `YOUR_TARGET_NAME` and then, in the `Podfile` directory, type:
 
-   ```bash
-   $ pod install
-   ```
+  ```bash
+  $ pod install
+  ```
 
 3. Import the Mobile Core and Edge libraries:
 
-```swift
-// AppDelegate.swift
-import AEPCore
-import AEPEdge
-import AEPEdgeIdentity
-```
+  ```swift
+  // AppDelegate.swift
+  import AEPCore
+  import AEPEdge
+  import AEPEdgeIdentity
+  ```
 
 4. Register the Identity for Edge Extension with MobileCore:
-```swift
-// AppDelegate.swift
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-  MobileCore.registerExtensions([Identity.self, Edge.self], {
-     MobileCore.configureWith(appId: "yourLaunchEnvironmentID")
-   })
-   ...
-}
-```
+  ```swift
+  // AppDelegate.swift
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    MobileCore.registerExtensions([Identity.self, Edge.self], {
+       MobileCore.configureWith(appId: "yourLaunchEnvironmentID")
+     })
+     ...
+  }
+  ```
 
 ## API reference
 
