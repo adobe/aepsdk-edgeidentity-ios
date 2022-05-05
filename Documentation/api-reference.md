@@ -25,27 +25,21 @@ The extensionVersion() API returns the version of the Identity for Edge Network 
 <table>
 <tr>
 <th> Platform </th>
-<th> Syntax </th>
-<th> Sample </th>
+<th> Syntax & Sample </th>
 </tr>
 <tr>
-<td>**Swift**</td>
+<td><b>Swift</b></td>
 <td>
-<code> static var extensionVersion: String </code>
-
-</td>
-<td>
-<code>let extensionVersion = EdgeIdentity.extensionVersion</code>
+Syntax: &emsp;<code> static var extensionVersion: String </code>
+Sample: &emsp;<code>let extensionVersion = EdgeIdentity.extensionVersion</code>
 </td>
 </tr>
 
 <tr>
 <td>**Objective-C**</td>
 <td>
-<code>+ (nonnull NSString*) extensionVersion; </code>
-</td>
-<td>
-<code> NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];</code>
+Syntax: &emsp;<code>+ (nonnull NSString*) extensionVersion; </code>
+Sample: &emsp;<code> NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];</code>
 </td>
 </tr>
 </table>
