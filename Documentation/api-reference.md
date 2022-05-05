@@ -1,61 +1,8 @@
 # Adobe Experience Platform Identity for Edge Network Extension - iOS
 
-
-[![Cocoapods](https://img.shields.io/cocoapods/v/AEPEdgeIdentity.svg?color=orange&label=AEPEdgeIdentity&logo=apple&logoColor=white)](https://cocoapods.org/pods/AEPEdgeIdentity)
-
-[![SPM](https://img.shields.io/badge/SPM-Supported-orange.svg?logo=apple&logoColor=white)](https://swift.org/package-manager/)
-[![CircleCI](https://img.shields.io/circleci/project/github/adobe/aepsdk-edgeidentity-ios/main.svg?logo=circleci)](https://circleci.com/gh/adobe/workflows/aepsdk-edgeidentity-ios)
-[![Code Coverage](https://img.shields.io/codecov/c/github/adobe/aepsdk-edgeidentity-ios/main.svg?logo=codecov)](https://codecov.io/gh/adobe/aepsdk-edgeidentity-ios/branch/main)
-
 ## Prerequisites
 
-The Adobe Experience Platform Identity for Edge Network extension has the following peer dependency, which must be installed prior to installing the identity extension:
-- [Core](https://github.com/adobe/aepsdk-core-ios#readme)
-
-## Getting started - Add the AEP Identity extension to your app
-
-### Download and import the Identity extension
-
-{% hint style="info" %}
-The following instructions are for configuring an application using Adobe Experience Platform Edge mobile extensions. If an application will include both Edge Network and Adobe Solution extensions, both the Identity for Edge Network and Identity for Experience Cloud ID Service extensions are required. Find more details in the [Frequently Asked Questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq) page.
-
-
-1. Add the Mobile Core and Edge extensions to your project using CocoaPods. Add following pods in your `Podfile`:
-
-  ```ruby
-  use_frameworks!
-  target 'YourTargetApp' do
-     pod 'AEPCore'
-     pod 'AEPEdge'
-     pod 'AEPEdgeIdentity'
-  end
-  ```
-  
-2. Install cocoapods dependencies. Replace `YOUR_TARGET_NAME` and then, in the `Podfile` directory, type:
-
-  ```bash
-  $ pod install
-  ```
-
-3. Import the Mobile Core and Edge libraries:
-
-  ```swift
-  // AppDelegate.swift
-  import AEPCore
-  import AEPEdge
-  import AEPEdgeIdentity
-  ```
-
-4. Register the Identity for Edge Extension with MobileCore:
-  ```swift
-  // AppDelegate.swift
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    MobileCore.registerExtensions([Identity.self, Edge.self], {
-       MobileCore.configureWith(appId: "yourLaunchEnvironmentID")
-     })
-     ...
-  }
-  ```
+Refer our [Getting Started Guide](getting-started.md)
 
 ## API reference
 
@@ -75,16 +22,40 @@ The following instructions are for configuring an application using Adobe Experi
 
 The extensionVersion() API returns the version of the Identity for Edge Network extension.
 
-**Syntax**
-
+<table>
+<tr>
+<th> Platform </th>
+<th> Syntax </th>
+<th> Sample </th>
+</tr>
+<tr>
+<td>**Swift**</td>
+<td>
 ```swift
 static var extensionVersion: String
 ```
-**Examples**
-
+</td>
+<td>
 ```swift
 let extensionVersion = EdgeIdentity.extensionVersion
 ```
+</td>
+</tr>
+
+<tr>
+<td>**Objective-C**</td>
+<td>
+```objectivec
++ (nonnull NSString*) extensionVersion;
+```
+</td>
+<td>
+```objectivec
+NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];
+```
+</td>
+</tr>
+</table>
 
 ### getExperienceCloudId
 
