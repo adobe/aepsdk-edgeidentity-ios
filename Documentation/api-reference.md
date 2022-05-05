@@ -17,6 +17,7 @@ Refer our [Getting Started Guide](getting-started.md)
 | [resetIdentities](#resetIdentities)            |
 | [updateIdentities](#updateIdentities)          |
 
+------
 
 ### extensionVersion
 
@@ -45,6 +46,7 @@ let extensionVersion = EdgeIdentity.extensionVersion
 ```objectivec
 NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];
 ```
+------
 
 ### getExperienceCloudId
 
@@ -82,6 +84,7 @@ Identity.getExperienceCloudId { (ecid, error) in
     // handle the error and the retrieved ID here    
 }];
 ```
+------
 
 ### getIdentities
 
@@ -106,6 +109,8 @@ Identity.getIdentities { (identityMap, error) in
   }
 }
 ```
+
+------
 
 ### getUrlVariables
 {% hint style="info" %}
@@ -138,7 +143,7 @@ Identity.getUrlVariables { (urlVariables, error) in
   }
 }
 ```
-
+------
 
 ### registerExtension
 
