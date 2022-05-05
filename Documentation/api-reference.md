@@ -47,12 +47,14 @@ Sample: &emsp;<pre> NSString *extensionVersion = [AEPMobileEdgeIdentity extensio
 </table>
 
 #### Swift
-
+| Label    | Code  |
+| -----    | ----- |
 | Syntax   | ```swift static var extensionVersion: String``` |
 | Sample   | ```swift let extensionVersion = EdgeIdentity.extensionVersion``` |
 
 #### Objective-C
-
+|          |       |
+| -----    | ----- |
 | Syntax   | ```objectivec + (nonnull NSString*) extensionVersion;`` |
 | Sample   | ```objectivec NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];``` |
 
