@@ -53,9 +53,8 @@ Sample: &emsp;<pre> NSString *extensionVersion = [AEPMobileEdgeIdentity extensio
 | Sample   | ```swift let extensionVersion = EdgeIdentity.extensionVersion``` |
 
 #### Objective-C
-|          |       |
 | -----    | ----- |
-| Syntax   | ```objectivec + (nonnull NSString*) extensionVersion;`` |
+| Syntax   | ```objectivec + (nonnull NSString*) extensionVersion;``` |
 | Sample   | ```objectivec NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];``` |
 
 ### getExperienceCloudId
