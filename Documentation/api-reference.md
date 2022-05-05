@@ -23,23 +23,25 @@ Refer our [Getting Started Guide](getting-started.md)
 The extensionVersion() API returns the version of the Identity for Edge Network extension.
 
 #### Swift
-**Syntax**
+
+##### Syntax
 ```swift
 static var extensionVersion: String
 ```
 
-**Example**
+##### Example
 ```swift
 let extensionVersion = EdgeIdentity.extensionVersion
 ```
 
 #### Objective-C
-**Syntax**
+
+##### Syntax
 ```objectivec
 + (nonnull NSString*) extensionVersion;
 ```
 
-**Example**
+##### Example
 ```objectivec
 NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];
 ```
@@ -48,16 +50,16 @@ NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];
 
 This API retrieves the Experience Cloud ID (ECID) that was generated when the app was initially launched. This ID is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall.
 
-**Syntax**
+#### Swift
 
+##### Syntax
 ```swift
 static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void)
 ```
 
 * _completion_ is invoked after the ECID is available.  The default timeout is 1000ms.
 
-**Examples**
-
+##### Example
 ```swift
 Identity.getExperienceCloudId { (ecid, error) in
   if let error = error {
@@ -66,6 +68,19 @@ Identity.getExperienceCloudId { (ecid, error) in
     // handle the retrieved ID here
   }
 }
+```
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) getExperienceCloudId:^(NSString * _Nullable ecid, NSError * _Nullable error)completion
+```
+
+##### Example
+```objectivec
+[AEPMobileEdgeIdentity getExperienceCloudId:^(NSString *ecid, NSError *error) {   
+    // handle the error and the retrieved ID here    
+}];
 ```
 
 ### getIdentities
