@@ -22,40 +22,27 @@ Refer our [Getting Started Guide](getting-started.md)
 
 The extensionVersion() API returns the version of the Identity for Edge Network extension.
 
-<table>
-<tr>
-<th> Platform </th>
-<th> Syntax & Sample </th>
-</tr>
-
-<tr>
-<td><b>Swift</b></td>
-<td>
-Syntax: &emsp;<pre>static var extensionVersion: String</pre>
-Sample: &emsp;<pre>let extensionVersion = EdgeIdentity.extensionVersion</pre>
-</td>
-</tr>
-
-<tr>
-<td><b>Objective-C</b></td>
-<td>
-Syntax: &emsp;<pre>+ (nonnull NSString*) extensionVersion; </pre>
-Sample: &emsp;<pre> NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];</pre>
-
-</td>
-</tr>
-</table>
-
 #### Swift
-| Label    | Code  |
-| -----    | ----- |
-| Syntax   | ```swift static var extensionVersion: String``` |
-| Sample   | ```swift let extensionVersion = EdgeIdentity.extensionVersion``` |
+**Syntax**
+```swift
+static var extensionVersion: String
+```
+
+**Example**
+```swift
+let extensionVersion = EdgeIdentity.extensionVersion
+```
 
 #### Objective-C
-| -----    | ----- |
-| Syntax   | ```objectivec + (nonnull NSString*) extensionVersion;``` |
-| Sample   | ```objectivec NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];``` |
+**Syntax**
+```objectivec
++ (nonnull NSString*) extensionVersion;
+```
+
+**Example**
+```objectivec
+NSString *extensionVersion = [AEPMobileEdgeIdentity extensionVersion];
+```
 
 ### getExperienceCloudId
 
