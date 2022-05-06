@@ -21,7 +21,7 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   end
   ```
 
-2. Install cocoapods dependencies. Replace `YOUR_TARGET_APP` and then, in the `Podfile` directory, type:
+2. Install [Cocoapods](https://cocoapods.org/) dependencies. Replace `YourTargetApp` and then, in the `Podfile` directory, type:
 
   ```bash
   $ pod install
