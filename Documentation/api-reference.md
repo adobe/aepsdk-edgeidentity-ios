@@ -119,7 +119,7 @@ Identity.getIdentities { (identityMap, error) in
 ##### Example
 ```objectivec
 [AEPMobileEdgeIdentity getIdentities:^(AEPIdentityMap *map, NSError *error) {   
-    // handle the error and the retrieved ID here
+    // handle the error and the retrieved  identities here
 }];
 ```
 
@@ -159,9 +159,9 @@ Identity.getUrlVariables { (urlVariables, error) in
     guard let urlWithVisitorData: URL = URL(string: urlStringWithVisitorData) else {
       // handle error, unable to construct URL
       return
-      // handle the retrieved urlVariables encoded string here
     }
 
+    // handle the retrieved urlVariables encoded string here
     // APIs which update the UI must be called from main thread
     DispatchQueue.main.async {
     self.webView.load(URLRequest(url: urlWithVisitorData))
