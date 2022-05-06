@@ -90,16 +90,15 @@ Identity.getExperienceCloudId { (ecid, error) in
 
 Get all the identities in the Identity for Edge Network extension, including customer identifiers which were previously added.
 
-**Syntax**
+#### Swift
 
+##### Syntax
 ```swift
 static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void)
 ```
+* _completion_ is invoked after the identities are available. The default timeout is 1000ms. The return format is an instance of [IdentityMap](#identitymap).
 
-* _completion_ is invoked after the identities are available.  The default timeout is 1000ms. The return format is an instance of [IdentityMap](#identitymap).
-
-**Examples**
-
+##### Example
 ```swift
 Identity.getIdentities { (identityMap, error) in
   if let error = error {
@@ -108,6 +107,20 @@ Identity.getIdentities { (identityMap, error) in
     // handle the retrieved identities here
   }
 }
+```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) getIdentities:^(AEPIdentityMap * _Nullable map, NSError * _Nullable error)completion
+```
+
+##### Example
+```objectivec
+[AEPMobileEdgeIdentity getIdentities:^(AEPIdentityMap *map, NSError *error) {   
+    // handle the error and the retrieved ID here
+}];
 ```
 
 ------
@@ -125,24 +138,64 @@ This API returns the identifiers in URL query parameter format for consumption i
   * `MCORGID` - Experience Cloud Org ID
   * `TS` - A timestamp taken when this request was made
 
-**Syntax**
+#### Swift
 
+##### Syntax
 ```swift
 static func getUrlVariables(completion: @escaping (String?, Error?) -> Void)
 ```
-* _completion_ is invoked after the url variables string is available. The default timeout is 1000ms.
+* _completion_ is invoked with _urlVariables_ containing the visitor identifiers as a query string, or _error_ if an unexpected error occurs or the request times out. The returned `Error` contains the [AEPError](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#aeperror) code of the specific error. The default timeout is 1000ms.
 
-**Examples**
-
+##### Example
 ```swift
 Identity.getUrlVariables { (urlVariables, error) in
   if let error = error {
     // handle error here
   } else {
-    // handle the retrieved urlVariables encoded string here
+    var urlStringWithVisitorData: String = "https://example.com"
+    if let urlVariables: String = urlVariables {
+      urlStringWithVisitorData.append("?" + urlVariables)
+    }
+
+    guard let urlWithVisitorData: URL = URL(string: urlStringWithVisitorData) else {
+      // handle error, unable to construct URL
+      return
+      // handle the retrieved urlVariables encoded string here
+    }
+
+    // APIs which update the UI must be called from main thread
+    DispatchQueue.main.async {
+    self.webView.load(URLRequest(url: urlWithVisitorData))
+    }
   }
 }
 ```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) getUrlVariables:^(NSString * _Nullable urlVariables, NSError * _Nullable error)completion
+```
+
+##### Example
+```objectivec
+[AEPMobileEdgeIdentity getUrlVariables:^(NSString *urlVariables, NSError *error){
+  if (error) {
+  // handle error here
+  } else {
+    // handle the URL query parameter string here
+    NSString* urlString = @"https://example.com";
+    NSString* urlStringWithVisitorData = [NSString stringWithFormat:@"%@?%@", urlString, urlVariables];
+    NSURL* urlWithVisitorData = [NSURL URLWithString:urlStringWithVisitorData];
+
+    // APIs which update the UI must be called from main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[self webView] loadRequest:[NSURLRequest requestWithURL:urlWithVisitorData]];
+    }
+  }
+}];```
+
 ------
 
 ### registerExtension
@@ -155,21 +208,40 @@ If your use-case covers both Edge Network and Adobe Experience Cloud Solutions e
 
 The extension registration occurs by passing Identity for Edge Network extension to the [MobileCore.registerExtensions API](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#registerextension-s).
 
-**Syntax**
+#### Swift
 
+##### Syntax
 ```swift
 static func registerExtensions(_ extensions: [NSObject.Type],
                                _ completion: (() -> Void)? = nil)
 ```
 
-**Examples**
-
+##### Example
 ```swift
 import AEPEdgeIdentity
 
 ...
 MobileCore.registerExtensions([Identity.self])
 ```
+
+#### Objective-C
+
+
+##### Syntax
+```objectivec
++ (void) registerExtensions: (NSArray<Class*>* _Nonnull) extensions
+                 completion: (void (^ _Nullable)(void)) completion;
+```
+
+##### Example
+```objectivec
+@import AEPEdgeIdentity;
+
+...
+[AEPMobileCore registerExtensions:@[AEPMobileEdgeIdentity.class] completion:nil];
+```
+
+------
 
 ### removeIdentity
 
@@ -183,17 +255,34 @@ Removing identities using a reserved namespace is not allowed using this API. Th
 * IDFA
 * GAID
 
-**Syntax**
+#### Swift
 
+##### Syntax
+```swift
+Identity.removeIdentity(item: IdentityItem(id: "user@example.com"), withNamespace: "Email")
+```
+
+##### Example
 ```swift
 static func removeIdentity(item: IdentityItem, withNamespace: String)
 ```
 
-**Examples**
+#### Objective-C
 
-```swift
-Identity.removeIdentity(item: IdentityItem(id: "user@example.com"), withNamespace: "Email")
+
+##### Syntax
+```objectivec
++ (void) removeIdentityItem:(AEPIdentityItem * _Nonnull) item
+                             withNamespace: (NSString * _Nonnull) namespace
 ```
+
+##### Example
+```objectivec
+AEPIdentityItem *item = [[AEPIdentityItem alloc] initWithId:@"user@example.com" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
+[AEPMobileEdgeIdentity removeIdentityItem:item withNamespace:@"Email"];
+```
+
+------
 
 ### resetIdentities
 
@@ -217,6 +306,7 @@ The Identity for Edge Network extension does not read the Mobile SDK's privacy s
 
 See [`MobileCore.resetIdentities`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#resetidentities) for more details.
 
+------
 
 ### updateIdentities
 
@@ -230,19 +320,36 @@ Updating identities using a reserved namespace is not allowed using this API. Th
 * IDFA
 * GAID
 
-**Syntax**
+#### Swift
 
+##### Syntax
 ```swift
 static func updateIdentities(with map: IdentityMap)
 ```
 
-**Examples**
-
+##### Example
 ```swift
 let identityMap = IdentityMap()
 map.addItem(item: IdentityItem(id: "user@example.com"), withNamespace: "Email")
 Identity.updateIdentities(with: identityMap)
 ```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) updateIdentities:(AEPIdentityMap * _Nonnull)map
+```
+
+##### Example
+```objectivec
+AEPIdentityItem *item = [[AEPIdentityItem alloc] initWithId:@"user@example.com" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
+AEPIdentityMap *map = [[AEPIdentityMap alloc] init];
+[map addItem:item withNamespace:@"Email"];
+[AEPMobileEdgeIdentity updateIdentities:map];
+```
+
+------
 
 ## Public Classes
 
@@ -307,6 +414,8 @@ let namespaces: [String] = identityMap.namespaces
 let hasNoIdentities: Bool = identityMap.isEmpty
 ```
 
+------
+
 ### IdentityItem
 
 Defines an identity to be included in an [IdentityMap](#identitymap).
@@ -329,6 +438,7 @@ let state: AuthenticatedState = item.authenticatedState
 let primary: Bool = item.primary
 ```
 
+------
 
 ### AuthenticatedState
 
