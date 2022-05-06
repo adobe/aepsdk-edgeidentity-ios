@@ -194,7 +194,8 @@ Identity.getUrlVariables { (urlVariables, error) in
       [[self webView] loadRequest:[NSURLRequest requestWithURL:urlWithVisitorData]];
     }
   }
-}];```
+}];
+```
 
 ------
 
