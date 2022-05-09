@@ -53,9 +53,8 @@ import Foundation
     /// - Parameter event: event containing `advertisingIdentifier` data
     private func handleRequestContent(event: Event) {
         if event.isAdIdEvent {
-            let resolver = createPendingXDMSharedState(event: event)
             state.updateAdvertisingIdentifier(event: event,
-                                              resolveXDMSharedState: resolver,
+                                              createXDMSharedState: createXDMSharedState(data:event:),
                                               eventDispatcher: dispatch(event:))
         }
     }

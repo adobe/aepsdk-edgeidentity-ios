@@ -553,13 +553,13 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.requestReset,
                           data: nil)
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
 
         let dispatchedEventsExpectation = XCTestExpectation(description: "Expected dispatched events")
         dispatchedEventsExpectation.expectedFulfillmentCount = 1
         var dispatchedEvents: [Event] = []
         state.resetIdentifiers(event: event,
-                               resolveXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill()
+                               resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill()
                                }, eventDispatcher: { event in
                                 // Only edgeIdentity event should be dispatched; consent is not handled as part of the reset flow
                                 dispatchedEvents += [event]
@@ -600,9 +600,9 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.requestReset,
                           data: nil)
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() },
                                eventDispatcher: { event in
                                 // Checking both the expected hit and that consent request event not sent
                                 XCTAssertTrue(event.type == EventType.edgeIdentity && event.source == EventSource.resetComplete)
@@ -628,9 +628,9 @@ class IdentityStateTests: XCTestCase {
                           source: EventSource.requestReset,
                           data: nil)
 
-        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be updated once")
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
         state.resetIdentifiers(event: event,
-                               createXDMSharedState: { _, _ in xdmSharedStateExpectation.fulfill() },
+                               resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() },
                                eventDispatcher: { event in
                                 // Checking both the expected hit and that consent request event not sent
                                 XCTAssertTrue(event.type == EventType.edgeIdentity && event.source == EventSource.resetComplete)

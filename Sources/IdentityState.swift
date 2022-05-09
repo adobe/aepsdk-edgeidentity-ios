@@ -99,10 +99,10 @@ class IdentityState {
     /// a new XDM shared state. A consent request event is dispatched when advertising tracking preferences change.
     /// - Parameters:
     ///   - event: event containing a new ADID value.
-    ///   - resolveXDMSharedState: function which resolves pending XDM shared state
+    ///   - createXDMSharedState: function which creates new XDM shared state
     ///   - eventDispatcher: function which dispatches events to the event hub
     func updateAdvertisingIdentifier(event: Event,
-                                     resolveXDMSharedState: ([String: Any]) -> Void,
+                                     createXDMSharedState: ([String: Any], Event) -> Void,
                                      eventDispatcher: (Event) -> Void) {
         // Update ad ID if changed, and extract the new ad ID value
         let (adIdChanged, shouldUpdateConsent) = shouldUpdateAdId(newAdID: event.adId)
@@ -115,12 +115,8 @@ class IdentityState {
                 dispatchAdIdConsentRequestEvent(val: val, eventDispatcher: eventDispatcher)
             }
 
-            saveToPersistence(and: resolveXDMSharedState)
-            return
+            saveToPersistence(and: createXDMSharedState, using: event)
         }
-
-        // resolve pending shared state
-        resolveXDMSharedState(identityProperties.toXdmData())
 
     }
 
@@ -250,6 +246,15 @@ class IdentityState {
     private func saveToPersistence(and resolveXDMSharedState: ([String: Any]) -> Void) {
         identityProperties.saveToPersistence()
         resolveXDMSharedState(identityProperties.toXdmData())
+    }
+
+    /// Save `identityProperties` to persistence and create an XDM shared state.
+    /// - Parameters:
+    ///   - createXDMSharedState: function which creates an XDM shared state
+    ///   - event: the event used to share the XDM state
+    private func saveToPersistence(and createXDMSharedState: ([String: Any], Event) -> Void, using event: Event) {
+        identityProperties.saveToPersistence()
+        createXDMSharedState(identityProperties.toXdmData(), event)
     }
 
     /// Check if the Identity direct extension is registered by checking the EventHub's shared state list of registered extensions.

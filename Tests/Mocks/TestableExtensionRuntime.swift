@@ -91,6 +91,4 @@ class TestableExtensionRuntime: ExtensionRuntime {
     func startEvents() {}
 
     func stopEvents() {}
-
-    func getHistoricalEvents(_ events: [EventHistoryRequest], enforceOrder: Bool, handler: @escaping ([EventHistoryResult]) -> Void) {}
 }
