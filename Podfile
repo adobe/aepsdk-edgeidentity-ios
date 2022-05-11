@@ -31,7 +31,7 @@ target 'TestApp' do
   pod 'AEPLifecycle'
   pod 'AEPSignal'
   pod 'AEPAssurance'
-  pod 'AEPEdge'
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
   pod 'AEPEdgeConsent'
 end
 
