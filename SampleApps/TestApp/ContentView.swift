@@ -12,9 +12,9 @@
 import AdSupport
 import AEPAssurance
 import AEPCore
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPIdentity
-import AEPEdgeConsent
 import AppTrackingTransparency
 import SwiftUI
 
@@ -131,7 +131,7 @@ struct AdvertisingIdentifierView: View {
     @State var adIdText: String = ""
     @State var adID: UUID?
     @State var resultText: String = ""
-    
+
     func getConsents() {
         Consent.getConsents() { consents, error in
             if let consents = consents {
@@ -141,7 +141,7 @@ struct AdvertisingIdentifierView: View {
             }
         }
     }
-    
+
     /// Provides the `advertisingIdentifier` for the given environment, assuming tracking authorization is provided
     ///
     /// Simulators will never provide a valid UUID, regardless of authorization; use the set ad ID flow to test a specific ad ID.
@@ -156,7 +156,7 @@ struct AdvertisingIdentifierView: View {
         print("Advertising identifier: \(ASIdentifierManager.shared().advertisingIdentifier)")
         return ASIdentifierManager.shared().advertisingIdentifier
     }
-    
+
     /// Requests tracking authorization from the user; prompt will only be shown once per app install, as per Apple rules
     ///
     /// It is possible to change tracking permissions at the Settings app level. Any change in tracking permissions will terminate the app.
@@ -176,13 +176,13 @@ struct AdvertisingIdentifierView: View {
                     resultText = "Authorized"
                     // IDFA now accessible
                     self.adID = getAdvertisingIdentifierForEnvironment()
-                    
+
                     // Set IDFA using Core API, which will be routed to Edge Identity extension.
                     // Note that this will automatically update ad ID consent (consent event dispatched)
                     // to "y" but only if the ad ID is not nil, all-zeros, or ""; in the case of the simulator it will be all-zeros.
                     // Set the ad ID manually after getting authorization to get consent updated properly
                     MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
-                    
+
                 // Tracking authorization dialog was shown and permission is denied
                 case .denied:
                     resultText = "Denied"
@@ -208,12 +208,12 @@ struct AdvertisingIdentifierView: View {
             if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
                 self.adID = getAdvertisingIdentifierForEnvironment()
                 resultText = "Tracking enabled"
-                
+
                 MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
-                
+
             } else {
                 resultText = "Tracking disabled"
-                
+
                 MobileCore.setAdvertisingIdentifier("")
             }
             print("Tracking authorization status is '\(resultText)'.")
@@ -229,7 +229,7 @@ struct AdvertisingIdentifierView: View {
                 Text(resultText)
                 Text("\(adID?.uuidString ?? "")")
             }
-            
+
             HStack {
                 Button(action: {
                     MobileCore.setAdvertisingIdentifier(adIdText)

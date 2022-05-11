@@ -100,7 +100,7 @@ class IdentityTests: XCTestCase {
         // verify
         XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
     }
-    
+
     /// Tests that when identity receives a generic identity request content event with a `nil` advertising ID, that the ID is not changed
     func testGenericIdentityRequestWithNilAdIdWithValidId() {
         // setup
@@ -108,7 +108,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Request Content",
                           type: EventType.genericIdentity,
                           source: EventSource.requestContent,
-                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: Optional<String>.none as Any] as [String: Any])
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: String?.none as Any] as [String: Any])
         // test
         mockRuntime.simulateComingEvent(event: event)
 
@@ -130,7 +130,7 @@ class IdentityTests: XCTestCase {
         // verify
         XCTAssertEqual("AdID", identity.state.identityProperties.advertisingIdentifier)
     }
-    
+
     /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is not changed
     func testGenericIdentityRequestWithoutAdIdWithoutValidId() {
         // setup

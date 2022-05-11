@@ -31,7 +31,7 @@ extension Event {
         }
         return adId
     }
-    
+
     /// Checks if the Event is an AdId event, based on the presence of the `ADVERTISING_IDENTIFIER` key and corresponding `String` value type at the top level of `data`.
     ///
     /// Because the `Any` type anonymizes the original classes of nil values, all checks against optional types pass if the actual value is `nil`.
