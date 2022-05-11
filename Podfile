@@ -32,7 +32,7 @@ target 'TestApp' do
   pod 'AEPSignal'
   pod 'AEPAssurance'
   pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
-  pod 'AEPEdgeConsent'
+  pod 'AEPEdgeConsent', '1.0.0'
 end
 
 target 'TestAppObjC' do
