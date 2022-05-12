@@ -20,13 +20,13 @@ import Compression
 import UIKit
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    // TODO: Set up the Environment File ID from your Launch property for the preferred environment
-    private let LAUNCH_ENVIRONMENT_FILE_ID = ""
+    // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+    private let ENVIRONMENT_FILE_ID = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
-        MobileCore.configureWith(appId: LAUNCH_ENVIRONMENT_FILE_ID)
+        MobileCore.configureWith(appId: ENVIRONMENT_FILE_ID)
         MobileCore.registerExtensions([Assurance.self,
                                        Consent.self,
                                        Edge.self,
