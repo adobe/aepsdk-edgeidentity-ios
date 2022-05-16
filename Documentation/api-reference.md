@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Refer our [Getting Started Guide](getting-started.md)
+Refer the [Getting Started Guide](getting-started.md)
 
 ## API reference
 
@@ -385,9 +385,9 @@ For more information, please read an overview of the [AEP Identity Service](http
   }
 ```
 
-##### Example
+#### Swift
 
-###### Swift
+##### Example
 ```swift
 // Initialize
 let identityMap: IdentityMap = IdentityMap()
@@ -409,6 +409,8 @@ let hasNoIdentities: Bool = identityMap.isEmpty
 ```
 
 ###### Objective-C
+
+##### Example
 ```objectivec
 // Initialize
 AEPIdentityMap* identityMap = [[AEPIdentityMap alloc] init];
@@ -439,9 +441,9 @@ Defines an identity to be included in an [IdentityMap](#identitymap).
 
 The format of the IdentityItem class is defined by the [XDM Identity Item Schema](https://github.com/adobe/xdm/blob/master/docs/reference/datatypes/identityitem.schema.md).
 
-##### Example
+#### Swift
 
-###### Swift
+##### Example
 ```swift
 // Initialize
 let item = IdentityItem(id: "identifier")
@@ -456,7 +458,9 @@ let state: AuthenticatedState = item.authenticatedState
 let primary: Bool = item.primary
 ```
 
-###### Objective-C
+#### Objective-C
+
+##### Example
 ```objectivec
 // Initialize
 AEPIdentityItem* item = [[AEPIdentityItem alloc] initWithId:@"identity" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
@@ -480,7 +484,7 @@ The possible authenticated states are:
 * Authenticated - the user is identified by a login or similar action
 * LoggedOut - the user was identified by a login action at a previous time, but is not logged in now
 
-**Syntax**
+##### Syntax
 
 ```swift
 @objc(AEPAuthenticatedState)
