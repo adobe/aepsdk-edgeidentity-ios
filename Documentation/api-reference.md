@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Refer the [Getting Started Guide](getting-started.md)
+Refer to the [Getting Started Guide](getting-started.md)
 
 ## API reference
 
@@ -408,7 +408,7 @@ let namespaces: [String] = identityMap.namespaces
 let hasNoIdentities: Bool = identityMap.isEmpty
 ```
 
-###### Objective-C
+#### Objective-C
 
 ##### Example
 ```objectivec
