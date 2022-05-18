@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Refer our [Getting Started Guide](getting-started.md)
+Refer to the [Getting Started Guide](getting-started.md)
 
 ## API reference
 
@@ -385,8 +385,9 @@ For more information, please read an overview of the [AEP Identity Service](http
   }
 ```
 
-**Example**
+#### Swift
 
+##### Example
 ```swift
 // Initialize
 let identityMap: IdentityMap = IdentityMap()
@@ -407,6 +408,31 @@ let namespaces: [String] = identityMap.namespaces
 let hasNoIdentities: Bool = identityMap.isEmpty
 ```
 
+#### Objective-C
+
+##### Example
+```objectivec
+// Initialize
+AEPIdentityMap* identityMap = [[AEPIdentityMap alloc] init];
+
+// Add an item
+AEPIdentityItem* item = [[AEPIdentityItem alloc] initWithId:@"user@example.com" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
+[identityMap addItem:item withNamespace:@"Email"];
+
+// Remove an item
+AEPIdentityItem* item = [[AEPIdentityItem alloc] initWithId:@"user@example.com" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
+[identityMap removeItem:item withNamespace:@"Email"];
+
+// Get a list of items for a given namespace
+NSArray<AEPIdentityItem*>* items = [identityMap getItemsWithNamespace:@"Email"];
+
+// Get a list of all namespaces used in current IdentityMap
+NSArray<NSString*>* namespaces = identityMap.namespaces;
+
+// Check if IdentityMap has no identities
+bool hasNoIdentities = identityMap.isEmpty;
+```
+
 ------
 
 ### IdentityItem
@@ -415,8 +441,9 @@ Defines an identity to be included in an [IdentityMap](#identitymap).
 
 The format of the IdentityItem class is defined by the [XDM Identity Item Schema](https://github.com/adobe/xdm/blob/master/docs/reference/datatypes/identityitem.schema.md).
 
-**Example**
+#### Swift
 
+##### Example
 ```swift
 // Initialize
 let item = IdentityItem(id: "identifier")
@@ -431,6 +458,20 @@ let state: AuthenticatedState = item.authenticatedState
 let primary: Bool = item.primary
 ```
 
+#### Objective-C
+
+##### Example
+```objectivec
+// Initialize
+AEPIdentityItem* item = [[AEPIdentityItem alloc] initWithId:@"identity" authenticatedState:AEPAuthenticatedStateAuthenticated primary:false];
+
+// Getters
+NSString* id = primaryEmail.id;
+
+long state = primaryEmail.authenticatedState;
+
+bool primary = primaryEmail.primary;
+```
 ------
 
 ### AuthenticatedState
@@ -443,7 +484,7 @@ The possible authenticated states are:
 * Authenticated - the user is identified by a login or similar action
 * LoggedOut - the user was identified by a login action at a previous time, but is not logged in now
 
-**Syntax**
+##### Syntax
 
 ```swift
 @objc(AEPAuthenticatedState)

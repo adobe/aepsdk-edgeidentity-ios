@@ -37,6 +37,7 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   ```
 
 4. Register the Identity for Edge Extension with MobileCore:
+
   ```swift
   // AppDelegate.swift
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
