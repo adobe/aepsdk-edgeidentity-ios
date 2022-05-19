@@ -128,9 +128,9 @@ struct GetIdentitiesView: View {
 }
 
 struct AdvertisingIdentifierView: View {
-    @State var adIdText: String = ""
     @State var adID: UUID?
-    @State var resultText: String = ""
+    @State var adIdText: String = ""
+    @State var trackingAuthorizationResultText: String = ""
     
     func getConsents() {
         Consent.getConsents() { consents, error in
@@ -142,91 +142,26 @@ struct AdvertisingIdentifierView: View {
         }
     }
     
-    /// Provides the `advertisingIdentifier` for the given environment, assuming tracking authorization is provided
-    ///
-    /// Simulators will never provide a valid UUID, regardless of authorization; use the set ad ID flow to test a specific ad ID.
-    func getAdvertisingIdentifierForEnvironment() -> UUID {
-        #if targetEnvironment(simulator)
-        print("""
-            Simulator environment detected. Please note that simulators cannot retrieve valid advertising identifier
-            from the ASIdentifierManager (as specified by Apple); an all-zeros UUID will be retrieved even if
-            authorization is provided. If you want to use a specific ad ID, you can use the set ad ID flow.
-            """)
-        #endif
-        print("Advertising identifier: \(ASIdentifierManager.shared().advertisingIdentifier)")
-        return ASIdentifierManager.shared().advertisingIdentifier
-    }
-    
-    /// Requests tracking authorization from the user; prompt will only be shown once per app install, as per Apple rules
-    ///
-    /// It is possible to change tracking permissions at the Settings app level. Any change in tracking permissions will terminate the app.
-    /// It is also possible for system-wide tracking to be off but individual per-app permissions granted.
-    /// If "Allow Apps to Request to Track" at the system level was on and is turned off, a system prompt appears asking if previously provided individual per-app tracking permissions should be kept as-is or all turned off
-    func requestTrackingAuthorization() {
-        /// Based on Apple documentation for `ASIdentifierManager.shared().advertisingIdentifier`, iOS 14.5+ is the cutoff for required permissions request to use IDFA
-        /// however, based on testing with iOS 14.0.1 simulator, `isAdvertisingTrackingEnabled` is false on fresh app install, even if device has device level tracking enabled; prompt is never given and app does not show up in Privacy -> Tracking app list
-        // ATTrackingManager only available in iOS 14+
-        // Requires Xcode 12 and AppTrackingTransparency framework
-        if #available(iOS 14, *) {
-            print("Calling requestTrackingAuthorization. Dialog will only be shown once per app install.")
-            ATTrackingManager.requestTrackingAuthorization { status in
-                switch status {
-                // Tracking authorization dialog was shown and authorization given
-                case .authorized:
-                    resultText = "Authorized"
-                    // IDFA now accessible
-                    self.adID = getAdvertisingIdentifierForEnvironment()
-                    
-                    // Set IDFA using Core API, which will be routed to Edge Identity extension.
-                    // Note that this will automatically update ad ID consent (consent event dispatched)
-                    // to "y" but only if the ad ID is not nil, all-zeros, or ""; in the case of the simulator it will be all-zeros.
-                    // Set the ad ID manually after getting authorization to get consent updated properly
-                    MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
-                    
-                // Tracking authorization dialog was shown and permission is denied
-                case .denied:
-                    resultText = "Denied"
-                    MobileCore.setAdvertisingIdentifier("")
-                // Tracking authorization dialog has not been shown
-                case .notDetermined:
-                    resultText = "Not Determined"
-                // Tracking authorization dialog is not allowed to be shown
-                case .restricted:
-                    resultText = "Restricted"
-                @unknown default:
-                    resultText = "Unknown"
-                }
-                print("Request tracking authorization status is '\(resultText)'.")
-            }
-        } else {
-            // ASIdentifierManager used for iOS <= 13
-            print("""
-                  iOS version <= 13 detected. ATTrackingManager's requestTrackingAuthorization is not available; using ASIdentifierManager and getting IDFA directly.
-                  ASIdentifierManager.shared().isAdvertisingTrackingEnabled: \(ASIdentifierManager.shared().isAdvertisingTrackingEnabled)
-                  Advertising identifier: \(getAdvertisingIdentifierForEnvironment())
-                  """)
-            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-                self.adID = getAdvertisingIdentifierForEnvironment()
-                resultText = "Tracking enabled"
-                
-                MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
-                
-            } else {
-                resultText = "Tracking disabled"
-                
-                MobileCore.setAdvertisingIdentifier("")
-            }
-            print("Tracking authorization status is '\(resultText)'.")
-        }
+    /// Updates view for ad ID related elements
+    func setDeviceAdvertisingIdentifier() {
+        let isTrackingAuthorized = AdIdUtils.isTrackingAuthorized()
+        print("isTrackingAuthorized: \(isTrackingAuthorized)")
+        trackingAuthorizationResultText = isTrackingAuthorized ? "Tracking allowed" : "Tracking not allowed"
+        
+        self.adID = AdIdUtils.getAdvertisingIdentifierForEnvironment()
+        print("Advertising identifier fetched: \(String(describing: adID))")
+        MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
     }
 
     var body: some View {
         VStack {
             VStack {
                 Button("Request Tracking Authorization", action: {
-                    requestTrackingAuthorization()
+                    AdIdUtils.requestTrackingAuthorization() {
+                        self.setDeviceAdvertisingIdentifier()
+                    }
                 })
-                Text(resultText)
+                Text(trackingAuthorizationResultText)
                 Text("\(adID?.uuidString ?? "")")
             }
             
@@ -234,9 +169,9 @@ struct AdvertisingIdentifierView: View {
                 Button(action: {
                     MobileCore.setAdvertisingIdentifier(adIdText)
                 }) {
-                    Text("Set AdId")
+                    Text("Set ad ID")
                 }.padding()
-                TextField("Enter Ad ID", text: $adIdText)
+                TextField("Enter ad ID", text: $adIdText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .fixedSize()
                     .autocapitalization(.none)
@@ -245,12 +180,17 @@ struct AdvertisingIdentifierView: View {
                 Button(action: {
                     MobileCore.setAdvertisingIdentifier(nil)
                 }) {
-                    Text("Set AdId as nil")
+                    Text("Set ad ID as nil")
                 }.padding()
                 Button(action: {
                     MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
                 }) {
-                    Text("Set AdId as zeros")
+                    Text("Set ad ID as all-zeros")
+                }.padding()
+                Button(action: {
+                    MobileCore.setAdvertisingIdentifier("")
+                }) {
+                    Text("Set ad ID as empty string")
                 }.padding()
             }
             Button("Get current consents", action: {
