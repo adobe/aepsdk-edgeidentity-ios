@@ -59,8 +59,6 @@ class AdIdUtils {
             print("Calling requestTrackingAuthorization. Dialog will only be shown once per app install.")
             ATTrackingManager.requestTrackingAuthorization { status in
                 print("Request tracking authorization status is '\(status)'.")
-                let adID = getAdvertisingIdentifierForEnvironment()
-                print("Advertising identifier: \(adID)")
                 switch status {
                 // Tracking authorization dialog was shown and authorization given
                 case .authorized:
