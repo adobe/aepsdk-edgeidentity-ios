@@ -129,39 +129,43 @@ class IdentityState {
     ///
     /// - Parameters
     ///   - event: event containing customer identifiers to add or update with the current customer identifiers
-    ///   - createXDMSharedState: function which creates new XDM shared state
-    func updateCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
+    ///   - resolveXDMSharedState: function which resolves pending XDM shared state
+    func updateCustomerIdentifiers(event: Event, resolveXDMSharedState: ([String: Any]) -> Void) {
         guard let identifiersData = event.data else {
             Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as no identifiers were found in the event data.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         guard let updateIdentityMap = IdentityMap.from(eventData: identifiersData) else {
             Log.debug(label: IdentityConstants.FRIENDLY_NAME, "IdentityState - Failed to update identifiers as the event data could not be encoded to an IdentityMap.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         identityProperties.updateCustomerIdentifiers(updateIdentityMap)
-        saveToPersistence(and: createXDMSharedState, using: event)
+        saveToPersistence(and: resolveXDMSharedState)
     }
 
     /// Remove customer identifiers specified in `event` from the current `IdentityMap`.
     /// - Parameters:
     ///   - event: event containing customer identifiers to remove from the current customer identities
-    ///   - createXDMSharedState: function which creates new XDM shared states
-    func removeCustomerIdentifiers(event: Event, createXDMSharedState: ([String: Any], Event) -> Void) {
+    ///   - resolveXDMSharedState: function which resolves pending XDM shared states
+    func removeCustomerIdentifiers(event: Event, resolveXDMSharedState: ([String: Any]) -> Void) {
         guard let identifiersData = event.data else {
             Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Failed to remove identifier as no identifiers were found in the event data.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         guard let removeIdentityMap = IdentityMap.from(eventData: identifiersData) else {
             Log.debug(label: IdentityConstants.LOG_TAG, "IdentityState - Failed to remove identifier as the event data could not be encoded to an IdentityMap.")
+            resolveXDMSharedState(identityProperties.toXdmData())
             return
         }
 
         identityProperties.removeCustomerIdentifiers(removeIdentityMap)
-        saveToPersistence(and: createXDMSharedState, using: event)
+        saveToPersistence(and: resolveXDMSharedState)
     }
 
     /// Clears all identities and regenerates a new ECID value.
@@ -172,12 +176,12 @@ class IdentityState {
     ///   - createXDMSharedState: function which creates new XDM shared states
     ///   - eventDispatcher: function which dispatches a new `Event`
     func resetIdentifiers(event: Event,
-                          createXDMSharedState: ([String: Any], Event) -> Void,
+                          resolveXDMSharedState: ([String: Any]) -> Void,
                           eventDispatcher: (Event) -> Void) {
         identityProperties.clear()
         identityProperties.ecid = ECID().ecidString
 
-        saveToPersistence(and: createXDMSharedState, using: event)
+        saveToPersistence(and: resolveXDMSharedState)
 
         let event = Event(name: IdentityConstants.EventNames.RESET_IDENTITIES_COMPLETE,
                           type: EventType.edgeIdentity,
@@ -234,6 +238,14 @@ class IdentityState {
                                     ]
                           ])
         eventDispatcher(event)
+    }
+
+    /// Save `identityProperties` to persistence and resolves the XDM shared state.
+    /// - Parameters:
+    ///   - resolveXDMSharedState: function which resolves the XDM shared state
+    private func saveToPersistence(and resolveXDMSharedState: ([String: Any]) -> Void) {
+        identityProperties.saveToPersistence()
+        resolveXDMSharedState(identityProperties.toXdmData())
     }
 
     /// Save `identityProperties` to persistence and create an XDM shared state.
