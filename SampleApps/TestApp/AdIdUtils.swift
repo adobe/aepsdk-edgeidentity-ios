@@ -80,7 +80,7 @@ class AdIdUtils {
                 callbackHandler()
             }
         } else {
-            // iOS version < 14 does not have ad ID tracking authorization; see Apple guidance on using
+            // iOS version < 14 does not use ad ID tracking authorization; see Apple guidance on using
             // advertisingIdentifier: https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614151-advertisingidentifier
             callbackHandler()
         }
