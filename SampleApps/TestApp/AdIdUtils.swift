@@ -35,7 +35,7 @@ class AdIdUtils {
         return ASIdentifierManager.shared().advertisingIdentifier
     }
     
-    /// Checks if ad ID tracking authorization is provided, if not returns `false`. Handles both iOS 14+ and <= iOS 13,
+    /// Checks if ad ID tracking authorization is provided, if not returns `false`. Handles both iOS 14+ and iOS < 14,
     /// using the appropriate APIs for each case
     ///
     /// - Returns: `true` if authorized, `false` for any other state
