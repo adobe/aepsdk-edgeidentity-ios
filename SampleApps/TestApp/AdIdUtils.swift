@@ -44,7 +44,7 @@ class AdIdUtils {
             print("Tracking authorization status: \(ATTrackingManager.trackingAuthorizationStatus)")
             return ATTrackingManager.trackingAuthorizationStatus == .authorized
         } else {
-            print("iOS version <= 13 detected; using ASIdentifierManager and getting IDFA directly.")
+            print("iOS version < 14 detected; using ASIdentifierManager and getting IDFA directly.")
             print("Tracking authorization status: \(ASIdentifierManager.shared().isAdvertisingTrackingEnabled)")
             return ASIdentifierManager.shared().isAdvertisingTrackingEnabled
         }
@@ -82,14 +82,8 @@ class AdIdUtils {
                 callbackHandler()
             }
         } else {
-            isTrackingAuthorized()
-            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-                // Tracking authorized; IDFA now accessible
-                getAdvertisingIdentifierForEnvironment()
-            } else {
-                // Tracking not authorized; IDFA is all-zeros
-                getAdvertisingIdentifierForEnvironment()
-            }
+            // iOS version < 14 does not have ad ID tracking authorization; see Apple guidance on using
+            // advertisingIdentifier: https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614151-advertisingidentifier
             callbackHandler()
         }
     }
