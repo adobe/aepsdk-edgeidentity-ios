@@ -17,11 +17,6 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
     var window: UIWindow?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-//        let window = UIWindow(frame: UIScreen.main.bounds)
-//        window.rootViewController = UIHostingController(rootView: ContentView())
-//        self.window = window
-//        window.makeKeyAndVisible()
-        
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)

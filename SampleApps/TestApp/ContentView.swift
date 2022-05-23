@@ -163,49 +163,61 @@ struct AdvertisingIdentifierView: View {
     }
     
     var body: some View {
-        VStack {
+        ScrollView {
             VStack {
-                Button("Request Tracking Authorization", action: {
-                    AdIdUtils.requestTrackingAuthorization() {
-                        self.setDeviceAdvertisingIdentifier()
+                VStack {
+                    Button("Request Tracking Authorization", action: {
+                        AdIdUtils.requestTrackingAuthorization() {
+                            self.setDeviceAdvertisingIdentifier()
+                        }
+                    })
+                    Text(trackingAuthorizationResultText)
+                    Text("\(adID?.uuidString ?? "")")
+                }
+                
+                HStack(spacing: 10) {
+                    Button(action: {
+                        MobileCore.setAdvertisingIdentifier(adIdText)
+                    }) {
+                        Text("Set ad ID")
                     }
+                    TextField("Enter ad ID", text: $adIdText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+                }
+                .padding()
+                HStack {
+                    Button(action: {
+                        MobileCore.setAdvertisingIdentifier(nil)
+                    }) {
+                        Text("Set ad ID as nil")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    Button(action: {
+                        MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
+                    }) {
+                        Text("Set ad ID as all-zeros")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    Button(action: {
+                        MobileCore.setAdvertisingIdentifier("")
+                    }) {
+                        Text("Set ad ID as empty string")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                }
+                Button("Get current consents", action: {
+                    getConsents()
                 })
-                Text(trackingAuthorizationResultText)
-                Text("\(adID?.uuidString ?? "")")
             }
-            
-            HStack {
-                Button(action: {
-                    MobileCore.setAdvertisingIdentifier(adIdText)
-                }) {
-                    Text("Set ad ID")
-                }.padding()
-                TextField("Enter ad ID", text: $adIdText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .fixedSize()
-                    .autocapitalization(.none)
-            }
-            HStack {
-                Button(action: {
-                    MobileCore.setAdvertisingIdentifier(nil)
-                }) {
-                    Text("Set ad ID as nil")
-                }.padding()
-                Button(action: {
-                    MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
-                }) {
-                    Text("Set ad ID as all-zeros")
-                }.padding()
-                Button(action: {
-                    MobileCore.setAdvertisingIdentifier("")
-                }) {
-                    Text("Set ad ID as empty string")
-                }.padding()
-            }
-            Button("Get current consents", action: {
-                getConsents()
-            })
         }
+        
     }
 }
 
@@ -243,7 +255,8 @@ struct CustomIdentifierView: View {
                     Text("ambiguous").tag(AuthenticatedState.ambiguous)
                     Text("authenticated").tag(AuthenticatedState.authenticated)
                     Text("logged out").tag(AuthenticatedState.loggedOut)
-                }.pickerStyle(SegmentedPickerStyle())
+                }
+                .pickerStyle(SegmentedPickerStyle())
             }
             HStack {
                 Button(action: {
@@ -253,13 +266,15 @@ struct CustomIdentifierView: View {
                     AEPEdgeIdentity.Identity.updateIdentities(with: map)
                 }) {
                     Text("Update Identity")
-                }.padding()
+                }
+                .padding()
                 Button(action: {
                     AEPEdgeIdentity.Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticatedState: selectedAuthenticatedState, primary: isPrimaryChecked),
                                                             withNamespace: identityNamespaceText)
                 }) {
                     Text("Remove Identity")
-                }.padding()
+                }
+                .padding()
             }
             
         }
@@ -293,7 +308,8 @@ struct MultipleIdentityView: View {
                 }) {
                     Text(extensions.isEdgeIdentityRegistered ? "Unregister Edge Identity" : "Register Edge Identity")
                 }
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
             
             Button(action: {
                 UserDefaults.standard.removeObject(forKey: edgeIdentityStoredDataKey)
