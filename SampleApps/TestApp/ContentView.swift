@@ -31,7 +31,6 @@ struct ContentView: View {
         NavigationView {
             ScrollView(showsIndicators: true) {
                 VStack(alignment: .center, spacing: 20) {
-
                     NavigationLink(
                         destination: AssuranceView(),
                         label: {
@@ -58,12 +57,9 @@ struct ContentView: View {
                         })
                 }
             }
-
         }
-
         Divider()
         GetIdentitiesView()
-
     }
 }
 
@@ -111,13 +107,15 @@ struct GetIdentitiesView: View {
                     }
                 } label: {
                     Text("Get Identities")
-                }.padding()
+                }
+                .padding()
 
                 Button {
                     MobileCore.resetIdentities()
                 } label: {
                     Text("Reset Identities")
-                }.padding()
+                }
+                .padding()
             }
             ScrollView {
                 Text(identityMapText)
@@ -336,19 +334,22 @@ struct MultipleIdentityView: View {
                 } label: {
                     Text(extensions.isIdentityDirectRegistered ? "Unregister Identity Direct" : "Register Identity Direct")
                 }
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
             Button {
                 MobileCore.setAdvertisingIdentifier(String(Int.random(in: 1...32)))
             } label: {
                 Text("Trigger State Change")
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
             Button {
                 UserDefaults.standard.removeObject(forKey: identityStoredDataKey)
             } label: {
                 Text("Clear Persistence")
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
             HStack {
                 Button {
@@ -390,9 +391,12 @@ struct AssuranceView: View {
                         .background(Color.gray)
                         .foregroundColor(.white)
                         .font(.caption)
-                }.cornerRadius(5)
+                }
+                .cornerRadius(5)
             }
-        }.padding().onAppear {
+        }
+        .padding()
+        .onAppear {
             MobileCore.track(state: "AssuranceView", data: nil)
         }
     }
