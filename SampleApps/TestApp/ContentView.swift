@@ -24,43 +24,46 @@ class RegisteredExtensions: ObservableObject {
 }
 
 struct ContentView: View {
-    @StateObject var registeredExtensions = RegisteredExtensions()
-
+    @ObservedObject var registeredExtensions = RegisteredExtensions()
+    
     var body: some View {
-
+        
         NavigationView {
-            VStack(alignment: .center, spacing: 20, content: {
-
-                NavigationLink(
-                    destination: AssuranceView(),
-                    label: {
-                        Text("Assurance")
-                    }
-                )
-
-                NavigationLink(
-                    destination: AdvertisingIdentifierView(),
-                    label: {
-                        Text("Set Advertising Identifier")
-                    })
-
-                NavigationLink(
-                    destination: CustomIdentifierView(),
-                    label: {
-                        Text("Update Custom Identity")
-                    })
-
-                NavigationLink(
-                    destination: MultipleIdentityView(extensions: registeredExtensions),
-                    label: {
-                        Text("Test with Multiple Identities")
-                    })
-            })
+            ScrollView(showsIndicators: true) {
+                VStack(alignment: .center, spacing: 20) {
+                    
+                    NavigationLink(
+                        destination: AssuranceView(),
+                        label: {
+                            Text("Assurance")
+                        }
+                    )
+                    
+                    NavigationLink(
+                        destination: AdvertisingIdentifierView(),
+                        label: {
+                            Text("Set Advertising Identifier")
+                        })
+                    
+                    NavigationLink(
+                        destination: CustomIdentifierView(),
+                        label: {
+                            Text("Update Custom Identity")
+                        })
+                    
+                    NavigationLink(
+                        destination: MultipleIdentityView(extensions: registeredExtensions),
+                        label: {
+                            Text("Test with Multiple Identities")
+                        })
+                }
+            }
+            
         }
-
+        
         Divider()
         GetIdentitiesView()
-
+        
     }
 }
 
@@ -68,28 +71,28 @@ struct GetIdentitiesView: View {
     @State var ecidEdgeIdentityText: String = ""
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
-
+    
     var body: some View {
         VStack {
             Button(action: {
                 self.ecidEdgeIdentityText = ""
                 self.ecidIdentityText = ""
-
+                
                 AEPEdgeIdentity.Identity.getExperienceCloudId { ecid, _ in
                     self.ecidEdgeIdentityText = ecid ?? "no ECID value found"
                 }
-
+                
                 AEPIdentity.Identity.getExperienceCloudId { ecid, _ in
                     self.ecidIdentityText = ecid ?? ""
                 }
             }) {
                 Text("Get ECID")
             }
-
+            
             Text("edge : \(ecidEdgeIdentityText)" + (ecidIdentityText.isEmpty ? "" : "\ndirect: \(ecidIdentityText)"))
                 .font(.system(size: 12))
                 .padding()
-
+            
             HStack {
                 Button(action: {
                     self.identityMapText = ""
@@ -109,7 +112,7 @@ struct GetIdentitiesView: View {
                 }) {
                     Text("Get Identities")
                 }.padding()
-
+                
                 Button(action: {
                     MobileCore.resetIdentities()
                 }) {
@@ -123,7 +126,7 @@ struct GetIdentitiesView: View {
                     .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
             }
         }
-
+        
     }
 }
 
@@ -158,7 +161,7 @@ struct AdvertisingIdentifierView: View {
             MobileCore.setAdvertisingIdentifier("")
         }
     }
-
+    
     var body: some View {
         VStack {
             VStack {
@@ -211,7 +214,7 @@ struct CustomIdentifierView: View {
     @State var identityNamespaceText: String = ""
     @State var selectedAuthenticatedState: AuthenticatedState = .ambiguous
     @State var isPrimaryChecked: Bool = false
-
+    
     var body: some View {
         VStack {
             VStack {
@@ -219,13 +222,13 @@ struct CustomIdentifierView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .fixedSize()
                     .autocapitalization(.none)
-
+                
                 HStack {
                     TextField("namespace", text: $identityNamespaceText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .fixedSize()
                         .autocapitalization(.none)
-
+                    
                     HStack {
                         Image(systemName: isPrimaryChecked ? "checkmark.square" : "square")
                             .onTapGesture {
@@ -258,7 +261,7 @@ struct CustomIdentifierView: View {
                     Text("Remove Identity")
                 }.padding()
             }
-
+            
         }
     }
 }
@@ -266,32 +269,32 @@ struct CustomIdentifierView: View {
 struct MultipleIdentityView: View {
     private let edgeIdentityStoredDataKey = "Adobe.com.adobe.edge.identity.identity.properties"
     private let identityStoredDataKey = "Adobe.com.adobe.module.identity.identity.properties"
-
+    
     @ObservedObject var extensions: RegisteredExtensions
     @State var ecidEdgeIdentityText: String = ""
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
-
+    
     var body: some View {
         VStack {
             HStack(alignment: .center) {
                 Image(systemName: extensions.isEdgeIdentityRegistered ? "circle.fill" : "circle")
                     .foregroundColor(Color.blue)
-
+                
                 Button(action: {
                     if extensions.isEdgeIdentityRegistered {
                         MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self)
                     } else {
                         MobileCore.registerExtension(AEPEdgeIdentity.Identity.self)
                     }
-
+                    
                     extensions.isEdgeIdentityRegistered.toggle()
-
+                    
                 }) {
                     Text(extensions.isEdgeIdentityRegistered ? "Unregister Edge Identity" : "Register Edge Identity")
                 }
             }.padding(.bottom, 5)
-
+            
             Button(action: {
                 UserDefaults.standard.removeObject(forKey: edgeIdentityStoredDataKey)
             }) {
@@ -300,38 +303,38 @@ struct MultipleIdentityView: View {
         }
         .padding()
         .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
-
+        
         VStack {
             HStack {
                 Image(systemName: extensions.isIdentityDirectRegistered ? "circle.fill" : "circle")
                     .foregroundColor(Color.blue)
-
+                
                 Button(action: {
                     if extensions.isIdentityDirectRegistered {
                         MobileCore.unregisterExtension(AEPIdentity.Identity.self)
                     } else {
                         MobileCore.registerExtension(AEPIdentity.Identity.self)
                     }
-
+                    
                     extensions.isIdentityDirectRegistered.toggle()
-
+                    
                 }) {
                     Text(extensions.isIdentityDirectRegistered ? "Unregister Identity Direct" : "Register Identity Direct")
                 }
             }.padding(.bottom, 5)
-
+            
             Button(action: {
                 MobileCore.setAdvertisingIdentifier(String(Int.random(in: 1...32)))
             }) {
                 Text("Trigger State Change")
             }.padding(.bottom, 5)
-
+            
             Button(action: {
                 UserDefaults.standard.removeObject(forKey: identityStoredDataKey)
             }) {
                 Text("Clear Persistence")
             }.padding(.bottom, 5)
-
+            
             HStack {
                 Button(action: {
                     MobileCore.setPrivacyStatus(.optedIn)
@@ -344,7 +347,7 @@ struct MultipleIdentityView: View {
                     Text("Privacy OptOut")
                 }
             }
-
+            
         }
         .padding()
         .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
@@ -353,7 +356,7 @@ struct MultipleIdentityView: View {
 
 struct AssuranceView: View {
     @State private var assuranceSessionUrl: String = ""
-
+    
     var body: some View {
         VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
             TextField("Copy Assurance Session URL to here", text: $assuranceSessionUrl)

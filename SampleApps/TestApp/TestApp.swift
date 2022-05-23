@@ -11,15 +11,15 @@
 //
 
 import SwiftUI
-
-@main
-struct TestApp: App {
-    // swiftlint:disable weak_delegate
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
+// Implementation updated to use App + Scene Delegates for iOS 13 compatibility
+//@main
+//struct TestApp: App {
+//    // swiftlint:disable weak_delegate
+//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+//
+//    var body: some Scene {
+//        WindowGroup {
+//            ContentView()
+//        }
+//    }
+//}
