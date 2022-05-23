@@ -55,9 +55,9 @@ test:
 	@echo "######################################################################"
 	@echo "### Testing iOS"
 	@echo "######################################################################"
-	@echo "List of available shared Schemes in xcodeproj:"
-	xcodebuild -project  $(PROJECT_NAME).xcodeproj -list
-	xcodebuild test -project $(PROJECT_NAME).xcodeproj -scheme $(PROJECT_NAME) -destination 'platform=iOS Simulator,name=iPhone 8' -derivedDataPath build/out -enableCodeCoverage YES
+	@echo "List of available shared Schemes in xcworkspace"
+	xcodebuild -workspace  $(PROJECT_NAME).xcworkspace -list
+	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$(PROJECT_NAME) (AEPEdgeIdentity project)" -destination 'platform=iOS Simulator,name=iPhone 8' -derivedDataPath build/out -enableCodeCoverage YES
 
 install-githook:
 	./tools/git-hooks/setup.sh
