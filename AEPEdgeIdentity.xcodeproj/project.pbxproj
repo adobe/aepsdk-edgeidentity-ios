@@ -45,7 +45,6 @@
 		BFF6492725BFD3160012A4C5 /* Identity+PublicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */; };
 		BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492C25C087720012A4C5 /* IdentityState.swift */; };
 		BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6493D25C097560012A4C5 /* AppDelegate.swift */; };
-		BFF6495625C09B2D0012A4C5 /* TestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6495525C09B2D0012A4C5 /* TestApp.swift */; };
 		BFF6497A25C09ED80012A4C5 /* IdentityPublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */; };
 		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
 		BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */; };
@@ -151,7 +150,6 @@
 		BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identity+PublicAPI.swift"; sourceTree = "<group>"; };
 		BFF6492C25C087720012A4C5 /* IdentityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityState.swift; sourceTree = "<group>"; };
 		BFF6493D25C097560012A4C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		BFF6495525C09B2D0012A4C5 /* TestApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApp.swift; sourceTree = "<group>"; };
 		BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPublicAPITests.swift; sourceTree = "<group>"; };
 		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
 		BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPropertiesTests.swift; sourceTree = "<group>"; };
@@ -380,7 +378,6 @@
 		D43BABA825BBC4BA00B08CC0 /* TestApp */ = {
 			isa = PBXGroup;
 			children = (
-				BFF6495525C09B2D0012A4C5 /* TestApp.swift */,
 				BFF6493D25C097560012A4C5 /* AppDelegate.swift */,
 				4CAD0F7A283C302400490A1F /* TestApp.storyboard */,
 				4CAD0F78283C155E00490A1F /* SceneDelegate.swift */,
@@ -932,7 +929,6 @@
 				BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */,
 				4C820A882836F19C00609575 /* AdIdUtils.swift in Sources */,
 				D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */,
-				BFF6495625C09B2D0012A4C5 /* TestApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

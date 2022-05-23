@@ -15,7 +15,7 @@ import AppTrackingTransparency
 import Foundation
 
 class AdIdUtils {
-    
+
     /// Provides the `advertisingIdentifier` for the given environment, assuming tracking authorization is provided.
     /// Use ``requestTrackingAuthorization(callbackHandler:)`` to request authorization.
     ///
@@ -34,7 +34,7 @@ class AdIdUtils {
         print("Advertising identifier: \(ASIdentifierManager.shared().advertisingIdentifier)")
         return ASIdentifierManager.shared().advertisingIdentifier
     }
-    
+
     /// Checks if ad ID tracking authorization is provided, if not returns `false`. Handles both iOS 14+ and iOS < 14,
     /// using the appropriate APIs for each case
     ///
@@ -49,12 +49,12 @@ class AdIdUtils {
             return ASIdentifierManager.shared().isAdvertisingTrackingEnabled
         }
     }
-    
+
     /// Requests tracking authorization from the user; prompt will only be shown once per app install, as per Apple rules
     ///
     /// - Parameters:
     ///     - callbackHandler: Called after authorization flow completes, to allow for request chaining
-    static func requestTrackingAuthorization(callbackHandler: @escaping ()->() = {}) {
+    static func requestTrackingAuthorization(callbackHandler: @escaping () -> Void = {}) {
         if #available(iOS 14, *) {
             print("Calling requestTrackingAuthorization. Dialog will only be shown once per app install.")
             ATTrackingManager.requestTrackingAuthorization { status in

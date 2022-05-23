@@ -10,12 +10,12 @@
 // governing permissions and limitations under the License.
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 class SceneDelegate: NSObject, UIWindowSceneDelegate {
     var window: UIWindow?
-    
+
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
