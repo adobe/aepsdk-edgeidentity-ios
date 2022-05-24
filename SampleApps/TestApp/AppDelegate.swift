@@ -19,6 +19,7 @@ import AEPServices
 import Compression
 import UIKit
 
+@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
     private let ENVIRONMENT_FILE_ID = ""
@@ -40,7 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        let sceneConfig = UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {

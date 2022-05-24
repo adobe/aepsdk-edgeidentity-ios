@@ -29,6 +29,8 @@
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C820A882836F19C00609575 /* AdIdUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C820A872836F19C00609575 /* AdIdUtils.swift */; };
+		4CAD0F79283C155E00490A1F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAD0F78283C155E00490A1F /* SceneDelegate.swift */; };
+		4CAD0F7B283C302400490A1F /* TestApp.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CAD0F7A283C302400490A1F /* TestApp.storyboard */; };
 		4CC3D10727D2CFD70055ACC6 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */; };
 		969BD00DE9BC2B23CA13749C /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
@@ -43,7 +45,6 @@
 		BFF6492725BFD3160012A4C5 /* Identity+PublicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */; };
 		BFF6492D25C087720012A4C5 /* IdentityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6492C25C087720012A4C5 /* IdentityState.swift */; };
 		BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6493D25C097560012A4C5 /* AppDelegate.swift */; };
-		BFF6495625C09B2D0012A4C5 /* TestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6495525C09B2D0012A4C5 /* TestApp.swift */; };
 		BFF6497A25C09ED80012A4C5 /* IdentityPublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */; };
 		BFF6498F25C0AC0F0012A4C5 /* ECIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */; };
 		BFF6499B25C0ACC00012A4C5 /* IdentityPropertiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */; };
@@ -116,6 +117,8 @@
 		4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityAdIDTests.swift; sourceTree = "<group>"; };
 		4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		4C820A872836F19C00609575 /* AdIdUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdIdUtils.swift; sourceTree = "<group>"; };
+		4CAD0F78283C155E00490A1F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		4CAD0F7A283C302400490A1F /* TestApp.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TestApp.storyboard; sourceTree = "<group>"; };
 		4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 		4EC5B471416D7ABA4A62D49C /* Pods-AEPIdentityEdge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdge.release.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdge/Pods-AEPIdentityEdge.release.xcconfig"; sourceTree = "<group>"; };
 		56FF745F8E6F9C0458C1ECA3 /* Pods-AEPIdentityEdgeSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-AEPIdentityEdgeSampleApp/Pods-AEPIdentityEdgeSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -147,7 +150,6 @@
 		BFF6492625BFD3160012A4C5 /* Identity+PublicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identity+PublicAPI.swift"; sourceTree = "<group>"; };
 		BFF6492C25C087720012A4C5 /* IdentityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityState.swift; sourceTree = "<group>"; };
 		BFF6493D25C097560012A4C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		BFF6495525C09B2D0012A4C5 /* TestApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApp.swift; sourceTree = "<group>"; };
 		BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPublicAPITests.swift; sourceTree = "<group>"; };
 		BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECIDTests.swift; sourceTree = "<group>"; };
 		BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityPropertiesTests.swift; sourceTree = "<group>"; };
@@ -376,8 +378,9 @@
 		D43BABA825BBC4BA00B08CC0 /* TestApp */ = {
 			isa = PBXGroup;
 			children = (
-				BFF6495525C09B2D0012A4C5 /* TestApp.swift */,
 				BFF6493D25C097560012A4C5 /* AppDelegate.swift */,
+				4CAD0F7A283C302400490A1F /* TestApp.storyboard */,
+				4CAD0F78283C155E00490A1F /* SceneDelegate.swift */,
 				4C820A872836F19C00609575 /* AdIdUtils.swift */,
 				D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */,
 				D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */,
@@ -603,6 +606,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */,
+				4CAD0F7B283C302400490A1F /* TestApp.storyboard in Resources */,
 				D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -921,10 +925,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CAD0F79283C155E00490A1F /* SceneDelegate.swift in Sources */,
 				BFF6493E25C097560012A4C5 /* AppDelegate.swift in Sources */,
 				4C820A882836F19C00609575 /* AdIdUtils.swift in Sources */,
 				D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */,
-				BFF6495625C09B2D0012A4C5 /* TestApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1290,7 +1294,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1313,7 +1317,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
