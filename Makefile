@@ -60,7 +60,7 @@ test:
 	final_scheme=""; \
 	if xcodebuild -workspace $(PROJECT_NAME).xcworkspace -list | grep -q "($(PROJECT_NAME) project)"; \
 	then \
-	   final_scheme="$(PROJECT_NAME) ($(PROJECT_NAME) project)" ; \
+	   final_scheme="$(PROJECT_NAME) ($(EXTENSION_NAME) project)" ; \
 	   echo $$final_scheme ; \
 	else \
 	   final_scheme="$(PROJECT_NAME)" ; \
