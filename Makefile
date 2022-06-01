@@ -60,10 +60,10 @@ test:
 	final_scheme=""; \
 	if xcodebuild -workspace $(PROJECT_NAME).xcworkspace -list | grep -q "($(PROJECT_NAME) project)"; \
 	then \
-	   final_scheme="$(PROJECT_NAME) ($(EXTENSION_NAME) project)" ; \
+	   final_scheme="$(EXTENSION_NAME) ($(PROJECT_NAME) project)" ; \
 	   echo $$final_scheme ; \
 	else \
-	   final_scheme="$(PROJECT_NAME)" ; \
+	   final_scheme="$(EXTENSION_NAME)" ; \
 	   echo $$final_scheme ; \
 	fi; \
 	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 8' -derivedDataPath build/out -enableCodeCoverage YES
