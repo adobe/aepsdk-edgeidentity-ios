@@ -55,14 +55,11 @@ enum IdentityConstants {
     enum EventDataKeys {
         static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
         static let STATE_OWNER = "stateowner"
+        static let URL_VARIABLES = "urlvariables"
     }
 
     enum DataStoreKeys {
         static let IDENTITY_PROPERTIES = "identity.properties"
-    }
-
-    enum EventDataKeys {
-        static let URL_VARIABLES = "urlvariables"
     }
 
     enum Namespaces {
