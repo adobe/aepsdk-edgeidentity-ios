@@ -23,11 +23,11 @@
 /* Begin PBXBuildFile section */
 		004DF6198BD3329E598B8FAB /* Pods_TestApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE39896A5E0D0C2B397EDD3 /* Pods_TestApp.framework */; };
 		2ECF038227ED68AC00B3C1DC /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */; };
+		2ED365D528496BD600D2F717 /* IdentityGetUrlVariablesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */; };
 		2EE7E6EA27FE5C3B00C4B12A /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */; };
 		2EE7E6ED27FE9D8600C4B12A /* URLUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */; };
 		43E2977FF5B6CE67BFA18068 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */; };
 		4C4B7D8C27A0CA2F00C0CE25 /* IdentityAdIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */; };
-		4C4B7D8E27A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
@@ -117,6 +117,7 @@
 		21194EEA9E974D4025B62CB7 /* Pods-FunctionalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunctionalTests.release.xcconfig"; path = "Target Support Files/Pods-FunctionalTests/Pods-FunctionalTests.release.xcconfig"; sourceTree = "<group>"; };
 		211C042081BAB03AF0C00D2D /* Pods_TestAppObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestAppObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
+		2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityGetUrlVariablesTests.swift; sourceTree = "<group>"; };
 		2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLUtils.swift; sourceTree = "<group>"; };
 		2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLUtilsTests.swift; sourceTree = "<group>"; };
 		4ADECD91E29628B33C7D45F5 /* Pods-UnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.release.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -379,6 +380,7 @@
 				BFF64A5A25C4C5410012A4C5 /* EdgeIdentity+IdentityDirectTests.swift */,
 				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
 				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
+				2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */,
 			);
 			name = FunctionalTests;
 			path = Tests/FunctionalTests;
@@ -926,6 +928,7 @@
 				4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */,
 				4C4B7D8C27A0CA2F00C0CE25 /* IdentityAdIDTests.swift in Sources */,
 				BFF64AEE25C8A9B40012A4C5 /* MockDataStore.swift in Sources */,
+				2ED365D528496BD600D2F717 /* IdentityGetUrlVariablesTests.swift in Sources */,
 				BFF64AEA25C8A9B40012A4C5 /* TestableExtensionRuntime.swift in Sources */,
 				BFF64A6A25C4C6A90012A4C5 /* TestHelpers.swift in Sources */,
 				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
