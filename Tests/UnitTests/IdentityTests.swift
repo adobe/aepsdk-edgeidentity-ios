@@ -155,6 +155,7 @@ class IdentityTests: XCTestCase {
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
         XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
+    }
 
     // MARK: handleRequestContent
     /// Tests that when identity receives a generic identity request content event with an advertising ID, that the ID is updated
