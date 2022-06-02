@@ -16,7 +16,7 @@ Refer to the [Getting Started Guide](getting-started.md)
 | [removeIdentity](#removeIdentity)                     |
 | [resetIdentities](#resetIdentities)                   |
 | [updateIdentities](#updateIdentities)                 |
-|[setAdvertisingIdentifier](#setAdvertisingIdentifier)  |
+| [setAdvertisingIdentifier](#setAdvertisingIdentifier) |
 
 ------
 
