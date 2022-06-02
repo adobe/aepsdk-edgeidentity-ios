@@ -37,7 +37,7 @@ import AppTrackingTransparency
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     ...
     if #available(iOS 14, *) {
-       setAdvertisingIdentiferUsingTrackingManager()
+       setAdvertisingIdentifierUsingTrackingManager()
     } else {
        // Fallback on earlier versions
        setAdvertisingIdentifierUsingIdentifierManager()
@@ -57,7 +57,7 @@ func setAdvertisingIdentifierUsingIdentifierManager() {
 }
 
 @available(iOS 14, *)
-func setAdvertisingIdentiferUsingTrackingManager() {
+func setAdvertisingIdentifierUsingTrackingManager() {
     ATTrackingManager.requestTrackingAuthorization { (status) in
         var idfa: String = "";
 
@@ -97,7 +97,7 @@ func setAdvertisingIdentiferUsingTrackingManager() {
 -   ...
 -   
     if (@available(iOS 14, *)) {
-        [self setAdvertisingIdentiferUsingTrackingManager];
+        [self setAdvertisingIdentifierUsingTrackingManager];
     } else {
         // fallback to earlier versions
         [self setAdvertisingIdentifierUsingIdentifierManager];
@@ -118,7 +118,7 @@ func setAdvertisingIdentiferUsingTrackingManager() {
 
 }
 
-- (void) setAdvertisingIdentiferUsingTrackingManager API_AVAILABLE(ios(14)) {
+- (void) setAdvertisingIdentifierUsingTrackingManager API_AVAILABLE(ios(14)) {
     [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:
     ^(ATTrackingManagerAuthorizationStatus status){
         NSString *idfa = nil;
