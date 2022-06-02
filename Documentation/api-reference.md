@@ -6,16 +6,17 @@ Refer to the [Getting Started Guide](getting-started.md)
 
 ## API reference
 
-| APIs                                           |
-| ---------------------------------------------- |
-| [extensionVersion](#extensionVersion)          |
-| [getExperienceCloudId](#getExperienceCloudId)  |
-| [getIdentities](#getIdentities)                |
-| [getUrlVariables](#getUrlVariables)            |
-| [registerExtension](#registerExtension)        |
-| [removeIdentity](#removeIdentity)              |
-| [resetIdentities](#resetIdentities)            |
-| [updateIdentities](#updateIdentities)          |
+| APIs                                                  |
+| ----------------------------------------------------- |
+| [extensionVersion](#extensionVersion)                 |
+| [getExperienceCloudId](#getExperienceCloudId)         |
+| [getIdentities](#getIdentities)                       |
+| [getUrlVariables](#getUrlVariables)                   |
+| [registerExtension](#registerExtension)               |
+| [removeIdentity](#removeIdentity)                     |
+| [resetIdentities](#resetIdentities)                   |
+| [updateIdentities](#updateIdentities)                 |
+|[setAdvertisingIdentifier](#setAdvertisingIdentifier)  |
 
 ------
 
@@ -126,7 +127,8 @@ Identity.getIdentities { (identityMap, error) in
 ------
 
 ### getUrlVariables
-> :information_source: This method was added in Edge Identity version 1.1.0.
+> :information_source: **Note**
+> This method was added in Edge Identity version 1.1.0.
 
 
 
@@ -202,7 +204,8 @@ Identity.getUrlVariables { (urlVariables, error) in
 
 Registers the Identity for Edge Network extension with the Mobile Core extension.
 
-> :information_source: If your use-case covers both Edge Network and Adobe Experience Cloud Solutions extensions, you need to register Identity for Edge Network and Identity for Experience Cloud Identity Service from Mobile Core extensions. For more details, see the [frequently asked questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq#q-i-am-using-aep-edge-and-adobe-solutions-extensions-which-identity-extension-should-i-install-and-register).
+> :information_source: **Note**
+> If your use-case covers both Edge Network and Adobe Experience Cloud Solutions extensions, you need to register Identity for Edge Network and Identity for Experience Cloud Identity Service from Mobile Core extensions. For more details, see the [frequently asked questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq#q-i-am-using-aep-edge-and-adobe-solutions-extensions-which-identity-extension-should-i-install-and-register).
 
 The extension registration occurs by passing Identity for Edge Network extension to the [MobileCore.registerExtensions API](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#registerextension-s).
 
@@ -220,16 +223,11 @@ import AEPEdgeIdentity
 
 ...
 MobileCore.registerExtensions([Identity.self])
-```
-
-#### Objective-C
-
 
 ##### Syntax
 ```objectivec
 + (void) registerExtensions: (NSArray<Class*>* _Nonnull) extensions
                  completion: (void (^ _Nullable)(void)) completion;
-```
 
 ##### Example
 ```objectivec
@@ -297,8 +295,147 @@ This API is not recommended for:
 * Removing existing custom identifiers; use the [`removeIdentity`](#removeidentity) API instead.
 * Removing a previously synced advertising identifier after the advertising tracking settings were changed by the user; use the [`setAdvertisingIdentifier`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/identity/identity-api-reference#setadvertisingidentifier) API instead.
 
-> :warning: The Identity for Edge Network extension does not read the Mobile SDK's privacy status, and therefore setting the SDK's privacy status to opt-out will not automatically clear the identities from the Identity for Edge Network extension. See [`MobileCore.resetIdentities`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#resetidentities) for more details.
+> :warning: **Warning**
+> The Identity for Edge Network extension does not read the Mobile SDK's privacy status, and therefore setting the SDK's privacy status to opt-out will not automatically clear the identities from the Identity for Edge Network extension. See [`MobileCore.resetIdentities`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#resetidentities) for more details.
 
+------
+
+### setAdvertisingIdentifier
+
+When this API is called with a valid advertising identifier, the Identity for Edge Network extension includes the advertising identifier in the XDM Identity Map using the _IDFA_ namespace. If the API is called with empty, nil or all-zeroes value, the IDFA is removed from the XDM Identity Map (if previously set).
+
+The IDFA is preserved between app upgrades, is saved and restored during the standard application backup process, and is removed at uninstall.
+
+> **Warning**
+> In order to enable the collection of current advertising tracking user's selection based on the provided advertising identifier, you need to install and register the [AEPEdgeConsent](https://aep-sdks.gitbook.io/docs/foundation-extensions/consent-for-edge-network) extension and update the [AEPEdge](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension) dependency to minimum 1.4.1.
+
+> **Warning**
+> Starting iOS 14+, applications must use the [App Tracking Transparency](https://developer.apple.com/documentation/apptrackingtransparency) framework to request user authorization before using the Identifier for Advertising (IDFA). To access IDFA and handle it correctly in your mobile application, see the [Apple developer documentation about IDFA](https://developer.apple.com/documentation/adsupport/asidentifiermanager).
+
+#### Swift
+
+##### Syntax
+```swift
+@objc(setAdvertisingIdentifier:)
+public static func setAdvertisingIdentifier(_ identifier: String?)
+```
+- _identifier_ is a string that provides developers with a simple, standard system to continue to track the Ads through their apps.
+##### Example
+```swift
+import AdSupport
+import AppTrackingTransparency
+...
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    ...
+    if #available(iOS 14, *) {
+       setAdvertisingIdentifierUsingTrackingManager()
+    } else {
+       // Fallback on earlier versions
+       setAdvertisingIdentifierUsingIdentifierManager()
+    }
+
+}
+
+func setAdvertisingIdentifierUsingIdentifierManager() {
+    var idfa:String = "";
+        if (ASIdentifierManager.shared().isAdvertisingTrackingEnabled) {
+            idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString;
+        } else {
+            Log.debug(label: "AppDelegateExample",
+                      "Advertising Tracking is disabled by the user, cannot process the advertising identifier.");
+        }
+        MobileCore.setAdvertisingIdentifier(idfa);
+}
+
+@available(iOS 14, *)
+func setAdvertisingIdentifierUsingTrackingManager() {
+    ATTrackingManager.requestTrackingAuthorization { (status) in
+        var idfa: String = "";
+
+        switch (status) {
+        case .authorized:
+            idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        case .denied:
+            Log.debug(label: "AppDelegateExample",
+                      "Advertising Tracking is denied by the user, cannot process the advertising identifier.")
+        case .notDetermined:
+            Log.debug(label: "AppDelegateExample",
+                      "Advertising Tracking is not determined, cannot process the advertising identifier.")
+        case .restricted:
+            Log.debug(label: "AppDelegateExample",
+                      "Advertising Tracking is restricted by the user, cannot process the advertising identifier.")
+        }
+
+        MobileCore.setAdvertisingIdentifier(idfa)
+    }
+}
+```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) setAdvertisingIdentifier: (NSString * _Nullable identifier);
+```
+
+##### Example
+```objectivec
+#import <AdSupport/ASIdentifierManager.h>
+#import <AppTrackingTransparency/ATTrackingManager.h>
+...
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+-   ...
+-   
+    if (@available(iOS 14, *)) {
+        [self setAdvertisingIdentifierUsingTrackingManager];
+    } else {
+        // fallback to earlier versions
+        [self setAdvertisingIdentifierUsingIdentifierManager];
+    }
+
+}
+
+- (void) setAdvertisingIdentifierUsingIdentifierManager {
+    // setup the advertising identifier
+    NSString *idfa = nil;
+    if ([[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled]) {
+        idfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    } else {
+        [AEPLog debugWithLabel:@"AppDelegateExample"
+                       message:@"Advertising Tracking is disabled by the user, cannot process the advertising identifier"];
+    }
+    [AEPMobileCore setAdvertisingIdentifier:idfa];
+
+}
+
+- (void) setAdvertisingIdentifierUsingTrackingManager API_AVAILABLE(ios(14)) {
+    [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:
+    ^(ATTrackingManagerAuthorizationStatus status){
+        NSString *idfa = nil;
+        switch(status) {
+            case ATTrackingManagerAuthorizationStatusAuthorized:
+                idfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+                break;
+            case ATTrackingManagerAuthorizationStatusDenied:
+                [AEPLog debugWithLabel:@"AppDelegateExample"
+                               message:@"Advertising Tracking is denied by the user, cannot process the advertising identifier"];
+                break;
+            case ATTrackingManagerAuthorizationStatusNotDetermined:
+                [AEPLog debugWithLabel:@"AppDelegateExample"
+                               message:@"Advertising Tracking is not determined, cannot process the advertising identifier"];
+                break;
+            case ATTrackingManagerAuthorizationStatusRestricted:
+                [AEPLog debugWithLabel:@"AppDelegateExample"
+                               message:@"Advertising Tracking is restricted by the user, cannot process the advertising identifier"];
+                break;
+        }
+
+        [AEPMobileCore setAdvertisingIdentifier:idfa];
+    }];
+}
+```
 ------
 
 ### updateIdentities

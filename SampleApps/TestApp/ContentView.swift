@@ -9,10 +9,13 @@
 // OF ANY KIND, either express or implied. See the License for the specific language
 // governing permissions and limitations under the License.
 //
+import AdSupport
 import AEPAssurance
 import AEPCore
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPIdentity
+import AppTrackingTransparency
 import SwiftUI
 
 class RegisteredExtensions: ObservableObject {
@@ -21,37 +24,42 @@ class RegisteredExtensions: ObservableObject {
 }
 
 struct ContentView: View {
-    @StateObject var registeredExtensions = RegisteredExtensions()
+    @ObservedObject var registeredExtensions = RegisteredExtensions()
 
     var body: some View {
 
         NavigationView {
-            VStack(alignment: .center, spacing: 20, content: {
+            ScrollView(showsIndicators: true) {
+                VStack(alignment: .center, spacing: 20) {
+                    NavigationLink(
+                        destination: AssuranceView(),
+                        label: {
+                            Text("Assurance")
+                        }
+                    )
 
-                NavigationLink(
-                    destination: AssuranceView(),
-                    label: {
-                        Text("Assurance")
-                    }
-                )
+                    NavigationLink(
+                        destination: AdvertisingIdentifierView(),
+                        label: {
+                            Text("Set Advertising Identifier")
+                        })
 
-                NavigationLink(
-                    destination: CustomIdentifierView(),
-                    label: {
-                        Text("Update Custom Identity")
-                    })
+                    NavigationLink(
+                        destination: CustomIdentifierView(),
+                        label: {
+                            Text("Update Custom Identity")
+                        })
 
-                NavigationLink(
-                    destination: MultipleIdentityView(extensions: registeredExtensions),
-                    label: {
-                        Text("Test with Multiple Identities")
-                    })
-            })
+                    NavigationLink(
+                        destination: MultipleIdentityView(extensions: registeredExtensions),
+                        label: {
+                            Text("Test with Multiple Identities")
+                        })
+                }
+            }
         }
-
         Divider()
         GetIdentitiesView()
-
     }
 }
 
@@ -63,7 +71,7 @@ struct GetIdentitiesView: View {
 
     var body: some View {
         VStack {
-            Button(action: {
+            Button {
                 self.ecidEdgeIdentityText = ""
                 self.ecidIdentityText = ""
 
@@ -74,7 +82,7 @@ struct GetIdentitiesView: View {
                 AEPIdentity.Identity.getExperienceCloudId { ecid, _ in
                     self.ecidIdentityText = ecid ?? ""
                 }
-            }) {
+            } label: {
                 Text("Get ECID")
             }
 
@@ -99,7 +107,7 @@ struct GetIdentitiesView: View {
                 .padding(5)
 
             HStack {
-                Button(action: {
+                Button {
                     self.identityMapText = ""
                     AEPEdgeIdentity.Identity.getIdentities { identityMap, _ in
                         if let identityMap = identityMap {
@@ -114,21 +122,113 @@ struct GetIdentitiesView: View {
                             self.identityMapText = "IdentityMap was nil"
                         }
                     }
-                }) {
+                } label: {
                     Text("Get Identities")
-                }.padding()
+                }
+                .padding()
 
-                Button(action: {
+                Button {
                     MobileCore.resetIdentities()
-                }) {
+                } label: {
                     Text("Reset Identities")
-                }.padding()
+                }
+                .padding()
             }
             ScrollView {
                 Text(identityMapText)
                     .font(.system(size: 12))
                     .padding()
                     .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
+            }
+        }
+
+    }
+}
+
+struct AdvertisingIdentifierView: View {
+    @State var adID: UUID?
+    @State var adIdText: String = ""
+    @State var trackingAuthorizationResultText: String = ""
+
+    func getConsents() {
+        Consent.getConsents() { consents, error in
+            if let consents = consents {
+                print(consents)
+            } else if let error = error {
+                print("Error getting consents: \(error)")
+            }
+        }
+    }
+
+    /// Updates view for ad ID related elements
+    func setDeviceAdvertisingIdentifier() {
+        let isTrackingAuthorized = AdIdUtils.isTrackingAuthorized()
+        print("isTrackingAuthorized: \(isTrackingAuthorized)")
+        trackingAuthorizationResultText = isTrackingAuthorized ? "Tracking allowed" : "Tracking not allowed"
+
+        if isTrackingAuthorized {
+            self.adID = AdIdUtils.getAdvertisingIdentifierForEnvironment()
+            print("Advertising identifier fetched: \(String(describing: adID))")
+            MobileCore.setAdvertisingIdentifier(self.adID?.uuidString)
+        } else {
+            print("Ad tracking not authorized; setting ad ID to the empty string")
+            MobileCore.setAdvertisingIdentifier("")
+        }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack {
+                VStack {
+                    Button("Request Tracking Authorization", action: {
+                        AdIdUtils.requestTrackingAuthorization() {
+                            self.setDeviceAdvertisingIdentifier()
+                        }
+                    })
+                    Text(trackingAuthorizationResultText)
+                    Text("\(adID?.uuidString ?? "")")
+                }
+
+                HStack(spacing: 10) {
+                    Button {
+                        MobileCore.setAdvertisingIdentifier(adIdText)
+                    } label: {
+                        Text("Set ad ID")
+                    }
+                    TextField("Enter ad ID", text: $adIdText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+                }
+                .padding()
+                HStack {
+                    Button {
+                        MobileCore.setAdvertisingIdentifier(nil)
+                    } label: {
+                        Text("Set ad ID as nil")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    Button {
+                        MobileCore.setAdvertisingIdentifier("00000000-0000-0000-0000-000000000000")
+                    } label: {
+                        Text("Set ad ID as all-zeros")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    Button {
+                        MobileCore.setAdvertisingIdentifier("")
+                    } label: {
+                        Text("Set ad ID as empty string")
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                }
+                Button("Get current consents", action: {
+                    getConsents()
+                })
             }
         }
 
@@ -169,23 +269,26 @@ struct CustomIdentifierView: View {
                     Text("ambiguous").tag(AuthenticatedState.ambiguous)
                     Text("authenticated").tag(AuthenticatedState.authenticated)
                     Text("logged out").tag(AuthenticatedState.loggedOut)
-                }.pickerStyle(SegmentedPickerStyle())
+                }
+                .pickerStyle(SegmentedPickerStyle())
             }
             HStack {
-                Button(action: {
+                Button {
                     let map = IdentityMap()
                     map.add(item: IdentityItem(id: identityItemText, authenticatedState: selectedAuthenticatedState, primary: isPrimaryChecked),
                             withNamespace: identityNamespaceText)
                     AEPEdgeIdentity.Identity.updateIdentities(with: map)
-                }) {
+                } label: {
                     Text("Update Identity")
-                }.padding()
-                Button(action: {
+                }
+                .padding()
+                Button {
                     AEPEdgeIdentity.Identity.removeIdentity(item: IdentityItem(id: identityItemText, authenticatedState: selectedAuthenticatedState, primary: isPrimaryChecked),
                                                             withNamespace: identityNamespaceText)
-                }) {
+                } label: {
                     Text("Remove Identity")
-                }.padding()
+                }
+                .padding()
             }
 
         }
@@ -207,7 +310,7 @@ struct MultipleIdentityView: View {
                 Image(systemName: extensions.isEdgeIdentityRegistered ? "circle.fill" : "circle")
                     .foregroundColor(Color.blue)
 
-                Button(action: {
+                Button {
                     if extensions.isEdgeIdentityRegistered {
                         MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self)
                     } else {
@@ -216,14 +319,15 @@ struct MultipleIdentityView: View {
 
                     extensions.isEdgeIdentityRegistered.toggle()
 
-                }) {
+                } label: {
                     Text(extensions.isEdgeIdentityRegistered ? "Unregister Edge Identity" : "Register Edge Identity")
                 }
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
-            Button(action: {
+            Button {
                 UserDefaults.standard.removeObject(forKey: edgeIdentityStoredDataKey)
-            }) {
+            } label: {
                 Text("Clear Persistence")
             }
         }
@@ -235,7 +339,7 @@ struct MultipleIdentityView: View {
                 Image(systemName: extensions.isIdentityDirectRegistered ? "circle.fill" : "circle")
                     .foregroundColor(Color.blue)
 
-                Button(action: {
+                Button {
                     if extensions.isIdentityDirectRegistered {
                         MobileCore.unregisterExtension(AEPIdentity.Identity.self)
                     } else {
@@ -244,32 +348,35 @@ struct MultipleIdentityView: View {
 
                     extensions.isIdentityDirectRegistered.toggle()
 
-                }) {
+                } label: {
                     Text(extensions.isIdentityDirectRegistered ? "Unregister Identity Direct" : "Register Identity Direct")
                 }
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
-            Button(action: {
+            Button {
                 MobileCore.setAdvertisingIdentifier(String(Int.random(in: 1...32)))
-            }) {
+            } label: {
                 Text("Trigger State Change")
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
-            Button(action: {
+            Button {
                 UserDefaults.standard.removeObject(forKey: identityStoredDataKey)
-            }) {
+            } label: {
                 Text("Clear Persistence")
-            }.padding(.bottom, 5)
+            }
+            .padding(.bottom, 5)
 
             HStack {
-                Button(action: {
+                Button {
                     MobileCore.setPrivacyStatus(.optedIn)
-                }) {
+                } label: {
                     Text("Privacy OptIn")
                 }
-                Button(action: {
+                Button {
                     MobileCore.setPrivacyStatus(.optedOut)
-                }) {
+                } label: {
                     Text("Privacy OptOut")
                 }
             }
@@ -287,23 +394,26 @@ struct AssuranceView: View {
         VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
             TextField("Copy Assurance Session URL to here", text: $assuranceSessionUrl)
             HStack {
-                Button(action: {
+                Button {
                     // step-assurance-start
                     // replace the url with the valid one generated on Assurance UI
                     if let url = URL(string: self.assuranceSessionUrl) {
                         Assurance.startSession(url: url)
                     }
                     // step-assurance-end
-                }) {
+                } label: {
                     Text("Connect")
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .padding()
                         .background(Color.gray)
                         .foregroundColor(.white)
                         .font(.caption)
-                }.cornerRadius(5)
+                }
+                .cornerRadius(5)
             }
-        }.padding().onAppear {
+        }
+        .padding()
+        .onAppear {
             MobileCore.track(state: "AssuranceView", data: nil)
         }
     }
