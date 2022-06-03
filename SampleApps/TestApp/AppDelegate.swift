@@ -22,7 +22,7 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
-    private let ENVIRONMENT_FILE_ID = ""
+    private let ENVIRONMENT_FILE_ID = "yourAppId"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
