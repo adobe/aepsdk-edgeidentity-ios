@@ -1,0 +1,19 @@
+name: "Label PRs"
+on:
+- pull_request_target
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: release-drafter/release-drafter@v5
+      with:
+        name: v${{ github.event.inputs.tag }}
+        tag: ${{ github.event.inputs.tag }}
+        version: ${{ github.event.inputs.tag }}
+        publish: false
+        config-name: label-pr-config.yml
+        
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

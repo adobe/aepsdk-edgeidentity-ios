@@ -1,0 +1,84 @@
+autolabeler:
+  - label: 'Type: documentation'
+    files:
+      - '*.md'
+    # Checks there is no word character (alphanumeric & underscore) before target words, or after to avoid accidental matches
+    title:
+      - '/(?<![\w])((doc)|(docs)|(documentation))(?![\w])/i'
+  - label: 'Type: fix'
+    branch:
+      - '/fix\/.+/'
+    title:
+      - '/(?<![\w])((fix)|(fixes))(?![\w])/i'
+  - label: 'Type: feature'
+    branch:
+      - '/feature\/.+/'
+    title:
+      - '/(?<![\w])((feat)|(feature))(?![\w])/i'
+  - label: 'Type: enhancement'
+    branch:
+      - '/enhancement\/.+/'
+    title:
+      - '/(?<![\w])((enhancement)|(enhancements))(?![\w])/i'
+  - label: 'Type: buildscripts'
+    files:
+      - '*.yml'
+    branch:
+      - '/buildscripts\/.+/'
+    title:
+      - '/(?<![\w])((buildscript)|(buildscripts))(?![\w])/i'
+
+# Config file for release drafter; the labeler creates a draft release but does not publish
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: 'Features'
+    labels: 
+      - 'Type: feature'
+  - title: 'Enhancements'
+    labels: 
+      - 'Type: enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'Type: bug'
+      - 'Type: bugfix'
+  - title: 'Deprecations'
+    labels:
+      - 'Type: deprecated'
+  - title: 'Maintenance'
+    labels: 
+      - 'Type: buildscripts'
+      - 'Type: documentation'
+      - 'Type: maintenance'
+include-labels:
+  - 'Type: bug'
+  - 'Type: bugfix'
+  - 'Type: buildscripts'
+  - 'Type: deprecated'
+  - 'Type: documentation'
+  - 'Type: enhancement'
+  - 'Type: feature'
+  - 'Type: fix'
+  - 'Type: maintenance'
+
+change-template: '$TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## Changes
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
+
+  
