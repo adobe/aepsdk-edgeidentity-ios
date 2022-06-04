@@ -34,7 +34,6 @@
 		4CC3D10727D2CFD70055ACC6 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */; };
 		969BD00DE9BC2B23CA13749C /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
-		B6F27EC32609146800C50A04 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EC22609146800C50A04 /* SceneDelegate.m */; };
 		B6F27EC62609146800C50A04 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EC52609146800C50A04 /* ViewController.m */; };
 		B6F27EC92609146800C50A04 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6F27EC72609146800C50A04 /* Main.storyboard */; };
 		B6F27ECB2609146A00C50A04 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6F27ECA2609146A00C50A04 /* Assets.xcassets */; };
@@ -68,6 +67,8 @@
 		D43BABAC25BBC4BA00B08CC0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BABAB25BBC4BA00B08CC0 /* ContentView.swift */; };
 		D43BABAE25BBC4BB00B08CC0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */; };
 		D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */; };
+		D4498376284AB0A000468A95 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */; };
+		D4498378284AB27300468A95 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4498377284AB27300468A95 /* AdSupport.framework */; };
 		EDB977BAD0D13E36A7F733B4 /* Pods_TestAppObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 211C042081BAB03AF0C00D2D /* Pods_TestAppObjC.framework */; };
 		FB2C37DD59AD6575214B4FB7 /* Pods_AEPEdgeIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC6D2266840DFF6DD80E5243 /* Pods_AEPEdgeIdentity.framework */; };
 /* End PBXBuildFile section */
@@ -135,8 +136,6 @@
 		B6F27EBC2609146800C50A04 /* TestAppObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestAppObjC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F27EBE2609146800C50A04 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B6F27EBF2609146800C50A04 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		B6F27EC12609146800C50A04 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		B6F27EC22609146800C50A04 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		B6F27EC42609146800C50A04 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		B6F27EC52609146800C50A04 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		B6F27EC82609146800C50A04 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -180,6 +179,7 @@
 		D43BABAD25BBC4BB00B08CC0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D43BABB225BBC4BB00B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4498377284AB27300468A95 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		FC6D2266840DFF6DD80E5243 /* Pods_AEPEdgeIdentity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPEdgeIdentity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -188,6 +188,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4498378284AB27300468A95 /* AdSupport.framework in Frameworks */,
+				D4498376284AB0A000468A95 /* AppTrackingTransparency.framework in Frameworks */,
 				EDB977BAD0D13E36A7F733B4 /* Pods_TestAppObjC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -233,6 +235,7 @@
 		0B5B2ACABDDBE64CBBCE2D00 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D4498377284AB27300468A95 /* AdSupport.framework */,
 				4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */,
 				AF5FC2982E587DB999C37858 /* Pods_FunctionalTests.framework */,
 				B8DD25A1697FC0CB5815F427 /* Pods_UnitTests.framework */,
@@ -248,8 +251,6 @@
 			children = (
 				B6F27EBE2609146800C50A04 /* AppDelegate.h */,
 				B6F27EBF2609146800C50A04 /* AppDelegate.m */,
-				B6F27EC12609146800C50A04 /* SceneDelegate.h */,
-				B6F27EC22609146800C50A04 /* SceneDelegate.m */,
 				B6F27EC42609146800C50A04 /* ViewController.h */,
 				B6F27EC52609146800C50A04 /* ViewController.m */,
 				B6F27EC72609146800C50A04 /* Main.storyboard */,
@@ -870,7 +871,6 @@
 				B6F27EC62609146800C50A04 /* ViewController.m in Sources */,
 				B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */,
 				B6F27ED12609146A00C50A04 /* main.m in Sources */,
-				B6F27EC32609146800C50A04 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -991,7 +991,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1011,7 +1011,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
