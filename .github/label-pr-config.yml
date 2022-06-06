@@ -9,7 +9,7 @@ autolabeler:
     branch:
       - '/fix\/.+/'
     title:
-      - '/(?<![\w])((fix)|(fixes))(?![\w])/i'
+      - '/(?<![\w])((fix)|(fixes)|(fixed)|(bug)|(bugfix)|(bug fix))(?![\w])/i'
   - label: 'Type: feature'
     branch:
       - '/feature\/.+/'
@@ -40,7 +40,6 @@ categories:
       - 'Type: enhancement'
   - title: 'Bug Fixes'
     labels:
-      - 'Type: bug'
       - 'Type: bugfix'
   - title: 'Deprecations'
     labels:
