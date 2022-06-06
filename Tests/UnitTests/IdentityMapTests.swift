@@ -522,4 +522,10 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(true, identityMap?.isEmpty)
     }
 
+    func testFromWithInvalidDataDecode() {
+        let bogusStr = String(bytes: [0xD8, 0x00] as [UInt8], encoding: String.Encoding.utf16BigEndian)!
+        let data = ["foo": bogusStr]
+        let identityMap = IdentityMap.from(eventData: data)
+        XCTAssertNil(identityMap)
+    }
 }

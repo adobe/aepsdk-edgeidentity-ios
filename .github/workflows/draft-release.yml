@@ -1,0 +1,36 @@
+name: Create Draft Release (GitHub only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag/version'
+        required: true
+        default: '1.0.0'
+
+      action_tag:
+        description: 'create tag ("no" to skip)'
+        required: true
+        default: 'yes'
+
+      create_full_release:
+        description: 'create as full release? ("no" to create draft release)'
+        required: true
+        default: 'no'
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: release-drafter/release-drafter@v5
+      if: ${{ github.event.inputs.action_tag == 'yes' }}
+      with:
+        name: v${{ github.event.inputs.tag }}
+        tag: ${{ github.event.inputs.tag }}
+        version: ${{ github.event.inputs.tag }}
+        publish: ${{ github.event.inputs.create_full_release == 'yes' }}
+        config-name: release-drafter.yml
+        
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
