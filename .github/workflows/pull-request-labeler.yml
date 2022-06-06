@@ -3,7 +3,7 @@ on:
 - pull_request_target
 
 jobs:
-  apply_pr_labels:
+  apply_labels:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
