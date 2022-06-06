@@ -32,10 +32,12 @@ target 'TestApp' do
   pod 'AEPSignal'
   pod 'AEPAssurance'
   pod 'AEPEdge'
-  pod 'AEPEdgeConsent', '1.0.0'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestAppObjC' do
   pod 'AEPCore'
   pod 'AEPServices'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end

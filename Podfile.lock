@@ -26,7 +26,7 @@ DEPENDENCIES:
   - AEPAssurance
   - AEPCore
   - AEPEdge
-  - AEPEdgeConsent (= 1.0.0)
+  - AEPEdgeConsent
   - AEPIdentity
   - AEPLifecycle
   - AEPServices
@@ -60,6 +60,6 @@ SPEC CHECKSUMS:
   AEPSignal: bbdb296030fec8239fb316576f40b230267fcf7c
   SwiftLint: e96c0a8c770c7ebbc4d36c55baf9096bb65c4584
 
-PODFILE CHECKSUM: 36bcfe06df306cbdc47dc4f48939e6f0595ad1ad
+PODFILE CHECKSUM: f54e85e5623474fdae1edfd8086d1547a937cffe
 
 COCOAPODS: 1.11.2
