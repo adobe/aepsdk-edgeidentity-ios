@@ -15,8 +15,8 @@ Refer to the [Getting Started Guide](getting-started.md)
 | [registerExtension](#registerExtension)               |
 | [removeIdentity](#removeIdentity)                     |
 | [resetIdentities](#resetIdentities)                   |
-| [updateIdentities](#updateIdentities)                 |
 | [setAdvertisingIdentifier](#setAdvertisingIdentifier) |
+| [updateIdentities](#updateIdentities)                 |
 
 ------
 
@@ -127,7 +127,7 @@ Identity.getIdentities { (identityMap, error) in
 ------
 
 ### getUrlVariables
-> :information_source: **Note**
+> **Note**
 > This method was added in Edge Identity version 1.1.0.
 
 
@@ -204,7 +204,7 @@ Identity.getUrlVariables { (urlVariables, error) in
 
 Registers the Identity for Edge Network extension with the Mobile Core extension.
 
-> :information_source: **Note**
+> **Note**
 > If your use-case covers both Edge Network and Adobe Experience Cloud Solutions extensions, you need to register Identity for Edge Network and Identity for Experience Cloud Identity Service from Mobile Core extensions. For more details, see the [frequently asked questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq#q-i-am-using-aep-edge-and-adobe-solutions-extensions-which-identity-extension-should-i-install-and-register).
 
 The extension registration occurs by passing Identity for Edge Network extension to the [MobileCore.registerExtensions API](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#registerextension-s).
@@ -295,7 +295,7 @@ This API is not recommended for:
 * Removing existing custom identifiers; use the [`removeIdentity`](#removeidentity) API instead.
 * Removing a previously synced advertising identifier after the advertising tracking settings were changed by the user; use the [`setAdvertisingIdentifier`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/identity/identity-api-reference#setadvertisingidentifier) API instead.
 
-> :warning: **Warning**
+> **Warning**
 > The Identity for Edge Network extension does not read the Mobile SDK's privacy status, and therefore setting the SDK's privacy status to opt-out will not automatically clear the identities from the Identity for Edge Network extension. See [`MobileCore.resetIdentities`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#resetidentities) for more details.
 
 ------
