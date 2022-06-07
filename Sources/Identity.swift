@@ -50,7 +50,7 @@ import Foundation
         }
 
         if event.urlVariables {
-            return getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event, resolution: .lastSet)?.status != .set
+            return getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event, resolution: .lastSet)?.value != nil
         }
 
         return true
