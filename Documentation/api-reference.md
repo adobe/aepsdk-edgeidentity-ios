@@ -130,8 +130,6 @@ Identity.getIdentities { (identityMap, error) in
 > **Note**
 > This method was added in Edge Identity version 1.1.0.
 
-
-
 This API returns the identifiers in URL query parameter format for consumption in **hybrid mobile applications**. There is no leading & or ? punctuation as the caller is responsible for placing the variables in their resulting URL in the correct locations. If an error occurs while retrieving the URL variables, the completion handler is called with a nil value and AEPError instance. Otherwise, the encoded string is returned, for example: `"adobe_mc=TS%3DTIMESTAMP_VALUE%7CMCMID%3DYOUR_ECID%7CMCORGID%3D9YOUR_EXPERIENCE_CLOUD_ID"`
 
 * The `adobe_mc` attribute is an URL encoded list that contains:

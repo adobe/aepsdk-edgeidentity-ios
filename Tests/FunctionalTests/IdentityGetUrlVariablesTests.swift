@@ -73,7 +73,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     func testGetUrlVariablesWhenOrgIdNotAvailableReturnsNil() {
         let expectation = XCTestExpectation(description: "getUrlVariables callback should return with nil urlVariablesString")
         Identity.getUrlVariables { urlVariablesString, error in
-            guard let urlVariablesString = urlVariablesString else {
+            guard urlVariablesString != nil else {
                 expectation.fulfill()
                 XCTAssertNotNil(error)
                 return
@@ -93,13 +93,15 @@ class IdentityGetUrlVariablesTest: XCTestCase {
 
     func getParamsFrom(urlVariablesString: String) -> [String: String] {
         var params = [String: String]()
-
-        let regex = try! NSRegularExpression(pattern: "adobe_mc=TS%3D(.*)%7CMCMID%3D(.*)%7CMCORGID%3D(.*)", options: .caseInsensitive)
-
-        if let match = regex.firstMatch(in: urlVariablesString, range: NSRange(urlVariablesString.startIndex..., in: urlVariablesString)) {
-            params["ts"] = String(urlVariablesString[Range(match.range(at: 1), in: urlVariablesString)!])
-            params["ecid"] = String(urlVariablesString[Range(match.range(at: 2), in: urlVariablesString)!])
-            params["orgId"] = String(urlVariablesString[Range(match.range(at: 3), in: urlVariablesString)!])
+        do {
+            let regex = try NSRegularExpression(pattern: "adobe_mc=TS%3D(.*)%7CMCMID%3D(.*)%7CMCORGID%3D(.*)", options: .caseInsensitive)
+            if let match = regex.firstMatch(in: urlVariablesString, range: NSRange(urlVariablesString.startIndex..., in: urlVariablesString)) {
+                params["ts"] = String(urlVariablesString[Range(match.range(at: 1), in: urlVariablesString)!])
+                params["ecid"] = String(urlVariablesString[Range(match.range(at: 2), in: urlVariablesString)!])
+                params["orgId"] = String(urlVariablesString[Range(match.range(at: 3), in: urlVariablesString)!])
+            }
+        } catch let error as NSError {
+            print("#getParamsFrom - Error while extracting params from urlVariablesString: \(error.localizedDescription)")
         }
 
         return params
