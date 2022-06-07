@@ -25,8 +25,6 @@ enum IdentityConstants {
     }
 
     enum SharedState {
-        static let STATE_OWNER = "stateowner"
-
         enum Configuration {
             static let SHARED_OWNER_NAME = "com.adobe.module.configuration"
         }
@@ -43,6 +41,7 @@ enum IdentityConstants {
     }
 
     enum EventNames {
+        static let CONSENT_UPDATE_REQUEST_AD_ID = "Consent Update Request for Ad ID"
         static let REQUEST_IDENTITY_ECID = "Edge Identity Request ECID"
         static let REQUEST_IDENTITY_URL_VARIABLES = "Edge Identity Request URL Variables"
         static let REQUEST_IDENTITIES = "Edge Identity Request Identities"
@@ -53,12 +52,14 @@ enum IdentityConstants {
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
     }
 
-    enum DataStoreKeys {
-        static let IDENTITY_PROPERTIES = "identity.properties"
+    enum EventDataKeys {
+        static let ADVERTISING_IDENTIFIER = "advertisingidentifier"
+        static let STATE_OWNER = "stateowner"
+        static let URL_VARIABLES = "urlvariables"
     }
 
-    enum EventDataKeys {
-        static let URL_VARIABLES = "urlvariables"
+    enum DataStoreKeys {
+        static let IDENTITY_PROPERTIES = "identity.properties"
     }
 
     enum Namespaces {
@@ -78,6 +79,8 @@ enum IdentityConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
+            static let ID_TYPE = "idType"
+            static let AD_ID = "adID"
             static let VAL = "val"
             static let YES = "y"
             static let NO = "n"
