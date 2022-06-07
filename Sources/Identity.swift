@@ -44,10 +44,16 @@ import Foundation
     }
 
     public func readyForEvent(_ event: Event) -> Bool {
-        if event.urlVariables, getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.status != .set { return false}
+        guard state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
+                                  createXDMSharedState: createXDMSharedState(data:event:)) else {
+            return false
+        }
 
-        return state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
-                                   createXDMSharedState: createXDMSharedState(data:event:))
+        if event.urlVariables {
+            return getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event, resolution: .lastSet)?.status != .set
+        }
+
+        return true
     }
 
     // MARK: Event Listeners
@@ -80,7 +86,7 @@ import Foundation
                                                            source: EventSource.responseIdentity,
                                                            data: [IdentityConstants.EventDataKeys.URL_VARIABLES: ""])
 
-        guard let configurationSharedState = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.value else {
+        guard let configurationSharedState = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event, resolution: .lastSet)?.value else {
             Log.warning(label: friendlyName, "\(#function) - Cannot process getUrlVariables request Identity event, configuration not found.")
             dispatch(event: emptyResponseEvent)
             return
