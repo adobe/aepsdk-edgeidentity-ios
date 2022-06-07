@@ -7,7 +7,8 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
 
 ### Download and import the Identity extension
 
-> :information_source: The following instructions are for configuring an application using Adobe Experience Platform Edge mobile extensions. If an application will include both Edge Network and Adobe Solution extensions, both the Identity for Edge Network and Identity for Experience Cloud ID Service extensions are required. Find more details in the [Frequently Asked Questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq) page.
+> **Note**
+> The following instructions are for configuring an application using Adobe Experience Platform Edge mobile extensions. If an application will include both Edge Network and Adobe Solution extensions, both the Identity for Edge Network and Identity for Experience Cloud ID Service extensions are required. Find more details in the [Frequently Asked Questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq) page.
 
 
 1. Add the Mobile Core and Edge extensions to your project using CocoaPods. Add following pods in your `Podfile`:
@@ -29,6 +30,7 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
 
 3. Import the Mobile Core and Edge libraries:
 
+#### Swift
   ```swift
   // AppDelegate.swift
   import AEPCore
@@ -36,8 +38,16 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   import AEPEdgeIdentity
   ```
 
+#### Objective-C
+  ```objectivec
+  // AppDelegate.h
+  @import AEPCore;
+  @import AEPEdge;
+  @import AEPEdgeIdentity;
+  ```
 4. Register the Identity for Edge Extension with MobileCore:
 
+#### Swift
   ```swift
   // AppDelegate.swift
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -47,3 +57,15 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
      ...
   }
   ```
+
+#### Objective-C
+```objectivec
+// AppDelegate.m
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [AEPMobileCore registerExtensions:@[AEPMobileEdgeIdentity.class, AEPMobileEdge.class] completion:^{
+    ...
+  }];
+  [AEPMobileCore configureWithAppId: @"yourLaunchEnvironmentID"];
+  ...
+}
+```
