@@ -17,7 +17,6 @@
 #import <AppTrackingTransparency/ATTrackingManager.h>
 #endif
 
-
 @import AEPEdgeIdentity;
 @import AEPCore;
 @import AEPServices;
@@ -34,6 +33,15 @@
     [AEPMobileEdgeIdentity getExperienceCloudId:^(NSString *ecid, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblECID setText:ecid];
+        });
+    }];
+}
+
+- (IBAction)btnGetUrlVariablesClicked:(id)sender {
+    [AEPMobileEdgeIdentity getUrlVariables:^(NSString *urlVariables, NSError *error){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.lblUrlVariables setText:urlVariables];
+
         });
     }];
 }
