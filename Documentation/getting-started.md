@@ -28,7 +28,7 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   $ pod install
   ```
 
-3. Import the Mobile Core and Edge libraries:
+3. Import the Mobile Core and Edge libraries and register Edge Extension with MobileCore:
 
 #### Swift
   ```swift
@@ -38,6 +38,16 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   import AEPEdgeIdentity
   ```
 
+  ```swift
+  // AppDelegate.swift
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    MobileCore.registerExtensions([Identity.self, Edge.self], {
+       MobileCore.configureWith(appId: "yourEnvironmentID")
+     })
+     ...
+  }
+  ```
+
 #### Objective-C
   ```objectivec
   // AppDelegate.h
@@ -45,27 +55,14 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
   @import AEPEdge;
   @import AEPEdgeIdentity;
   ```
-4. Register the Identity for Edge Extension with MobileCore:
 
-#### Swift
-  ```swift
-  // AppDelegate.swift
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    MobileCore.registerExtensions([Identity.self, Edge.self], {
-       MobileCore.configureWith(appId: "yourLaunchEnvironmentID")
-     })
-     ...
+  ```objectivec
+  // AppDelegate.m
+  - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+      [AEPMobileCore registerExtensions:@[AEPMobileEdgeIdentity.class, AEPMobileEdge.class] completion:^{
+      ...
+    }];
+    [AEPMobileCore configureWithAppId: @"yourEnvironmentID"];
+    ...
   }
   ```
-
-#### Objective-C
-```objectivec
-// AppDelegate.m
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [AEPMobileCore registerExtensions:@[AEPMobileEdgeIdentity.class, AEPMobileEdge.class] completion:^{
-    ...
-  }];
-  [AEPMobileCore configureWithAppId: @"yourLaunchEnvironmentID"];
-  ...
-}
-```
