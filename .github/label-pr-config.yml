@@ -5,11 +5,11 @@ autolabeler:
     # Checks there is no word character (alphanumeric & underscore) before target words, or after to avoid accidental matches
     title:
       - '/(?<![\w])((doc)|(docs)|(documentation))(?![\w])/i'
-  - label: 'Type: fix'
+  - label: 'Type: bugfix'
     branch:
       - '/fix\/.+/'
     title:
-      - '/(?<![\w])((fix)|(fixes)|(fixed)|(bug)|(bugfix)|(bug fix))(?![\w])/i'
+      - '/(?<![\w])((fix)|(fixes)|(fixed)|(bug)|(bugfix))(?![\w])/i'
   - label: 'Type: feature'
     branch:
       - '/feature\/.+/'
@@ -26,7 +26,7 @@ autolabeler:
     branch:
       - '/buildscripts\/.+/'
     title:
-      - '/(?<![\w])((buildscript)|(buildscripts))(?![\w])/i'
+      - '/(?<![\w])((buildscript)|(buildscripts)|(CI)|(CI\/CD))(?![\w])/i'
 
 # Config file for release drafter; the labeler creates a draft release but does not publish
 name-template: 'v$RESOLVED_VERSION'
