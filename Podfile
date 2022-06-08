@@ -31,9 +31,13 @@ target 'TestApp' do
   pod 'AEPLifecycle'
   pod 'AEPSignal'
   pod 'AEPAssurance'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestAppObjC' do
   pod 'AEPCore'
   pod 'AEPServices'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end

@@ -14,7 +14,9 @@
 
 @import AEPCore;
 @import AEPServices;
+@import AEPEdge;
 @import AEPEdgeIdentity;
+@import AEPEdgeConsent;
 
 @interface AppDelegate ()
 
@@ -24,23 +26,21 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+    NSString* ENVIRONMENT_FILE_ID = @"";
     
-    //[AEPMobileCore configureWithAppId:@"<Your_AppID>"];
-
     [AEPMobileCore setLogLevel: AEPLogLevelTrace];
-    [AEPMobileCore registerExtensions:@[AEPMobileEdgeIdentity.class] completion:nil];
+    [AEPMobileCore configureWithAppId: ENVIRONMENT_FILE_ID];
+    [AEPMobileCore registerExtensions:@[AEPMobileEdge.class, AEPMobileEdgeIdentity.class, AEPMobileEdgeConsent.class] completion:nil];
     return YES;
 }
 
-
-#pragma mark - UISceneSession lifecycle
-
-
-- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
-    // Called when a new scene session is being created.
-    // Use this method to select a configuration to create the new scene with.
-    return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+- (void) applicationWillEnterForeground:(UIApplication *)application {
+    [AEPMobileCore lifecycleStart:nil];
 }
 
+- (void) applicationDidEnterBackground:(UIApplication *)application {
+   [AEPMobileCore lifecyclePause];
+}
 
 @end

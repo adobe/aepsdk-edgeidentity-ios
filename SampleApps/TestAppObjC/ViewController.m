@@ -10,18 +10,16 @@
 // governing permissions and limitations under the License.
 //
 
+#import "Foundation/Foundation.h"
 #import "ViewController.h"
+#import <AdSupport/ASIdentifierManager.h>
+#if __has_include(<AppTrackingTransparency/AppTrackingTransparency.h>)
+#import <AppTrackingTransparency/ATTrackingManager.h>
+#endif
+
 @import AEPEdgeIdentity;
 @import AEPCore;
-
-@interface ViewController ()
-@property (weak, nonatomic) IBOutlet UILabel *lblextensionVersion;
-@property (weak, nonatomic) IBOutlet UILabel *lblECID;
-@property (weak, nonatomic) IBOutlet UIButton *btnUpdateIdentities;
-@property (weak, nonatomic) IBOutlet UITextView *txtAllIdentities;
-
-
-@end
+@import AEPServices;
 
 @implementation ViewController
 
@@ -35,6 +33,15 @@
     [AEPMobileEdgeIdentity getExperienceCloudId:^(NSString *ecid, NSError *error){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.lblECID setText:ecid];
+        });
+    }];
+}
+
+- (IBAction)btnGetUrlVariablesClicked:(id)sender {
+    [AEPMobileEdgeIdentity getUrlVariables:^(NSString *urlVariables, NSError *error){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.lblUrlVariables setText:urlVariables];
+
         });
     }];
 }
@@ -85,6 +92,65 @@
 - (IBAction)resetIdentitiesClicked:(id)sender {
     [AEPMobileCore resetIdentities];
     [self btnGetIdentitesClicked:nil];
+}
+
+- (IBAction)setAdvertisingIdentifier:(id)sender {
+    NSString* advertisingId = [_advertisingIdValue text];
+    if ([advertisingId isEqualToString:@"device_adid"]) {
+        // setup the advertising identifier
+       if (@available(iOS 14, *)) {
+           [self requestTrackingAuthorization];
+       } else {
+           [self setAdvertisingIdentifier];
+       }
+    } else if ([advertisingId length] > 0) {
+        [AEPMobileCore setAdvertisingIdentifier: advertisingId];
+    } else {
+        [AEPMobileCore setAdvertisingIdentifier: nil];
+    }
+}
+
+// Test function to check if ad tracking is enabled and get device advertising identifier using ASIdentifierManager, deprecated in iOS 14.
+// Ad tracking may be disabled in device Settings -> Privacy -> Advertising -> "Limit Ad Tracking"
+- (void) setAdvertisingIdentifier {
+    // setup the advertising identifier
+    NSString *idfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    BOOL trackingEnabled = [[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled];
+
+    [AEPLog traceWithLabel:@"AdvertisingIdentifier" message:[NSString stringWithFormat:@"Advertising Tracking is %@ by the user, and IDFA is %@", trackingEnabled ? @"true" : @"false", idfa]];
+    [AEPMobileCore setAdvertisingIdentifier: idfa];
+    
+}
+
+// Test function to request tracking authorization and get device identifier using ATTrackingManager, first available in iOS 14+.
+// On first launch, UI is displayed to user to allow or deny tracking. On simulators, advertising identifier is all zeros.
+- (void) requestTrackingAuthorization {
+    if (@available(iOS 14, *)) {
+        [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:
+        ^(ATTrackingManagerAuthorizationStatus status){
+            NSString *statusMsg = @"";
+
+            switch(status) {
+                case ATTrackingManagerAuthorizationStatusRestricted:
+                    statusMsg = @"Restricted";
+                    break;
+                case ATTrackingManagerAuthorizationStatusDenied:
+                    statusMsg = @"Denied";
+                    break;
+                case ATTrackingManagerAuthorizationStatusAuthorized:
+                    statusMsg = @"Authorized";
+                    break;
+                case ATTrackingManagerAuthorizationStatusNotDetermined:
+                    statusMsg = @"Not Determined";
+                    break;
+            }
+
+            NSString *idfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+
+            [AEPLog traceWithLabel:@"AdvertisingIdentifier" message:[NSString stringWithFormat:@"Advertising Tracking is %@, IDFA is %@", statusMsg, idfa]];
+            [AEPMobileCore setAdvertisingIdentifier:idfa];
+        }];
+    }
 }
 
 @end
