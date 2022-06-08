@@ -4,31 +4,32 @@ tag-template: 'v$RESOLVED_VERSION'
 categories:
   - title: 'Features'
     labels: 
-      - 'feature'
+      - 'Type: feature'
   - title: 'Enhancements'
     labels: 
-      - 'enhancement'
+      - 'Type: enhancement'
   - title: 'Bug Fixes'
     labels:
-      - 'bugfix'
+      - 'Type: bugfix'
   - title: 'Deprecations'
     labels:
-      - 'deprecated'
+      - 'Type: deprecated'
   - title: 'Maintenance'
     labels: 
-      - 'buildscripts'
-      - 'documentation'
-      - 'maintenance'
+      - 'Type: buildscripts'
+      - 'Type: documentation'
+      - 'Type: maintenance'
 include-labels:
-  - 'bug'
-  - 'bugfix'
-  - 'buildscripts'
-  - 'deprecated'
-  - 'documentation'
-  - 'enhancement'
-  - 'feature'
-  - 'fix'
-  - 'maintenance'
+  - 'Type: bug'
+  - 'Type: bugfix'
+  - 'Type: buildscripts'
+  - 'Type: deprecated'
+  - 'Type: documentation'
+  - 'Type: enhancement'
+  - 'Type: feature'
+  - 'Type: fix'
+  - 'Type: maintenance'
+
 change-template: '$TITLE (#$NUMBER) @$AUTHOR'
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
