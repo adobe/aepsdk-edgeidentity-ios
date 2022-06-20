@@ -14,6 +14,10 @@ import AEPCore
 import Foundation
 
 extension Event {
+    /// Reads the url variables flag from the event data, returns false if not present
+    var urlVariables: Bool {
+        return data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? Bool ?? false
+    }
 
     /// Reads the advertising ID from the event data
     ///

@@ -16,6 +16,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *lblextensionVersion;
 @property (weak, nonatomic) IBOutlet UILabel *lblECID;
+@property (weak, nonatomic) IBOutlet UILabel *lblUrlVariables;
 @property (weak, nonatomic) IBOutlet UIButton *btnUpdateIdentities;
 @property (weak, nonatomic) IBOutlet UITextView *txtAllIdentities;
 @property (weak, nonatomic) IBOutlet UITextField *advertisingIdValue;
