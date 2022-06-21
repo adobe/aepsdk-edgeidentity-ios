@@ -10,7 +10,7 @@ jobs:
     - uses: release-drafter/release-drafter@v5
       with:
         name: v${{ github.event.inputs.tag }}
-        tag: pr-label-release-to-delete
+        tag: temp-tag-created-by-pr-auto-labeler
         version: ${{ github.event.inputs.tag }}
         publish: false
         config-name: label-pr-config.yml
@@ -18,6 +18,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # GitHub CLI available on all GitHub runners; delete draft release with auto-confirmation flag
-    - run: gh release delete pr-label-release-to-delete -y
+    - run: gh release delete temp-tag-created-by-pr-auto-labeler -y
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
