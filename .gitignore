@@ -97,3 +97,6 @@ Pods/
 # Bundler
 .bundle/
 vendor/
+
+# VSCode
+.VSCode

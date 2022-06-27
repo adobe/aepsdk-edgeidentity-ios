@@ -4,29 +4,29 @@ autolabeler:
       - '*.md'
     # Checks there is no word character (alphanumeric & underscore) before target words, or after to avoid accidental matches
     title:
-      - '/(?<![\w])((doc)|(docs)|(documentation))(?![\w])/i'
+      - '/(?<![\w])(doc(()|(s)|(umentation)))(?![\w])/i'
   - label: 'Type: bugfix'
     branch:
       - '/fix\/.+/'
     title:
-      - '/(?<![\w])((fix)|(fixes)|(fixed)|(bug)|(bugfix))(?![\w])/i'
+      - '/(?<![\w])((fix(()|(es)|(ed)))|(bug(()|(fix))))(?![\w])/i'
   - label: 'Type: feature'
     branch:
       - '/feature\/.+/'
     title:
-      - '/(?<![\w])((feat)|(feature))(?![\w])/i'
+      - '/(?<![\w])(feat(()|(ure)|(ures)))(?![\w])/i'
   - label: 'Type: enhancement'
     branch:
       - '/enhancement\/.+/'
     title:
-      - '/(?<![\w])((enhancement)|(enhancements))(?![\w])/i'
+      - '/(?<![\w])(enhanc((e)|(es)|(ing)|(ement)|(ements)))(?![\w])/i'
   - label: 'Type: buildscripts'
     files:
       - '*.yml'
     branch:
       - '/buildscripts\/.+/'
     title:
-      - '/(?<![\w])((buildscript)|(buildscripts)|(CI)|(CI\/CD))(?![\w])/i'
+      - '/(?<![\w])((build(()|(script)|(scripts)))|(CI(()|(CD)|(\/CD))))(?![\w])/i'
 
 # Config file for release drafter; the labeler creates a draft release but does not publish
 name-template: 'v$RESOLVED_VERSION'
