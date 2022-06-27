@@ -50,14 +50,12 @@ categories:
       - 'Type: documentation'
       - 'Type: maintenance'
 include-labels:
-  - 'Type: bug'
   - 'Type: bugfix'
   - 'Type: buildscripts'
   - 'Type: deprecated'
   - 'Type: documentation'
   - 'Type: enhancement'
   - 'Type: feature'
-  - 'Type: fix'
   - 'Type: maintenance'
 
 change-template: '$TITLE (#$NUMBER) @$AUTHOR'
