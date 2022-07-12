@@ -17,7 +17,7 @@ import PackageDescription
 
 let package = Package(
     name: "AEPEdgeIdentity",
-    platforms: [.iOS(.v10)],
+    platforms: [.iOS(.v10), .tvOS(.v10)],
     products: [
         .library(name: "AEPEdgeIdentity", targets: ["AEPEdgeIdentity"])
     ],

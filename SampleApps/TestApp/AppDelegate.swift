@@ -10,14 +10,18 @@
 // governing permissions and limitations under the License.
 //
 
-import AEPAssurance
 import AEPCore
-import AEPEdge
-import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPServices
 import Compression
 import UIKit
+
+// MARK: TODO remove this once Assurance has tvOS support.
+#if os(iOS)
+import AEPAssurance
+import AEPEdge
+import AEPEdgeConsent
+#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,13 +29,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let ENVIRONMENT_FILE_ID = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        var extensions = [Identity.self]
+        // MARK: TODO remove this once Assurance has tvOS support.
+        #if os(iOS)
+        extensions.append(Assurance.self)
+        extensions.append(Consent.self)
+        extensions.append(Edge.self)
+        #endif
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
         MobileCore.configureWith(appId: ENVIRONMENT_FILE_ID)
-        MobileCore.registerExtensions([Assurance.self,
-                                       Consent.self,
-                                       Edge.self,
-                                       Identity.self])
+        MobileCore.registerExtensions(extensions)
 
         return true
     }
