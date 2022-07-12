@@ -66,7 +66,7 @@ jobs:
           command: xcrun instruments -w "iPhone 8 (13.5) [" || true
 
       - run:
-          name: Run Tests
+          name: Run iOS Tests
           command: make test-ios
 
       # code coverage
@@ -90,7 +90,7 @@ jobs:
           command: xcrun instruments -w "Apple TV (15.0) [" || true
 
       - run:
-          name: Run AEPCore tvOS Tests
+          name: Run tvOS Tests
           command: make test-tvos
 
       - run:

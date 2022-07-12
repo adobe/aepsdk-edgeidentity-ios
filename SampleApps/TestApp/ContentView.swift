@@ -202,9 +202,9 @@ struct AdvertisingIdentifierView: View {
                         Text("Set ad ID")
                     }
                     TextField("Enter ad ID", text: $adIdText)
-                    #if os(iOS)
+                        #if os(iOS)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    #endif
+                        #endif
                         .autocapitalization(.none)
                 }
                 .padding()
