@@ -71,6 +71,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     }
 
     func testGetUrlVariablesWhenOrgIdNotAvailableReturnsNil() {
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
         let expectation = XCTestExpectation(description: "getUrlVariables callback should return with nil urlVariablesString")
         Identity.getUrlVariables { urlVariablesString, error in
             guard urlVariablesString != nil else {
