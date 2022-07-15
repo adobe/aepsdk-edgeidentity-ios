@@ -110,7 +110,7 @@ struct GetIdentitiesView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(5)
 
-            HStack {
+            VStack {
                 Button {
                     self.identityMapText = ""
                     AEPEdgeIdentity.Identity.getIdentities { identityMap, _ in
@@ -255,35 +255,21 @@ struct CustomIdentifierView: View {
         VStack {
             VStack {
                 TextField("Enter Identifier", text: $identityItemText)
-                    #if os(iOS)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    #endif
                     .fixedSize()
                     .autocapitalization(.none)
 
                 HStack {
-                    TextField("namespace", text: $identityNamespaceText)
-                        #if os(iOS)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        #endif
+                    TextField("Enter Namespace", text: $identityNamespaceText)
                         .fixedSize()
                         .autocapitalization(.none)
+                        .padding(.horizontal)
 
-                    #if os(iOS)
-                    HStack {
-                        Image(systemName: isPrimaryChecked ? "checkmark.square" : "square")
-
-                            .onTapGesture {
-                                isPrimaryChecked.toggle()
-                            }
-                        Text("primary")
-                    }
-                    #endif
-                    #if os(tvOS)
                     VStack {
-                        Toggle("primary", isOn: $isPrimaryChecked)
+                        Toggle(isOn: $isPrimaryChecked) {
+                            Text("primary")
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
                     }
-                    #endif
                 }
             }
             HStack {
@@ -334,9 +320,9 @@ struct MultipleIdentityView: View {
 
                 Button {
                     if extensions.isEdgeIdentityRegistered {
-                        MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self as! Extension.Type)
+                        MobileCore.unregisterExtension(AEPEdgeIdentity.Identity.self)
                     } else {
-                        MobileCore.registerExtension(AEPEdgeIdentity.Identity.self as! Extension.Type)
+                        MobileCore.registerExtension(AEPEdgeIdentity.Identity.self)
                     }
 
                     extensions.isEdgeIdentityRegistered.toggle()
@@ -410,7 +396,6 @@ struct MultipleIdentityView: View {
 }
 // MARK: TODO remove this once Assurance has tvOS support.
 #if os(iOS)
-
 struct AssuranceView: View {
     @State private var assuranceSessionUrl: String = ""
 

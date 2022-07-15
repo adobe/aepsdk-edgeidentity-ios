@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let ENVIRONMENT_FILE_ID = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        var extensions = [Identity.self]
+        var extensions: [NSObject.Type] = [Identity.self]
         // MARK: TODO remove this once Assurance has tvOS support.
         #if os(iOS)
         extensions.append(Assurance.self)
