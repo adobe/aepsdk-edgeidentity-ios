@@ -19,17 +19,11 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     var identity: Identity!
     var mockRuntime: TestableExtensionRuntime!
 
-    private let configuration = [
-        "experienceCloud.org": "1234@Adobe"]
-
     override func setUp() {
         continueAfterFailure = false
-        UserDefaults.clear()
-        FileManager.default.clearCache()
         ServiceProvider.shared.reset()
         ServiceProvider.shared.networkService = FunctionalTestNetworkService()
         EventHub.reset()
-        MobileCore.setLogLevel(LogLevel.trace)
         registerEdgeIdentityAndStart()
     }
 
@@ -44,12 +38,49 @@ class IdentityGetUrlVariablesTest: XCTestCase {
 
         // Clear persisted data
         UserDefaults.clear()
+        FileManager.default.clearCache()
+    }
+
+    func waitForProcessing(interval: TimeInterval = 0.5) {
+        let expectation = XCTestExpectation()
+        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + interval - 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: interval)
+    }
+
+    func registerEdgeIdentityAndStart() {
+        let initExpectation = XCTestExpectation(description: "init Edge Identity extensions")
+        MobileCore.setLogLevel(.trace)
+        MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
+            initExpectation.fulfill()
+            MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
+        }
+        wait(for: [initExpectation], timeout: 1)
+    }
+
+    func getParamsFrom(urlVariablesString: String) -> [String: String] {
+        var params = [String: String]()
+        do {
+            let regex = try NSRegularExpression(pattern: "adobe_mc=TS%3D(.*)%7CMCMID%3D(.*)%7CMCORGID%3D(.*)", options: .caseInsensitive)
+            if let match = regex.firstMatch(in: urlVariablesString, range: NSRange(urlVariablesString.startIndex..., in: urlVariablesString)) {
+                params["ts"] = String(urlVariablesString[Range(match.range(at: 1), in: urlVariablesString)!])
+                params["ecid"] = String(urlVariablesString[Range(match.range(at: 2), in: urlVariablesString)!])
+                params["orgId"] = String(urlVariablesString[Range(match.range(at: 3), in: urlVariablesString)!])
+            }
+        } catch let error as NSError {
+            print("#getParamsFrom - Error while extracting params from urlVariablesString: \(error.localizedDescription)")
+        }
+
+        return params
     }
 
     // MARK: test cases
 
     func testGetUrlVariablesWhenECIDAndOrgIdAvailable() {
-        MobileCore.updateConfigurationWith(configDict: configuration)
+        MobileCore.updateConfigurationWith(configDict: ["experienceCloud.org": "1234@Adobe"])
+        waitForProcessing()
+
         let expectation = XCTestExpectation(description: "getUrlVariables callback")
         Identity.getUrlVariables { urlVariablesString, error in
             guard let urlVariablesString = urlVariablesString else {
@@ -80,31 +111,5 @@ class IdentityGetUrlVariablesTest: XCTestCase {
             }
         }
         wait(for: [expectation], timeout: 1)
-    }
-
-    func registerEdgeIdentityAndStart() {
-        let initExpectation = XCTestExpectation(description: "init Edge Identity extensions")
-        MobileCore.setLogLevel(.trace)
-        MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
-            initExpectation.fulfill()
-            MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
-        }
-        wait(for: [initExpectation], timeout: 1)
-    }
-
-    func getParamsFrom(urlVariablesString: String) -> [String: String] {
-        var params = [String: String]()
-        do {
-            let regex = try NSRegularExpression(pattern: "adobe_mc=TS%3D(.*)%7CMCMID%3D(.*)%7CMCORGID%3D(.*)", options: .caseInsensitive)
-            if let match = regex.firstMatch(in: urlVariablesString, range: NSRange(urlVariablesString.startIndex..., in: urlVariablesString)) {
-                params["ts"] = String(urlVariablesString[Range(match.range(at: 1), in: urlVariablesString)!])
-                params["ecid"] = String(urlVariablesString[Range(match.range(at: 2), in: urlVariablesString)!])
-                params["orgId"] = String(urlVariablesString[Range(match.range(at: 3), in: urlVariablesString)!])
-            }
-        } catch let error as NSError {
-            print("#getParamsFrom - Error while extracting params from urlVariablesString: \(error.localizedDescription)")
-        }
-
-        return params
     }
 }
