@@ -19,6 +19,7 @@ build/*
 SampleApps/AEPIdentityEdgeSampleApp/build
 ci/*
 out/*
+TestProject/*
 
 DerivedData/
 *.moved-aside

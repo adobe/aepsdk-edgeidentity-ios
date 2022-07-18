@@ -28,9 +28,9 @@ echo "
 platform :ios, '10.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 3.0'
-  pod 'AEPIdentity', '~> 3.0'
-  pod 'AEPServices', '~> 3.0'
+  pod 'AEPCore', '~> 3.7'
+  pod 'AEPIdentity', '~> 3.7'
+  pod 'AEPServices', '~> 3.7'
   pod 'AEPRulesEngine', '~> 1.0'
   pod 'AEPEdge', '~> 1.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
@@ -71,14 +71,14 @@ echo "
 platform :tvos, '10.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 3.0'
-  pod 'AEPIdentity', '~> 3.0'
-  pod 'AEPServices', '~> 3.0'
+  pod 'AEPCore', '~> 3.7'
+  pod 'AEPIdentity', '~> 3.7'
+  pod 'AEPServices', '~> 3.7'
   pod 'AEPRulesEngine', '~> 1.0'
-  pod 'AEPEdge', '~> 1.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
+# TODO add pod 'AEPEdge', '~> 1.0' after tvOS support for edge
 
 # Install the pods.
 pod install
