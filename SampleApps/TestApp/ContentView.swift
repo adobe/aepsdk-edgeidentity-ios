@@ -10,13 +10,16 @@
 // governing permissions and limitations under the License.
 //
 import AdSupport
-import AEPAssurance
 import AEPCore
-import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPIdentity
 import AppTrackingTransparency
 import SwiftUI
+
+#if os(iOS)
+import AEPAssurance
+import AEPEdgeConsent
+#endif
 
 class RegisteredExtensions: ObservableObject {
     @Published var isEdgeIdentityRegistered: Bool = true
@@ -31,13 +34,14 @@ struct ContentView: View {
         NavigationView {
             ScrollView(showsIndicators: true) {
                 VStack(alignment: .center, spacing: 20) {
+                    #if os(iOS)
                     NavigationLink(
                         destination: AssuranceView(),
                         label: {
                             Text("Assurance")
                         }
                     )
-
+                    #endif
                     NavigationLink(
                         destination: AdvertisingIdentifierView(),
                         label: {
@@ -106,7 +110,7 @@ struct GetIdentitiesView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(5)
 
-            HStack {
+            VStack {
                 Button {
                     self.identityMapText = ""
                     AEPEdgeIdentity.Identity.getIdentities { identityMap, _ in
@@ -150,6 +154,7 @@ struct AdvertisingIdentifierView: View {
     @State var adIdText: String = ""
     @State var trackingAuthorizationResultText: String = ""
 
+    #if os(iOS)
     func getConsents() {
         Consent.getConsents() { consents, error in
             if let consents = consents {
@@ -159,6 +164,7 @@ struct AdvertisingIdentifierView: View {
             }
         }
     }
+    #endif
 
     /// Updates view for ad ID related elements
     func setDeviceAdvertisingIdentifier() {
@@ -196,7 +202,9 @@ struct AdvertisingIdentifierView: View {
                         Text("Set ad ID")
                     }
                     TextField("Enter ad ID", text: $adIdText)
+                        #if os(iOS)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        #endif
                         .autocapitalization(.none)
                 }
                 .padding()
@@ -226,9 +234,11 @@ struct AdvertisingIdentifierView: View {
                     }
                     .padding()
                 }
+                #if os(iOS)
                 Button("Get current consents", action: {
                     getConsents()
                 })
+                #endif
             }
         }
 
@@ -245,22 +255,20 @@ struct CustomIdentifierView: View {
         VStack {
             VStack {
                 TextField("Enter Identifier", text: $identityItemText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
                     .fixedSize()
                     .autocapitalization(.none)
 
                 HStack {
-                    TextField("namespace", text: $identityNamespaceText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    TextField("Enter Namespace", text: $identityNamespaceText)
                         .fixedSize()
                         .autocapitalization(.none)
+                        .padding(.horizontal)
 
-                    HStack {
-                        Image(systemName: isPrimaryChecked ? "checkmark.square" : "square")
-                            .onTapGesture {
-                                isPrimaryChecked.toggle()
-                            }
-                        Text("primary")
+                    VStack {
+                        Toggle(isOn: $isPrimaryChecked) {
+                            Text("primary")
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
                     }
                 }
             }
@@ -386,7 +394,8 @@ struct MultipleIdentityView: View {
         .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
     }
 }
-
+// MARK: TODO remove this once Assurance has tvOS support.
+#if os(iOS)
 struct AssuranceView: View {
     @State private var assuranceSessionUrl: String = ""
 
@@ -418,6 +427,7 @@ struct AssuranceView: View {
         }
     }
 }
+#endif
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
