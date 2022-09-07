@@ -44,8 +44,8 @@ To add the AEPEdgeIdentity Package to your application, from the Xcode 13.x menu
 
 `File > Add Packages...`
 
-> **Note** 
-> the menu options may vary depending on the version of Xcode being used.
+> **Note:** 
+>  the menu options may vary depending on the version of Xcode being used.
 
 Enter the URL for the AEPEdgeIdentity package repository: `https://github.com/adobe/aepsdk-edgeidentity-ios.git`.
 
