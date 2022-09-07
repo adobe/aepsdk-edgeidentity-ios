@@ -9,13 +9,18 @@ coverage:
 
   status:
     project: yes
-    patch: yes
+    patch:
+      default:
+        target: 90%
+        threshold: 5%
     changes: no
 
   ignore:
     - "./Tests/**/*"
     - "./Tests/.*"
     - "./SampleApps"
+    - "./build"
+    - "./Documentation"
 
 parsers:
   gcov:
@@ -29,4 +34,3 @@ comment:
   layout: "header, diff"
   behavior: default
   require_changes: no
-

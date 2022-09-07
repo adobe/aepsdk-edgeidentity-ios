@@ -72,6 +72,164 @@ class IdentityTests: XCTestCase {
         XCTAssertNotNil(responseEvent?.data)
     }
 
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set that we dispatch a response event with the UrlVariables string
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_returnsProperUrlString() {
+        // setup
+        let testECID = ECID()
+        identity.state.identityProperties.ecid = testECID.ecidString
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertNotNil(responseEvent)
+        XCTAssertEqual(EventType.edgeIdentity, responseEvent?.type)
+        XCTAssertEqual(EventSource.responseIdentity, responseEvent?.source)
+        let urlVariablesString = responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String ?? ""
+        XCTAssertFalse(urlVariablesString.isEmpty)
+
+        let expectedUrlVariableTSString = "adobe_mc=TS%3"
+        let expectedUrlVariableIdentifiersString = "%7C" + "MCMID" + "%3D" + testECID.ecidString + "%7C" + "MCORGID" + "%3D" + "test-org-id%40AdobeOrg"
+        XCTAssertTrue(urlVariablesString.contains(expectedUrlVariableTSString))
+        XCTAssertTrue(urlVariablesString.contains(expectedUrlVariableIdentifiersString))
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing org id configuration will dispatch a response event with empty url variables string
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenOrgIdMissing_returnsNil() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: (["test": "value"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
+
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing ecid will dispatch a response event with empty url variables string
+    func testEdgeIdentityRequestIdentifiersGetUrlVariables_whenECIDNotGenerated_returnsNil() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        // simulate ecid not being generated
+        identity.state.identityProperties.ecid = nil
+
+        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
+    }
+
+    /// Tests that when identity receives an edge identity request identity event with urlVariables flag set and missing configuration shared state will dispatch a response event with empty url variables string
+    func testEdgeIdentityRequestIdentifiersGetUrlVariablesWithoutConfigurationSharedState() {
+        // setup
+        let getUrlVariablesEvent = Event(name: "Test Request Identifiers",
+                                         type: EventType.edgeIdentity,
+                                         source: EventSource.requestIdentity,
+                                         data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
+
+        // test
+        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+
+        // verify
+        let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
+        XCTAssertEqual(responseEvent?.data?[IdentityConstants.EventDataKeys.URL_VARIABLES] as? String, "")
+    }
+
+    // MARK: handleRequestContent
+    /// Tests that when identity receives a generic identity request content event with an advertising ID, that the ID is updated
+    func testGenericIdentityRequestWithAdIdWithValidId() {
+        // setup
+        identity.state.identityProperties.advertisingIdentifier = "AdID"
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
+    }
+    /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is updated
+    func testGenericIdentityRequestWithAdIdWithoutValidId() {
+        // setup
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
+    }
+
+    /// Tests that when identity receives a generic identity request content event with a `nil` advertising ID, that the ID is not changed
+    func testGenericIdentityRequestWithNilAdIdWithValidId() {
+        // setup
+        identity.state.identityProperties.advertisingIdentifier = "AdID"
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: String?.none as Any] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNotNil(identity.state.identityProperties.advertisingIdentifier)
+    }
+
+    /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is not changed
+    func testGenericIdentityRequestWithoutAdIdWithValidId() {
+        // setup
+        identity.state.identityProperties.advertisingIdentifier = "AdID"
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: ["someKey": "someValue"] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertEqual("AdID", identity.state.identityProperties.advertisingIdentifier)
+    }
+
+    /// Tests that when identity receives a generic identity request content event **without** an advertising ID, that the ID is not changed
+    func testGenericIdentityRequestWithoutAdIdWithoutValidId() {
+        // setup
+        let event = Event(name: "Test Request Content",
+                          type: EventType.genericIdentity,
+                          source: EventSource.requestContent,
+                          data: ["someKey": "someValue"] as [String: Any])
+        // test
+        mockRuntime.simulateComingEvent(event: event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
+    }
+
     // MARK: handleUpdateIdentity
 
     /// Tests when Identity receives an update identity event with valid data the customer identifiers are updated
@@ -172,6 +330,7 @@ class IdentityTests: XCTestCase {
         let identityMap = IdentityMap()
         identityMap.add(item: IdentityItem(id: "id"), withNamespace: "customer")
         identity.state.identityProperties.updateCustomerIdentifiers(identityMap)
+        identity.state.identityProperties.advertisingIdentifier = "adid"
         identity.state.identityProperties.ecid = originalEcid.ecidString
 
         let event = Event(name: "Test Request Event",
@@ -183,6 +342,7 @@ class IdentityTests: XCTestCase {
 
         // verify
         XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "customer"))
+        XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
         XCTAssertNotNil(identity.state.identityProperties.ecid)
         XCTAssertNotEqual(originalEcid.ecidString, identity.state.identityProperties.ecid)
     }
@@ -194,7 +354,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
@@ -224,7 +384,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
@@ -254,7 +414,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,
@@ -275,7 +435,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         // test
         mockRuntime.simulateComingEvent(event: event)
@@ -292,7 +452,7 @@ class IdentityTests: XCTestCase {
         let event = Event(name: "Test Identity State Change",
                           type: EventType.hub,
                           source: EventSource.sharedState,
-                          data: [IdentityConstants.SharedState.STATE_OWNER: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME])
+                          data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME])
 
         mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
                                         event: event,

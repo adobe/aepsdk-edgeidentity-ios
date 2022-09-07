@@ -84,6 +84,30 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that getIdentities returns an error if the response event data contains no ecid
+    func testGetExperienceCloudIdReturnsEmptyStringIfResponseContainsDataWithoutECIDValues() {
+        // setup
+        let expectation = XCTestExpectation(description: "getExperienceCloudId callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseIdentity,
+                                                          data: ["identityMap": ["ECID": []]])
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getExperienceCloudId { ecid, error in
+            XCTAssertNil(error)
+            XCTAssertEqual("", ecid)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
     /// Tests that getIdentities dispatches an identity request identity event
     func testGetIdentities() {
         // setup
@@ -147,8 +171,96 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that getUrlVariables dispatches an identity request identity event
+    func testGetUrlVariables_dispatchesEvent() {
+        // setup
+        let expectation = XCTestExpectation(description: "getUrlVariables should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            XCTAssertTrue(event.urlVariables)
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.getUrlVariables { _, _ in}
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getUrlVariables returns urlVariables string when response contains urlVariables data
+    func testGetUrlVariables_ifResponseContainsURLVariablesString_returnsProperString() {
+        // setup
+        let expectedURLVariablesString = "adobe_mc=sample_url_string"
+        let expectation = XCTestExpectation(description: "getUrlVariables callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_URL_VARIABLES,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseIdentity,
+                                                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: expectedURLVariablesString])
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getUrlVariables { urlVariablesString, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(expectedURLVariablesString, urlVariablesString)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getUrlVariables returns an error if the response event contains no data
+    func testGetUrlVariables_ifResponseContainsNilData_returnsUnexpectedError() {
+        // setup
+        let expectation = XCTestExpectation(description: "getUrlVariables callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_URL_VARIABLES,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseIdentity,
+                                                          data: nil)
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getUrlVariables { _, error in
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that getUrlVariables returns an unexpected error if the response data is empty
+    func testGetUrlVariablesReturns_whenResponseContainsEmptyData_returnsUnexpectedError() {
+        // setup
+        let expectation = XCTestExpectation(description: "getUrlVariables callback should get called")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity) { event in
+            let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseIdentity,
+                                                          data: [:])
+            MobileCore.dispatch(event: responseEvent)
+        }
+
+        // test
+        Identity.getUrlVariables { _, error in
+            XCTAssertEqual(AEPError.unexpected, error as? AEPError ?? AEPError.none)
+            expectation.fulfill()
+        }
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
     /// Tests that updateIdentifiers dispatches an identity update identity event
-    func testUpdateIdentifiers() {
+    func testUpdateIdentities() {
         // setup
         let expectation = XCTestExpectation(description: "updateIdentities should dispatch an event")
         expectation.assertForOverFulfill = true
@@ -165,6 +277,19 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    /// Tests that updateIdentifiers dispatches an identity update identity event
+    func testUpdateIdentitiesWithEmptyValuesShouldNotDispatchEvent() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity) { _ in
+            XCTFail("updateIdentities should not dispatch an event")
+        }
+
+        // test
+        let map = IdentityMap()
+        map.add(item: IdentityItem(id: ""), withNamespace: "")
+        Identity.updateIdentities(with: map)
+    }
+
     /// Tests that removeIdentity dispatches an identity remove identity event
     func testRemoveIdentity() {
         // setup
@@ -179,5 +304,16 @@ class IdentityAPITests: XCTestCase {
 
         // verify
         wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that removeIdentity dispatches an identity remove identity event
+    func testRemoveIdentityWithEmptyValuesShouldNotDispatchEvent() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity) { _ in
+            XCTFail("removeIdentity should not dispatch an event")
+        }
+
+        // test
+        Identity.removeIdentity(item: IdentityItem(id: ""), withNamespace: "")
     }
 }

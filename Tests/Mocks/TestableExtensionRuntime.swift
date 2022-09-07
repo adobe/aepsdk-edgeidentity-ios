@@ -14,6 +14,10 @@
 import Foundation
 
 class TestableExtensionRuntime: ExtensionRuntime {
+    func getHistoricalEvents(_ requests: [EventHistoryRequest], enforceOrder: Bool, handler: @escaping ([EventHistoryResult]) -> Void) {
+        // no-op
+    }
+
     var listeners: [String: EventListener] = [:]
     var dispatchedEvents: [Event] = []
     var createdSharedStates: [[String: Any]?] = []
@@ -52,7 +56,11 @@ class TestableExtensionRuntime: ExtensionRuntime {
         }
     }
 
-    func getSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+    public func getSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+        getSharedState(extensionName: extensionName, event: event, barrier: barrier, resolution: .any)
+    }
+
+    public func getSharedState(extensionName: String, event: Event?, barrier: Bool, resolution: SharedStateResolution) -> SharedStateResult? {
         return otherSharedStates["\(extensionName)-\(String(describing: event?.id))"] ?? nil
     }
 
@@ -66,7 +74,11 @@ class TestableExtensionRuntime: ExtensionRuntime {
         }
     }
 
-    func getXDMSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+    public func getXDMSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+        getXDMSharedState(extensionName: extensionName, event: event, barrier: barrier, resolution: .any)
+    }
+
+    public func getXDMSharedState(extensionName: String, event: Event?, barrier: Bool, resolution: SharedStateResolution) -> SharedStateResult? {
         return otherXDMSharedStates["\(extensionName)-\(String(describing: event?.id))"] ?? nil
     }
 

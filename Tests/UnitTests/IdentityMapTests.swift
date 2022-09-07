@@ -178,7 +178,7 @@ class IdentityMapTests: XCTestCase {
             [
                 "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false] ],
                 "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]
-        ]
+            ]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
@@ -198,7 +198,7 @@ class IdentityMapTests: XCTestCase {
                     ["id": "id", "authenticatedState": "ambiguous", "primary": false],
                     ["id": "123", "authenticatedState": "ambiguous", "primary": false]
                 ]
-        ]
+            ]
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
 
@@ -522,4 +522,10 @@ class IdentityMapTests: XCTestCase {
         XCTAssertEqual(true, identityMap?.isEmpty)
     }
 
+    func testFromWithInvalidDataDecode() {
+        let bogusStr = String(bytes: [0xD8, 0x00] as [UInt8], encoding: String.Encoding.utf16BigEndian)!
+        let data = ["foo": bogusStr]
+        let identityMap = IdentityMap.from(eventData: data)
+        XCTAssertNil(identityMap)
+    }
 }

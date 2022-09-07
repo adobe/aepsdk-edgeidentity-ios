@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "AEPEdgeIdentity"
-  s.version          = "1.0.0"
+  s.version          = "1.1.0"
   s.summary          = "Experience Platform Edge Identity extension for Adobe Experience Platform Mobile SDK. Written and maintained by Adobe."
 
   s.description      = <<-DESC
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
 
   s.pod_target_xcconfig = { 'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES' }
-  s.dependency 'AEPCore', '>= 3.1.1'
+  s.dependency 'AEPCore', '>= 3.6.0'
 
   s.source_files = 'Sources/**/*.swift'
 end

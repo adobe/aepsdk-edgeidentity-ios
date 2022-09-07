@@ -10,23 +10,28 @@
 // governing permissions and limitations under the License.
 //
 
-import ACPCore
 import AEPAssurance
 import AEPCore
+import AEPEdge
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPServices
 import Compression
 import UIKit
 
+@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    // TODO: Set up the Environment File ID from your Launch property for the preferred environment
-    private let LAUNCH_ENVIRONMENT_FILE_ID = ""
+    // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+    private let ENVIRONMENT_FILE_ID = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         MobileCore.setLogLevel(.trace)
-        MobileCore.configureWith(appId: LAUNCH_ENVIRONMENT_FILE_ID)
-        MobileCore.registerExtensions([Identity.self, AEPAssurance.self])
+        MobileCore.configureWith(appId: ENVIRONMENT_FILE_ID)
+        MobileCore.registerExtensions([Assurance.self,
+                                       Consent.self,
+                                       Edge.self,
+                                       Identity.self])
 
         return true
     }
@@ -36,7 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        let sceneConfig = UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {

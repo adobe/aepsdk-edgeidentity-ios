@@ -14,6 +14,7 @@ jobs:
 
   build-and-test:
     macos:
+
       xcode: 13.4.0 # Specify the Xcode version to use
 
     steps:
@@ -57,17 +58,13 @@ jobs:
             - ~/.cocoapods
 
       - run:
-          name: Install SwiftLint
-          command: make install-swiftlint
-
-      - run:
           name: Lint Source Code
           command: make lint
 
       # pre-start the simulator to prevent timeouts
       - run:
           name: Pre-start Simulator
-          command: xcrun instruments -w "iPhone 8 (13.6) [" || true
+          command: xcrun instruments -w "iPhone 8 (13.5) [" || true
 
       - run:
           name: Run Tests

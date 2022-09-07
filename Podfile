@@ -6,6 +6,8 @@ use_frameworks!
 workspace 'AEPEdgeIdentity'
 project 'AEPEdgeIdentity.xcodeproj'
 
+pod 'SwiftLint', '0.44.0'
+
 target 'AEPEdgeIdentity' do
   pod 'AEPCore'
   pod 'AEPServices'
@@ -28,11 +30,14 @@ target 'TestApp' do
   pod 'AEPIdentity'
   pod 'AEPLifecycle'
   pod 'AEPSignal'
-  pod 'ACPCore', :git => 'https://github.com/adobe/aep-sdk-compatibility-ios.git', :branch => 'main'
   pod 'AEPAssurance'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestAppObjC' do
   pod 'AEPCore'
   pod 'AEPServices'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
