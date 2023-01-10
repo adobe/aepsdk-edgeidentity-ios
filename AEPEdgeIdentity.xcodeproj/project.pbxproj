@@ -134,7 +134,6 @@
 		2ECF038127ED68AC00B3C1DC /* Event+Identity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityGetUrlVariablesTests.swift; sourceTree = "<group>"; };
 		2EDF6181287CC36B007DCFCC /* TestApptvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApptvOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2EDF6182287CC36B007DCFCC /* TestApp copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TestApp copy-Info.plist"; path = "/Users/abhadra/Documents/git/forked/aepsdk/aepsdk-edgeidentity-ios/TestApp copy-Info.plist"; sourceTree = "<absolute>"; };
 		2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLUtils.swift; sourceTree = "<group>"; };
 		2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLUtilsTests.swift; sourceTree = "<group>"; };
 		331B4CD4E86538F9767CB3CE /* Pods-FunctionalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunctionalTests.release.xcconfig"; path = "Target Support Files/Pods-FunctionalTests/Pods-FunctionalTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -346,7 +345,6 @@
 				D43BAB1125BBA4F700B08CC0 /* Products */,
 				D00D9C7ED5DCBE11F5BE521D /* Pods */,
 				0B5B2ACABDDBE64CBBCE2D00 /* Frameworks */,
-				2EDF6182287CC36B007DCFCC /* TestApp copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1363,7 +1361,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.edge.identity;
 				PRODUCT_MODULE_NAME = AEPEdgeIdentity;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -1394,7 +1392,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.edge.identity;
 				PRODUCT_MODULE_NAME = AEPEdgeIdentity;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
