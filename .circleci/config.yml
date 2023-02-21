@@ -124,7 +124,7 @@ jobs:
 
       - install_dependencies
 
-      - prestart_ios_simulator
+      - prestart_tvos_simulator
       
       - run:
           name: Run tvOS Tests
