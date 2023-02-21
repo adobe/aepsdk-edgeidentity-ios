@@ -40,7 +40,7 @@ class AdIdUtils {
     ///
     /// - Returns: `true` if authorized, `false` for any other state
     static func isTrackingAuthorized() -> Bool {
-        if #available(iOS 14, *) {
+        if #available(iOS 14, tvOS 14, *) {
             print("Tracking authorization status: \(ATTrackingManager.trackingAuthorizationStatus)")
             return ATTrackingManager.trackingAuthorizationStatus == .authorized
         } else {
@@ -55,7 +55,7 @@ class AdIdUtils {
     /// - Parameters:
     ///     - callbackHandler: Called after authorization flow completes, to allow for request chaining
     static func requestTrackingAuthorization(callbackHandler: @escaping () -> Void = {}) {
-        if #available(iOS 14, *) {
+        if #available(iOS 14, tvOS 14, *) {
             print("Calling requestTrackingAuthorization. Dialog will only be shown once per app install.")
             ATTrackingManager.requestTrackingAuthorization { status in
                 print("Request tracking authorization status is '\(status)'.")
