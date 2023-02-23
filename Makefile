@@ -114,10 +114,10 @@ test-tvos:
 
 
 install-githook:
-	./tools/git-hooks/setup.sh
+	git config core.hooksPath .githooks
 
 lint-autocorrect:
-	(./Pods/SwiftLint/swiftlint autocorrect --format)
+	(./Pods/SwiftLint/swiftlint --fix --format)
 
 lint:
 	(./Pods/SwiftLint/swiftlint lint Sources SampleApps/$(APP_NAME))
