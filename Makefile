@@ -15,6 +15,10 @@ TVOS_SIMULATOR_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/tvos_simulator.xcarchive/dS
 TVOS_ARCHIVE_PATH = ./build/tvos.xcarchive/Products/Library/Frameworks/
 TVOS_ARCHIVE_DSYM_PATH = $(CURR_DIR)/build/tvos.xcarchive/dSYMs/
 
+TEST_APP_IOS_SCHEME = TestApp
+TEST_APP_IOS_OBJC_SCHEME = TestAppObjC
+TEST_APP_TVOS_SCHEME = TestApptvOS
+
 setup:
 	(pod install)
 	(cd SampleApps/$(APP_NAME) && pod install)
@@ -47,8 +51,21 @@ open-app:
 clean:
 	(rm -rf build)
 
-build-app:
-	#make -C SampleApps/$(APP_NAME) build-shallow
+build-app: setup
+	@echo "######################################################################"
+	@echo "### Building $(TEST_APP_IOS_SCHEME)"
+	@echo "######################################################################"
+	xcodebuild clean build -workspace $(PROJECT_NAME).xcworkspace -scheme $(TEST_APP_IOS_SCHEME) -destination 'generic/platform=iOS Simulator'
+	
+	@echo "######################################################################"
+	@echo "### Building $(TEST_APP_IOS_OBJC_SCHEME)"
+	@echo "######################################################################"
+	xcodebuild clean build -workspace $(PROJECT_NAME).xcworkspace -scheme $(TEST_APP_IOS_OBJC_SCHEME) -destination 'generic/platform=iOS Simulator'
+
+	@echo "######################################################################"
+	@echo "### Building $(TEST_APP_TVOS_SCHEME)"
+	@echo "######################################################################"
+	xcodebuild clean build -workspace $(PROJECT_NAME).xcworkspace -scheme $(TEST_APP_TVOS_SCHEME) -destination 'generic/platform=tvOS Simulator'
 
 archive: pod-update
 	xcodebuild archive -workspace $(PROJECT_NAME).xcworkspace -scheme $(SCHEME_NAME_XCFRAMEWORK) -archivePath "./build/ios.xcarchive" -sdk iphoneos -destination="iOS" SKIP_INSTALL=NO BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
@@ -76,7 +93,7 @@ test-ios:
 	   final_scheme="$(EXTENSION_NAME)" ; \
 	   echo $$final_scheme ; \
 	fi; \
-	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 8' -derivedDataPath build/out -enableCodeCoverage YES
+	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 8' -derivedDataPath build/out -resultBundlePath iosresults.xcresult -enableCodeCoverage YES
 
 test-tvos:
 	@echo "######################################################################"
@@ -93,7 +110,7 @@ test-tvos:
 	   final_scheme="$(EXTENSION_NAME)" ; \
 	   echo $$final_scheme ; \
 	fi; \
-	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=tvOS Simulator,name=Apple TV' -derivedDataPath build/out -enableCodeCoverage YES
+	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=tvOS Simulator,name=Apple TV' -derivedDataPath build/out -resultBundlePath tvosresults.xcresult -enableCodeCoverage YES
 
 
 install-githook:
@@ -113,3 +130,4 @@ test-SPM-integration:
 
 test-podspec:
 	(sh ./Script/test-podspec.sh)
+ 
