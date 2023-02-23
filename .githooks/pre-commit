@@ -3,7 +3,7 @@ SWIFTLINT=./Pods/SwiftLint/swiftlint
 CONFIG=.swiftlint.yml
 
 if ! command -v "${SWIFTLINT}" &> /dev/null; then
-	echo "${SWIFTLINT} is not installed. Please run 'make install-swiftlint'."
+	echo "${SWIFTLINT} is not installed. Please run 'pod install'."
 	exit 0
 fi
 
