@@ -19,17 +19,9 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     var identity: Identity!
     var mockRuntime: TestableExtensionRuntime!
 
-    private let configuration = [
-        "experienceCloud.org": "1234@Adobe"]
-
     override func setUp() {
         continueAfterFailure = false
-        UserDefaults.clear()
-        FileManager.default.clearCache()
-        ServiceProvider.shared.reset()
-        ServiceProvider.shared.networkService = FunctionalTestNetworkService()
-        EventHub.reset()
-        MobileCore.setLogLevel(LogLevel.trace)
+        reset()
         registerEdgeIdentityAndStart()
     }
 
@@ -41,15 +33,23 @@ class IdentityGetUrlVariablesTest: XCTestCase {
         }
 
         wait(for: [unregisterExpectation], timeout: 2)
+    }
+
+    private func reset() {
+        ServiceProvider.shared.reset()
+        ServiceProvider.shared.networkService = FunctionalTestNetworkService()
+        EventHub.reset()
 
         // Clear persisted data
         UserDefaults.clear()
+        FileManager.default.clearCache()
     }
 
     // MARK: test cases
 
     func testGetUrlVariablesWhenECIDAndOrgIdAvailable() {
-        MobileCore.updateConfigurationWith(configDict: configuration)
+        MobileCore.updateConfigurationWith(configDict: ["experienceCloud.org": "1234@Adobe"])
+
         let expectation = XCTestExpectation(description: "getUrlVariables callback")
         Identity.getUrlVariables { urlVariablesString, error in
             guard let urlVariablesString = urlVariablesString else {
@@ -71,6 +71,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     }
 
     func testGetUrlVariablesWhenOrgIdNotAvailableReturnsNil() {
+        MobileCore.updateConfigurationWith(configDict: ["global.privacy": "optedin"])
         let expectation = XCTestExpectation(description: "getUrlVariables callback should return with nil urlVariablesString")
         Identity.getUrlVariables { urlVariablesString, error in
             guard urlVariablesString != nil else {
@@ -82,7 +83,8 @@ class IdentityGetUrlVariablesTest: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func registerEdgeIdentityAndStart() {
+    // MARK: Helpers
+    private func registerEdgeIdentityAndStart() {
         let initExpectation = XCTestExpectation(description: "init Edge Identity extensions")
         MobileCore.setLogLevel(.trace)
         MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
@@ -91,7 +93,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
         wait(for: [initExpectation], timeout: 1)
     }
 
-    func getParamsFrom(urlVariablesString: String) -> [String: String] {
+    private func getParamsFrom(urlVariablesString: String) -> [String: String] {
         var params = [String: String]()
         do {
             let regex = try NSRegularExpression(pattern: "adobe_mc=TS%3D(.*)%7CMCMID%3D(.*)%7CMCORGID%3D(.*)", options: .caseInsensitive)
