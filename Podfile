@@ -31,13 +31,32 @@ target 'TestApp' do
   pod 'AEPLifecycle'
   pod 'AEPSignal'
   pod 'AEPAssurance'
-  pod 'AEPEdge'
-  pod 'AEPEdgeConsent'
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
+  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
+end
+
+target 'TestApptvOS' do
+  pod 'AEPCore'
+  pod 'AEPServices'
+  pod 'AEPIdentity'
+  pod 'AEPLifecycle'  
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
+  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
 end
 
 target 'TestAppObjC' do
   pod 'AEPCore'
   pod 'AEPServices'
-  pod 'AEPEdge'
-  pod 'AEPEdgeConsent'
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
+  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
+end
+
+post_install do |pi|
+  pi.pods_project.targets.each do |t|
+    t.build_configurations.each do |bc|
+        bc.build_settings['TVOS_DEPLOYMENT_TARGET'] = '10.0'
+        bc.build_settings['SUPPORTED_PLATFORMS'] = 'iphoneos iphonesimulator appletvos appletvsimulator'
+        bc.build_settings['TARGETED_DEVICE_FAMILY'] = "1,2,3"
+    end
+  end
 end

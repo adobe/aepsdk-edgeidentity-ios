@@ -30,7 +30,7 @@ identifier_name:
     allowed_symbols: "_"
     excluded:
         - id
-        - no
+        - NO
         - ok
 line_length:
     warning: 180
