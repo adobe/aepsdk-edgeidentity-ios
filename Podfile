@@ -31,8 +31,8 @@ target 'TestApp' do
   pod 'AEPLifecycle'
   pod 'AEPSignal'
   pod 'AEPAssurance'
-  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
-  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestApptvOS' do
@@ -40,15 +40,15 @@ target 'TestApptvOS' do
   pod 'AEPServices'
   pod 'AEPIdentity'
   pod 'AEPLifecycle'  
-  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
-  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestAppObjC' do
   pod 'AEPCore'
   pod 'AEPServices'
-  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edge-ios.git', :branch => 'staging'
-  pod 'AEPEdgeConsent', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'staging'
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 post_install do |pi|
