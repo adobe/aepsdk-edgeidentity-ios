@@ -11,6 +11,7 @@
 //
 import AdSupport
 import AEPCore
+import AEPEdgeConsent
 import AEPEdgeIdentity
 import AEPIdentity
 import AppTrackingTransparency
@@ -18,7 +19,6 @@ import SwiftUI
 
 #if os(iOS)
 import AEPAssurance
-import AEPEdgeConsent
 #endif
 
 class RegisteredExtensions: ObservableObject {
@@ -154,7 +154,6 @@ struct AdvertisingIdentifierView: View {
     @State var adIdText: String = ""
     @State var trackingAuthorizationResultText: String = ""
 
-    #if os(iOS)
     func getConsents() {
         Consent.getConsents() { consents, error in
             if let consents = consents {
@@ -164,7 +163,6 @@ struct AdvertisingIdentifierView: View {
             }
         }
     }
-    #endif
 
     /// Updates view for ad ID related elements
     func setDeviceAdvertisingIdentifier() {
@@ -234,11 +232,9 @@ struct AdvertisingIdentifierView: View {
                     }
                     .padding()
                 }
-                #if os(iOS)
                 Button("Get current consents", action: {
                     getConsents()
                 })
-                #endif
             }
         }
 
