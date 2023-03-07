@@ -39,7 +39,9 @@ target 'TestApptvOS' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
-  pod 'AEPLifecycle'
+  pod 'AEPLifecycle'  
+  pod 'AEPEdge'
+  pod 'AEPEdgeConsent'
 end
 
 target 'TestAppObjC' do

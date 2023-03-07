@@ -38,7 +38,7 @@ extension FileManager {
             "Library/Caches/com.adobe.mobile.diskcache": true
         ]
 
-        if let _ = self.urls(for: .cachesDirectory, in: .userDomainMask).first {
+        if self.urls(for: .cachesDirectory, in: .userDomainMask).first != nil {
 
             for (url, isDirectory) in cacheUrls {
                 do {
