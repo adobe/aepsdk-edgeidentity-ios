@@ -40,9 +40,6 @@ pod-install:
 open:
 	open $(PROJECT_NAME).xcworkspace
 
-open-app:
-	open ./SampleApps/$(APP_NAME)/*.xcworkspace
-
 pod-repo-update:
 	pod repo update
 	cd SampleApps/$(APP_NAME) && pod repo update
@@ -147,7 +144,7 @@ lint-autocorrect:
 lint:
 	./Pods/SwiftLint/swiftlint lint Sources SampleApps/$(APP_NAME)
 
-# make check-version VERSION=2.0.0
+# make check-version VERSION=4.0.0
 check-version:
 	sh ./Script/version.sh $(VERSION)
 

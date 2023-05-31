@@ -55,7 +55,7 @@ Alternatively, if your project has a `Package.swift` file, you can add AEPEdgeId
 
 ```
 dependencies: [
-	.package(url: "https://github.com/adobe/aepsdk-edgeidentity-ios.git", .upToNextMajor(from: "2.0.0"))
+	.package(url: "https://github.com/adobe/aepsdk-edgeidentity-ios.git", .upToNextMajor(from: "4.0.0"))
 ],
 targets: [
    	.target(name: "YourTarget",
