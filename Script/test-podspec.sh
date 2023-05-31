@@ -75,10 +75,10 @@ target '$PROJECT_NAME' do
   pod 'AEPIdentity', '~> 4'
   pod 'AEPServices', '~> 4'
   pod 'AEPRulesEngine', '~> 2'
+  pod 'AEPEdge', '~> 2'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
-# TODO add pod 'AEPEdge', '~> 1.0' after tvOS support for edge
 
 # Install the pods.
 pod install

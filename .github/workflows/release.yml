@@ -64,8 +64,6 @@ jobs:
     - name: Create GH Release
       id: create_release
       uses: release-drafter/release-drafter@v5
-
-    - uses: release-drafter/release-drafter@v5
       if: ${{ github.event.inputs.action_tag == 'yes' }}
       with:
         name: v${{ github.event.inputs.tag }}
