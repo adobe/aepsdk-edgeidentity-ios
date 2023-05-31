@@ -56,10 +56,10 @@ jobs:
         make test-podspec
 
     - name: Build Artifacts
-       if: ${{ github.event.inputs.action_tag == 'yes' }}
-       run: |
-         make archive
-         make zip
+      if: ${{ github.event.inputs.action_tag == 'yes' }}
+      run: |
+        make archive
+        make zip
 
      - name: Create GH Release
        id: create_release
