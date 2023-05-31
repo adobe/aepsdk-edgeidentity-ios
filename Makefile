@@ -97,6 +97,8 @@ _archive: clean build-ios build-tvos
 	-framework $(IOS_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(IOS_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM \
 	-framework $(TVOS_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(TVOS_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM -output ./build/$(PROJECT_NAME).xc
 
+test: test-ios test-tvos
+
 test-ios:
 	@echo "######################################################################"
 	@echo "### Testing iOS"
