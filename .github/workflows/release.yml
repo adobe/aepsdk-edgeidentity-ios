@@ -61,9 +61,9 @@ jobs:
         make archive
         make zip
 
-     - name: Create GH Release
-       id: create_release
-       uses: release-drafter/release-drafter@v5
+    - name: Create GH Release
+      id: create_release
+      uses: release-drafter/release-drafter@v5
 
     - uses: release-drafter/release-drafter@v5
       if: ${{ github.event.inputs.action_tag == 'yes' }}
@@ -81,7 +81,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./build/AEPEdgeIdentity.xcframework.zip
-        asset_name: AEPEdgeIdentity.xcframework.zip
+        asset_name: AEPEdgeIdentity-${{ github.event.inputs.tag }}.xcframework.zip
         asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

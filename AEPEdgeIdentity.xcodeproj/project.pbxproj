@@ -740,6 +740,7 @@
 		};
 		2EDF617C287CC36B007DCFCC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -945,6 +946,7 @@
 		};
 		D43BAC2325BF4A7F00B08CC0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1364,7 +1366,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.edge.identity;
 				PRODUCT_MODULE_NAME = AEPEdgeIdentity;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -1395,7 +1397,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.aep.edge.identity;
 				PRODUCT_MODULE_NAME = AEPEdgeIdentity;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
