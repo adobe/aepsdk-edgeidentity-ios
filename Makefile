@@ -26,8 +26,13 @@ setup:
 setup-tools: install-githook
 
 clean:
-	rm -rf ./build
+	rm -rf build
 
+clean-ios-test-files:
+	rm -rf iosresults.xcresult
+
+clean-tvos-test-files:
+	rm -rf tvosresults.xcresult
 pod-install:
 	pod install --repo-update
 	cd SampleApps/$(APP_NAME) && pod install --repo-update
@@ -95,11 +100,11 @@ _archive: clean build-ios build-tvos
 	xcodebuild -create-xcframework -framework $(IOS_SIMULATOR_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(IOS_SIMULATOR_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM \
 	-framework $(TVOS_SIMULATOR_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(TVOS_SIMULATOR_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM \
 	-framework $(IOS_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(IOS_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM \
-	-framework $(TVOS_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(TVOS_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM -output ./build/$(PROJECT_NAME).xc
+	-framework $(TVOS_ARCHIVE_PATH)$(PROJECT_NAME).framework -debug-symbols $(TVOS_ARCHIVE_DSYM_PATH)$(PROJECT_NAME).framework.dSYM -output ./build/$(PROJECT_NAME).xcframework
 
 test: test-ios test-tvos
 
-test-ios:
+test-ios: clean-ios-test-files
 	@echo "######################################################################"
 	@echo "### Testing iOS"
 	@echo "######################################################################"
@@ -116,7 +121,7 @@ test-ios:
 	fi; \
 	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 14' -derivedDataPath build/out -resultBundlePath iosresults.xcresult -enableCodeCoverage YES
 
-test-tvos:
+test-tvos: clean-tvos-test-files
 	@echo "######################################################################"
 	@echo "### Testing tvOS"
 	@echo "######################################################################"
@@ -140,14 +145,15 @@ lint-autocorrect:
 	./Pods/SwiftLint/swiftlint autocorrect
 
 lint:
-	(./Pods/SwiftLint/swiftlint lint Sources SampleApps/$(APP_NAME))
+	./Pods/SwiftLint/swiftlint lint Sources SampleApps/$(APP_NAME)
 
+# make check-version VERSION=2.0.0
 check-version:
-	(sh ./Script/version.sh $(VERSION))
+	sh ./Script/version.sh $(VERSION)
 
 test-SPM-integration:
-	(sh ./Script/test-SPM.sh)
+	sh ./Script/test-SPM.sh
 
 test-podspec:
-	(sh ./Script/test-podspec.sh)
+	sh ./Script/test-podspec.sh
  
