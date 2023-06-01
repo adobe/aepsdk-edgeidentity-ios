@@ -28,11 +28,11 @@ echo "
 platform :ios, '11.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 4'
-  pod 'AEPIdentity', '~> 4'
-  pod 'AEPServices', '~> 4'
-  pod 'AEPRulesEngine', '~> 2'
-  pod 'AEPEdge', '~> 2'
+  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPRulesEngine', :git => 'git@github.com:adobe/aepsdk-rulesengine-ios.git', :branch => 'dev-v2.0.0'
+  pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
@@ -71,11 +71,11 @@ echo "
 platform :tvos, '11.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 4'
-  pod 'AEPIdentity', '~> 4'
-  pod 'AEPServices', '~> 4'
-  pod 'AEPRulesEngine', '~> 2'
-  pod 'AEPEdge', '~> 2'
+  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'dev-v4.0.0'
+  pod 'AEPRulesEngine',  :git => 'git@github.com:adobe/aepsdk-rulesengine-ios.git', :branch => 'dev-v2.0.0'
+  pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
