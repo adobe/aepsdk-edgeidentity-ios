@@ -6,7 +6,7 @@ use_frameworks!
 workspace 'AEPEdgeIdentity'
 project 'AEPEdgeIdentity.xcodeproj'
 
-pod 'SwiftLint', '0.44.0'
+pod 'SwiftLint', '0.52.0'
 
 target 'AEPEdgeIdentity' do
   pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
@@ -32,8 +32,9 @@ target 'TestApp' do
   pod 'AEPSignal', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
   pod 'AEPAssurance'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
-  pod 'AEPEdgeIdentity', :git => 'git@github.com:adobe/aepsdk-edgeidentity-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
+  pod 'AEPEdgeIdentity', :path => './AEPEdgeIdentity.podspec'
+
 end
 
 target 'TestApptvOS' do
