@@ -28,8 +28,6 @@ target 'TestApp' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
-  pod 'AEPLifecycle'
-  pod 'AEPSignal'
   pod 'AEPAssurance'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
@@ -41,7 +39,6 @@ target 'TestApptvOS' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
-  pod 'AEPLifecycle'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
 end
