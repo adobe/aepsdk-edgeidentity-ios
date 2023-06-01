@@ -60,7 +60,7 @@ class IdentityPropertiesTests: XCTestCase {
             [ "identityMap": [
                 "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] ],
                 "IDFA": [ ["id": "test-ad-id", "authenticatedState": "ambiguous", "primary": 0] ],
-                "custom": [ ["id": "identifier", "authenticatedState": "ambiguous", "primary": 0] as [String: Any] ]
+                "custom": [ ["id": "identifier", "authenticatedState": "ambiguous", "primary": 0]]
             ]
             ]
 
@@ -84,7 +84,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0] as [String: Any] ]
+                "ECID": [ ["id": "\(ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
             ]
             ]
 
@@ -107,7 +107,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0] as [String: Any],
+                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
                           ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
             ]]
 
@@ -130,7 +130,7 @@ class IdentityPropertiesTests: XCTestCase {
         // verify
         let expectedResult: [String: Any] =
             [ "identityMap": [
-                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0] as [String: Any],
+                "ECID": [ ["id": "\(primaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0],
                           ["id": "\(secondaryEcid.ecidString)", "authenticatedState": "ambiguous", "primary": 0]]
             ]]
 

@@ -93,7 +93,7 @@ class IdentityAPITests: XCTestCase {
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
-                                                          data: ["identityMap": ["ECID": [Any]()]])
+                                                          data: ["identityMap": ["ECID": []]])
             MobileCore.dispatch(event: responseEvent)
         }
 
@@ -157,7 +157,7 @@ class IdentityAPITests: XCTestCase {
             let responseEvent = event.createResponseEvent(name: IdentityConstants.EventNames.IDENTITY_RESPONSE_CONTENT_ONE_TIME,
                                                           type: EventType.edgeIdentity,
                                                           source: EventSource.responseIdentity,
-                                                          data: [IdentityConstants.XDMKeys.IDENTITY_MAP: [String: Any]()])
+                                                          data: [IdentityConstants.XDMKeys.IDENTITY_MAP: [:]])
             MobileCore.dispatch(event: responseEvent)
         }
 
