@@ -32,7 +32,7 @@ target '$PROJECT_NAME' do
   pod 'AEPIdentity', '~> 4.0'
   pod 'AEPServices', '~> 4.0'
   pod 'AEPRulesEngine', '~> 4.0'
-  pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
@@ -75,7 +75,7 @@ target '$PROJECT_NAME' do
   pod 'AEPIdentity', '~> 4.0'
   pod 'AEPServices', '~> 4.0'
   pod 'AEPRulesEngine', '~> 4.0'
-  pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
+  pod 'AEPEdge', :git => 'https://github.com/adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
