@@ -155,7 +155,7 @@ class IdentityStateTests: XCTestCase {
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
                                                 IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]()
+                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
                                                 ]])
                 }
 
@@ -238,7 +238,7 @@ class IdentityStateTests: XCTestCase {
                 if name == IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME {
                     return SharedStateResult(status: .set, value: [
                                                 IdentityConstants.SharedState.Hub.EXTENSIONS: [
-                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]()
+                                                    IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME: [:]
                                                 ]])
                 }
                 // shared state is set but no ECID
