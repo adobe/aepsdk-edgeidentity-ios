@@ -90,7 +90,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]],
                     "IDFA": [["id": newAdID, "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
@@ -120,7 +120,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]],
                     "IDFA": [["id": initialAdID, "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
@@ -146,7 +146,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]],
                     "IDFA": [["id": initialAdID, "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
@@ -172,7 +172,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]]
                 ]
             ]
 
@@ -209,7 +209,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]]
                 ]
             ]
 
@@ -247,7 +247,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]],
                     "IDFA": [["id": newAdID, "authenticatedState": "ambiguous", "primary": 0]]
                 ]
             ]
@@ -284,7 +284,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]]
                 ]
             ]
 
@@ -308,7 +308,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]]
                 ]
             ]
 
@@ -332,7 +332,7 @@ class IdentityAdIDTests: XCTestCase {
         let expectedIdentity: [String: Any] =
             [
                 "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
+                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0] as [String: Any]]
                 ]
             ]
 

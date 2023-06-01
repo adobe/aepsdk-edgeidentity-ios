@@ -90,13 +90,13 @@ struct GetIdentitiesView: View {
                 Text("Get ECID")
             }
 
-            Button(action: {
+            Button {
                 self.urlVariablesText = ""
 
                 AEPEdgeIdentity.Identity.getUrlVariables { urlVariablesString, _ in
                     self.urlVariablesText = urlVariablesString ?? "URLVariables not generated"
                 }
-            }) {
+            } label: {
                 Text("Get URLVariables")
             }
 
