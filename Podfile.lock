@@ -17,7 +17,7 @@ PODS:
     - AEPCore (>= 4.0.0)
   - AEPLifecycle (4.0.0):
     - AEPCore (>= 4.0.0)
-  - AEPRulesEngine (2.0.0)
+  - AEPRulesEngine (4.0.0)
   - AEPServices (4.0.0)
   - AEPSignal (4.0.0):
     - AEPCore (>= 4.0.0)
@@ -25,25 +25,25 @@ PODS:
 
 DEPENDENCIES:
   - AEPAssurance
-  - "AEPCore (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `dev-v4.0.0`)"
+  - "AEPCore (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - "AEPEdge (from `git@github.com:adobe/aepsdk-edge-ios.git`, branch `dev`)"
   - "AEPEdgeConsent (from `git@github.com:adobe/aepsdk-edgeconsent-ios.git`, branch `dev`)"
   - "AEPEdgeIdentity (from `git@github.com:adobe/aepsdk-edgeidentity-ios.git`, branch `dev`)"
-  - "AEPIdentity (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `dev-v4.0.0`)"
-  - "AEPLifecycle (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `dev-v4.0.0`)"
-  - "AEPRulesEngine (from `git@github.com:adobe/aepsdk-rulesengine-ios.git`, branch `dev-v2.0.0`)"
-  - "AEPServices (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `dev-v4.0.0`)"
-  - "AEPSignal (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `dev-v4.0.0`)"
+  - "AEPIdentity (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
+  - "AEPLifecycle (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
+  - "AEPServices (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
+  - "AEPSignal (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - SwiftLint (= 0.44.0)
 
 SPEC REPOS:
   trunk:
     - AEPAssurance
+    - AEPRulesEngine
     - SwiftLint
 
 EXTERNAL SOURCES:
   AEPCore:
-    :branch: dev-v4.0.0
+    :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPEdge:
     :branch: dev
@@ -55,24 +55,21 @@ EXTERNAL SOURCES:
     :branch: dev
     :git: "git@github.com:adobe/aepsdk-edgeidentity-ios.git"
   AEPIdentity:
-    :branch: dev-v4.0.0
+    :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPLifecycle:
-    :branch: dev-v4.0.0
+    :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
-  AEPRulesEngine:
-    :branch: dev-v2.0.0
-    :git: "git@github.com:adobe/aepsdk-rulesengine-ios.git"
   AEPServices:
-    :branch: dev-v4.0.0
+    :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPSignal:
-    :branch: dev-v4.0.0
+    :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
 
 CHECKOUT OPTIONS:
   AEPCore:
-    :commit: 692af1ce983722d75919497ad35dcede96808cb4
+    :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPEdge:
     :commit: 3a9d27323219d7c386104c4c556be9f578721371
@@ -84,19 +81,16 @@ CHECKOUT OPTIONS:
     :commit: f57c2be2369aaa19725ac589b0a0af6d76cebbe9
     :git: "git@github.com:adobe/aepsdk-edgeidentity-ios.git"
   AEPIdentity:
-    :commit: 692af1ce983722d75919497ad35dcede96808cb4
+    :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPLifecycle:
-    :commit: 692af1ce983722d75919497ad35dcede96808cb4
+    :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
-  AEPRulesEngine:
-    :commit: 77a6e255804bc6de49cb818e3ce3684eb9a51d23
-    :git: "git@github.com:adobe/aepsdk-rulesengine-ios.git"
   AEPServices:
-    :commit: 692af1ce983722d75919497ad35dcede96808cb4
+    :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
   AEPSignal:
-    :commit: 692af1ce983722d75919497ad35dcede96808cb4
+    :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
 
 SPEC CHECKSUMS:
@@ -107,11 +101,11 @@ SPEC CHECKSUMS:
   AEPEdgeIdentity: c2396b9119abd6eb530ea11efc58ec019b163bd4
   AEPIdentity: 45ee1c3717e08ff3ca60930caf4a869d60d7bf08
   AEPLifecycle: 59be1b5381d8ec4939ece43516ea7d2de4aaba65
-  AEPRulesEngine: 7682950b2e57a02488484e6d40f8cc7f73958d57
+  AEPRulesEngine: 458450a34922823286ead045a0c2bd8c27e224c6
   AEPServices: ca493988df250d84fda050124ff7549bcc43c65f
   AEPSignal: b2b332adf4d8a9af6a1b57f5dd8c2e1ea6d5c112
   SwiftLint: e96c0a8c770c7ebbc4d36c55baf9096bb65c4584
 
-PODFILE CHECKSUM: a652b72316ece1fc0b0ba6e4da641ddcdd661719
+PODFILE CHECKSUM: 2b113405d58266b293bdd5e5d80b0e76c17873ae
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.11.2
