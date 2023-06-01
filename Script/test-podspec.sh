@@ -28,10 +28,10 @@ echo "
 platform :ios, '11.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPRulesEngine', :git => 'git@github.com:adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
+  pod 'AEPCore', '~> 4.0'
+  pod 'AEPIdentity', '~> 4.0'
+  pod 'AEPServices', '~> 4.0'
+  pod 'AEPRulesEngine', '~> 4.0'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
@@ -71,10 +71,10 @@ echo "
 platform :tvos, '11.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPRulesEngine',  :git => 'git@github.com:adobe/aepsdk-rulesengine-ios.git', :branch => 'main'
+  pod 'AEPCore', '~> 4.0'
+  pod 'AEPIdentity', '~> 4.0'
+  pod 'AEPServices', '~> 4.0'
+  pod 'AEPRulesEngine', '~> 4.0'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
