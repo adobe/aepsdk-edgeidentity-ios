@@ -9,27 +9,27 @@ project 'AEPEdgeIdentity.xcodeproj'
 pod 'SwiftLint', '0.52.0'
 
 target 'AEPEdgeIdentity' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
 end
 
 target 'UnitTests' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
 end
 
 target 'FunctionalTests' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
+  pod 'AEPIdentity'
 end
 
 target 'TestApp' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPLifecycle', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPSignal', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
+  pod 'AEPIdentity'
+  pod 'AEPLifecycle'
+  pod 'AEPSignal'
   pod 'AEPAssurance'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
@@ -38,17 +38,17 @@ target 'TestApp' do
 end
 
 target 'TestApptvOS' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPIdentity', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPLifecycle', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
+  pod 'AEPIdentity'
+  pod 'AEPLifecycle'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
 end
 
 target 'TestAppObjC' do
-  pod 'AEPCore', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPServices', :git => 'git@github.com:adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPCore'
+  pod 'AEPServices'
   pod 'AEPEdge', :git => 'git@github.com:adobe/aepsdk-edge-ios.git', :branch => 'dev'
   pod 'AEPEdgeConsent', :git => 'git@github.com:adobe/aepsdk-edgeconsent-ios.git', :branch => 'dev'
 end
