@@ -21,19 +21,19 @@ PODS:
   - AEPServices (4.0.0)
   - AEPSignal (4.0.0):
     - AEPCore (>= 4.0.0)
-  - SwiftLint (0.44.0)
+  - SwiftLint (0.52.0)
 
 DEPENDENCIES:
   - AEPAssurance
   - "AEPCore (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - "AEPEdge (from `git@github.com:adobe/aepsdk-edge-ios.git`, branch `dev`)"
   - "AEPEdgeConsent (from `git@github.com:adobe/aepsdk-edgeconsent-ios.git`, branch `dev`)"
-  - "AEPEdgeIdentity (from `git@github.com:adobe/aepsdk-edgeidentity-ios.git`, branch `dev`)"
+  - AEPEdgeIdentity (from `./AEPEdgeIdentity.podspec`)
   - "AEPIdentity (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - "AEPLifecycle (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - "AEPServices (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
   - "AEPSignal (from `git@github.com:adobe/aepsdk-core-ios.git`, branch `staging`)"
-  - SwiftLint (= 0.44.0)
+  - SwiftLint (= 0.52.0)
 
 SPEC REPOS:
   trunk:
@@ -52,8 +52,7 @@ EXTERNAL SOURCES:
     :branch: dev
     :git: "git@github.com:adobe/aepsdk-edgeconsent-ios.git"
   AEPEdgeIdentity:
-    :branch: dev
-    :git: "git@github.com:adobe/aepsdk-edgeidentity-ios.git"
+    :path: "./AEPEdgeIdentity.podspec"
   AEPIdentity:
     :branch: staging
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
@@ -77,9 +76,6 @@ CHECKOUT OPTIONS:
   AEPEdgeConsent:
     :commit: aa1d067950f6857a29bfa6946571f9a820d6d189
     :git: "git@github.com:adobe/aepsdk-edgeconsent-ios.git"
-  AEPEdgeIdentity:
-    :commit: f57c2be2369aaa19725ac589b0a0af6d76cebbe9
-    :git: "git@github.com:adobe/aepsdk-edgeidentity-ios.git"
   AEPIdentity:
     :commit: ee46ab5904b55578c978e3723f2d8b0d20f4961c
     :git: "git@github.com:adobe/aepsdk-core-ios.git"
@@ -104,8 +100,8 @@ SPEC CHECKSUMS:
   AEPRulesEngine: 458450a34922823286ead045a0c2bd8c27e224c6
   AEPServices: ca493988df250d84fda050124ff7549bcc43c65f
   AEPSignal: b2b332adf4d8a9af6a1b57f5dd8c2e1ea6d5c112
-  SwiftLint: e96c0a8c770c7ebbc4d36c55baf9096bb65c4584
+  SwiftLint: 13280e21cdda6786ad908dc6e416afe5acd1fcb7
 
-PODFILE CHECKSUM: 2b113405d58266b293bdd5e5d80b0e76c17873ae
+PODFILE CHECKSUM: 630121bb6d25579e54157e2ee509a5cb7ec98a68
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
