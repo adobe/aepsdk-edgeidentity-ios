@@ -1,7 +1,7 @@
 PODS:
-  - AEPAssurance (3.1.2):
-    - AEPCore (>= 3.9.0)
-    - AEPServices (>= 3.9.0)
+  - AEPAssurance (4.0.0):
+    - AEPCore (>= 4.0.0)
+    - AEPServices (>= 4.0.0)
   - AEPCore (4.0.0):
     - AEPRulesEngine (>= 4.0.0)
     - AEPServices (>= 4.0.0)
@@ -22,8 +22,8 @@ PODS:
 DEPENDENCIES:
   - AEPAssurance
   - AEPCore
-  - "AEPEdge (from `git@github.com:adobe/aepsdk-edge-ios.git`, branch `dev`)"
-  - "AEPEdgeConsent (from `git@github.com:adobe/aepsdk-edgeconsent-ios.git`, branch `dev`)"
+  - AEPEdge
+  - AEPEdgeConsent
   - AEPEdgeIdentity (from `./AEPEdgeIdentity.podspec`)
   - AEPIdentity
   - AEPServices
@@ -33,31 +33,19 @@ SPEC REPOS:
   trunk:
     - AEPAssurance
     - AEPCore
+    - AEPEdge
+    - AEPEdgeConsent
     - AEPIdentity
     - AEPRulesEngine
     - AEPServices
     - SwiftLint
 
 EXTERNAL SOURCES:
-  AEPEdge:
-    :branch: dev
-    :git: "git@github.com:adobe/aepsdk-edge-ios.git"
-  AEPEdgeConsent:
-    :branch: dev
-    :git: "git@github.com:adobe/aepsdk-edgeconsent-ios.git"
   AEPEdgeIdentity:
     :path: "./AEPEdgeIdentity.podspec"
 
-CHECKOUT OPTIONS:
-  AEPEdge:
-    :commit: 8bb2d4f80e38f9f35c97592d1ea61487156d3cb1
-    :git: "git@github.com:adobe/aepsdk-edge-ios.git"
-  AEPEdgeConsent:
-    :commit: 6db83b68aa3ea18babda2ed4b45ae7d6b544df0d
-    :git: "git@github.com:adobe/aepsdk-edgeconsent-ios.git"
-
 SPEC CHECKSUMS:
-  AEPAssurance: 694bc2bca10e15bd33542bb6ae4549abee46d85d
+  AEPAssurance: 4fa3138ddd7308c1f9923570f4d2b0b8526a916f
   AEPCore: dd7cd69696c768c610e6adc0307032985a381c7e
   AEPEdge: ffea1ada1e81c9cb239aac694efa5c8635b50c1f
   AEPEdgeConsent: 54c1b6a30a3d646e3d4bc4bae1713755422b471e
@@ -67,6 +55,6 @@ SPEC CHECKSUMS:
   AEPServices: ca493988df250d84fda050124ff7549bcc43c65f
   SwiftLint: 13280e21cdda6786ad908dc6e416afe5acd1fcb7
 
-PODFILE CHECKSUM: 888cebdedd5cf6edbac4e8df45a6ad596b5aad2f
+PODFILE CHECKSUM: 7294af1f758cc450b75d8527d34cc1513b9b962d
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
