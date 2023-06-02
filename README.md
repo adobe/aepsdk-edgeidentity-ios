@@ -7,7 +7,7 @@
 
 ## About this project
 
-The AEP Edge Identity Extension is an extension that enables handling of user identity data from a mobile application when using the [Adobe Experience Platform SDK](https://developer.adobe.com/client-sdks) and the Edge Network extension.
+The AEP Edge Identity mobile extension enables handling of user identity data from a mobile application when using the [Adobe Experience Platform SDK](https://developer.adobe.com/client-sdks) and the Edge Network extension.
 
 ## Requirements
 - Xcode 14.1 (or newer)
