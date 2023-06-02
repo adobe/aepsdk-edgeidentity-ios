@@ -1,10 +1,9 @@
 # Adobe Experience Platform Edge Identity Mobile Extension
 
-[![Cocoapods](https://img.shields.io/cocoapods/v/AEPEdgeIdentity.svg?color=orange&label=AEPEdgeIdentity&logo=apple&logoColor=white)](https://cocoapods.org/pods/AEPEdgeIdentity)
-
-[![SPM](https://img.shields.io/badge/SPM-Supported-orange.svg?logo=apple&logoColor=white)](https://swift.org/package-manager/)
-[![CircleCI](https://img.shields.io/circleci/project/github/adobe/aepsdk-edgeidentity-ios/main.svg?logo=circleci)](https://circleci.com/gh/adobe/workflows/aepsdk-edgeidentity-ios)
-[![Code Coverage](https://img.shields.io/codecov/c/github/adobe/aepsdk-edgeidentity-ios/main.svg?logo=codecov)](https://codecov.io/gh/adobe/aepsdk-edgeidentity-ios/branch/main)
+[![CocoaPods](https://img.shields.io/github/v/release/adobe/aepsdk-edgeidentity-ios?label=CocoaPods&logo=apple&logoColor=white&color=orange)](https://cocoapods.org/pods/AEPEdgeIdentity)
+[![SPM](https://img.shields.io/github/v/release/adobe/aepsdk-edgeidentity-ios?label=SPM&logo=apple&logoColor=white&color=orange)](https://github.com/adobe/aepsdk-edgeidentity-ios/releases)
+[![CircleCI](https://img.shields.io/circleci/project/github/adobe/aepsdk-edgeidentity-ios/main.svg?label=Build&logo=circleci)](https://circleci.com/gh/adobe/workflows/aepsdk-edgeidentity-ios)
+[![Code Coverage](https://img.shields.io/codecov/c/github/adobe/aepsdk-edgeidentity-ios/main.svg?label=Coverage&logo=codecov)](https://codecov.io/gh/adobe/aepsdk-edgeidentity-ios/branch/main)
 
 ## About this project
 
