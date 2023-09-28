@@ -84,7 +84,8 @@ jobs:
   validate-code:
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-
+    resource_class: macos.x86.medium.gen2
+    
     steps:
       - checkout
 
@@ -97,7 +98,8 @@ jobs:
   test-ios:
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-
+    resource_class: macos.x86.medium.gen2
+    
     steps:
       - checkout
 
@@ -119,7 +121,8 @@ jobs:
   test-tvos:
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-
+    resource_class: macos.x86.medium.gen2
+    
     steps:
       - checkout
 
@@ -141,6 +144,7 @@ jobs:
   build_xcframework_and_app:  
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
+    resource_class: macos.x86.medium.gen2
     
     steps:
       - checkout
@@ -148,13 +152,9 @@ jobs:
       - run:
           name: Build XCFramework
           command: |
-            if [ "${CIRCLE_BRANCH}" == "main" ]; then
               make archive
-            fi
       # verify test app builds
       - run:
           name: Build Test App
           command: |
-            if [ "${CIRCLE_BRANCH}" == "main" ]; then
               make build-app
-            fi
