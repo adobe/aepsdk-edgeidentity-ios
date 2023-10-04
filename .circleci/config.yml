@@ -4,7 +4,7 @@
 version: 2.1
 
 orbs:
-  codecov: codecov/codecov@3.2.5
+  codecov: codecov/codecov@3.3.0
   macos: circleci/macos@2
 
 # Workflows orchestrate a set of jobs to be run;
@@ -84,7 +84,7 @@ jobs:
   validate-code:
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     
     steps:
       - checkout
@@ -98,7 +98,7 @@ jobs:
   test-ios:
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     
     steps:
       - checkout
@@ -144,7 +144,7 @@ jobs:
   build_xcframework_and_app:  
     macos:
       xcode: 14.1.0 # Specify the Xcode version to use
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     
     steps:
       - checkout
