@@ -160,7 +160,7 @@ class IdentityMapTests: XCTestCase {
             return
         }
         let expectedResult: [String: Any] =
-            ["space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]]
+        ["space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false]]]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)
     }
@@ -176,8 +176,8 @@ class IdentityMapTests: XCTestCase {
         }
         let expectedResult: [String: Any] =
             [
-                "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false] ],
-                "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false] ]
+                "A": [ ["id": "123", "authenticatedState": "ambiguous", "primary": false]],
+                "space": [ ["id": "id", "authenticatedState": "ambiguous", "primary": false]]
             ]
 
         XCTAssertEqual(expectedResult as NSObject, actualResult as NSObject)

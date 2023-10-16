@@ -1,4 +1,4 @@
-platform :ios, '10.0'
+platform :ios, '11.0'
 
 # Comment the next line if you don't want to use dynamic frameworks
 use_frameworks!
@@ -6,7 +6,7 @@ use_frameworks!
 workspace 'AEPEdgeIdentity'
 project 'AEPEdgeIdentity.xcodeproj'
 
-pod 'SwiftLint', '0.44.0'
+pod 'SwiftLint', '0.52.0'
 
 target 'AEPEdgeIdentity' do
   pod 'AEPCore'
@@ -28,18 +28,17 @@ target 'TestApp' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
-  pod 'AEPLifecycle'
-  pod 'AEPSignal'
   pod 'AEPAssurance'
   pod 'AEPEdge'
   pod 'AEPEdgeConsent'
+  pod 'AEPEdgeIdentity', :path => './AEPEdgeIdentity.podspec'
+
 end
 
 target 'TestApptvOS' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
-  pod 'AEPLifecycle'  
   pod 'AEPEdge'
   pod 'AEPEdgeConsent'
 end
@@ -54,7 +53,7 @@ end
 post_install do |pi|
   pi.pods_project.targets.each do |t|
     t.build_configurations.each do |bc|
-        bc.build_settings['TVOS_DEPLOYMENT_TARGET'] = '10.0'
+        bc.build_settings['TVOS_DEPLOYMENT_TARGET'] = '11.0'
         bc.build_settings['SUPPORTED_PLATFORMS'] = 'iphoneos iphonesimulator appletvos appletvsimulator'
         bc.build_settings['TARGETED_DEVICE_FAMILY'] = "1,2,3"
     end

@@ -90,13 +90,13 @@ struct GetIdentitiesView: View {
                 Text("Get ECID")
             }
 
-            Button(action: {
+            Button {
                 self.urlVariablesText = ""
 
                 AEPEdgeIdentity.Identity.getUrlVariables { urlVariablesString, _ in
                     self.urlVariablesText = urlVariablesString ?? "URLVariables not generated"
                 }
-            }) {
+            } label: {
                 Text("Get URLVariables")
             }
 
@@ -155,7 +155,7 @@ struct AdvertisingIdentifierView: View {
     @State var trackingAuthorizationResultText: String = ""
 
     func getConsents() {
-        Consent.getConsents() { consents, error in
+        Consent.getConsents { consents, error in
             if let consents = consents {
                 print(consents)
             } else if let error = error {
@@ -185,7 +185,7 @@ struct AdvertisingIdentifierView: View {
             VStack {
                 VStack {
                     Button("Request Tracking Authorization", action: {
-                        AdIdUtils.requestTrackingAuthorization() {
+                        AdIdUtils.requestTrackingAuthorization {
                             self.setDeviceAdvertisingIdentifier()
                         }
                     })
