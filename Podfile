@@ -16,12 +16,14 @@ end
 target 'UnitTests' do
   pod 'AEPCore'
   pod 'AEPServices'
+  pod 'AEPTestUtils', :git => 'https://github.com/adobe/aepsdk-testutils-ios.git', :branch => 'json-comparison-custom-protocol'
 end
 
 target 'FunctionalTests' do
   pod 'AEPCore'
   pod 'AEPServices'
   pod 'AEPIdentity'
+  pod 'AEPTestUtils', :git => 'https://github.com/adobe/aepsdk-testutils-ios.git', :branch => 'json-comparison-custom-protocol'
 end
 
 target 'TestApp' do
@@ -32,7 +34,6 @@ target 'TestApp' do
   pod 'AEPEdge'
   pod 'AEPEdgeConsent'
   pod 'AEPEdgeIdentity', :path => './AEPEdgeIdentity.podspec'
-
 end
 
 target 'TestApptvOS' do
