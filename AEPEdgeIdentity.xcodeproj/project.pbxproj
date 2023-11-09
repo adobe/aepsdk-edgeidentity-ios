@@ -374,13 +374,13 @@
 			isa = PBXGroup;
 			children = (
 				BFF6498E25C0AC0F0012A4C5 /* ECIDTests.swift */,
-				BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */,
-				D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */,
 				BFF649B625C0FC810012A4C5 /* IdentityMapTests.swift */,
 				BFF6499A25C0ACC00012A4C5 /* IdentityPropertiesTests.swift */,
+				BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
-				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
+				D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */,
 				2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */,
+				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
 			);
 			name = UnitTests;
 			path = Tests/UnitTests;
@@ -389,11 +389,11 @@
 		D43BAB3725BBA8C700B08CC0 /* FunctionalTests */ = {
 			isa = PBXGroup;
 			children = (
-				4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */,
 				BFF64A5A25C4C5410012A4C5 /* EdgeIdentity+IdentityDirectTests.swift */,
-				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
-				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
+				4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */,
 				2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */,
+				BFF64A6925C4C6A90012A4C5 /* TestHelpers.swift */,
+				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
 			);
 			name = FunctionalTests;
 			path = Tests/FunctionalTests;
