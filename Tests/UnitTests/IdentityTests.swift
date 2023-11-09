@@ -13,6 +13,7 @@
 @testable import AEPCore
 @testable import AEPEdgeIdentity
 import AEPServices
+import AEPTestUtils
 import XCTest
 
 class IdentityTests: XCTestCase {
@@ -42,12 +43,11 @@ class IdentityTests: XCTestCase {
                           type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
                           data: nil)
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
-                                        event: event,
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event),
                                         data: (["testKey": "testVal"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == event.id })
@@ -64,7 +64,7 @@ class IdentityTests: XCTestCase {
                           data: nil)
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == event.id })
@@ -82,10 +82,10 @@ class IdentityTests: XCTestCase {
                                          source: EventSource.requestIdentity,
                                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, getUrlVariablesEvent), data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+        mockRuntime.simulateComingEvents(getUrlVariablesEvent)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
@@ -109,10 +109,10 @@ class IdentityTests: XCTestCase {
                                          source: EventSource.requestIdentity,
                                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: (["test": "value"], .set))
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, getUrlVariablesEvent), data: (["test": "value"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+        mockRuntime.simulateComingEvents(getUrlVariablesEvent)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
@@ -131,10 +131,10 @@ class IdentityTests: XCTestCase {
         // simulate ecid not being generated
         identity.state.identityProperties.ecid = nil
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: getUrlVariablesEvent, data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, getUrlVariablesEvent), data: ([IdentityConstants.ConfigurationKeys.EXPERIENCE_CLOUD_ORGID: "test-org-id@AdobeOrg"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+        mockRuntime.simulateComingEvents(getUrlVariablesEvent)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
@@ -150,7 +150,7 @@ class IdentityTests: XCTestCase {
                                          data: [IdentityConstants.EventDataKeys.URL_VARIABLES: true])
 
         // test
-        mockRuntime.simulateComingEvent(event: getUrlVariablesEvent)
+        mockRuntime.simulateComingEvents(getUrlVariablesEvent)
 
         // verify
         let responseEvent = mockRuntime.dispatchedEvents.first(where: { $0.responseID == getUrlVariablesEvent.id })
@@ -167,7 +167,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
@@ -180,7 +180,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: "newAdId"] as [String: Any])
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("newAdId", identity.state.identityProperties.advertisingIdentifier)
@@ -195,7 +195,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: String?.none as Any] as [String: Any])
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNotNil(identity.state.identityProperties.advertisingIdentifier)
@@ -210,7 +210,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: ["someKey": "someValue"] as [String: Any])
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("AdID", identity.state.identityProperties.advertisingIdentifier)
@@ -224,7 +224,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestContent,
                           data: ["someKey": "someValue"] as [String: Any])
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
@@ -243,7 +243,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.updateIdentity,
                           data: identityMap.asDictionary())
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -263,7 +263,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.updateIdentity,
                           data: nil)
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -291,7 +291,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.removeIdentity,
                           data: identityMap.asDictionary())
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -314,7 +314,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.removeIdentity,
                           data: nil)
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify data is the same
         XCTAssertNotNil(identity.state.identityProperties.identityMap)
@@ -338,7 +338,7 @@ class IdentityTests: XCTestCase {
                           source: EventSource.requestReset,
                           data: nil)
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "customer"))
@@ -356,12 +356,11 @@ class IdentityTests: XCTestCase {
                           source: EventSource.sharedState,
                           data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
-                                        event: event,
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event),
                                         data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("legacyEcidValue", identity.state.identityProperties.ecidSecondary)
@@ -386,12 +385,11 @@ class IdentityTests: XCTestCase {
                           source: EventSource.sharedState,
                           data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
-                                        event: event,
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event),
                                         data: (["somekey": "someValue"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertNil(identity.state.identityProperties.ecidSecondary)
@@ -416,12 +414,11 @@ class IdentityTests: XCTestCase {
                           source: EventSource.sharedState,
                           data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
-                                        event: event,
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event),
                                         data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "currentLegacyEcid"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
@@ -438,7 +435,7 @@ class IdentityTests: XCTestCase {
                           data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME])
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
@@ -454,12 +451,11 @@ class IdentityTests: XCTestCase {
                           source: EventSource.sharedState,
                           data: [IdentityConstants.EventDataKeys.STATE_OWNER: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME])
 
-        mockRuntime.simulateSharedState(extensionName: IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME,
-                                        event: event,
+        mockRuntime.simulateSharedState(for: (IdentityConstants.SharedState.IdentityDirect.SHARED_OWNER_NAME, event),
                                         data: ([IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID: "legacyEcidValue"], .set))
 
         // test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // verify
         XCTAssertEqual("currentLegacyEcid", identity.state.identityProperties.ecidSecondary) // no change
