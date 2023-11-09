@@ -15,7 +15,7 @@ import AEPServices
 import AEPTestUtils
 import XCTest
 
-class IdentityAdIDTests: XCTestCase {
+class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
     var identity: Identity!
 
     var mockRuntime: TestableExtensionRuntime!
@@ -87,20 +87,34 @@ class IdentityAdIDTests: XCTestCase {
 
         // Verify
         XCTAssertEqual(newAdID, identity.state.identityProperties.advertisingIdentifier)
-
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
-                    "IDFA": [["id": newAdID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
+            ],
+            "IDFA": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(newAdID)",
+                "primary": false
+              }
             ]
+          }
+        }
+        """#
 
         // 2 Shared states expected:
         // 1. Bootup (ECID + initial ad ID)
         // 2. Request content event with new valid ad ID (ECID + new ad ID)
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!, 
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
         // No dispatched events because consent event should not happen
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
@@ -118,16 +132,29 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertEqual(initialAdID, identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
-                    "IDFA": [["id": initialAdID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
+            ],
+            "IDFA": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(initialAdID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -144,16 +171,29 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertEqual(initialAdID, identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
-                    "IDFA": [["id": initialAdID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
+            ],
+            "IDFA": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(initialAdID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -169,30 +209,39 @@ class IdentityAdIDTests: XCTestCase {
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
-
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
             ]
+          }
+        }
+        """#
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
 
         // Consent event should be dispatched; check that the event body matches expected format
-        let expectedConsent: [String: Any] =
-            [
-                "consents": [
-                    "adID": [
-                        "val": "n",
-                        "idType": "IDFA"
-                    ]
-                ]
-            ]
+        let expectedConsentJSON = #"""
+        {
+          "consents": {
+            "adID": {
+              "idType": "IDFA",
+              "val": "n"
+            }
+          }
+        }
+        """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
     }
 
     /// Test ad ID is updated from valid to nil, and consent event is dispatched
@@ -206,29 +255,39 @@ class IdentityAdIDTests: XCTestCase {
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
-
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
             ]
+          }
+        }
+        """#
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
 
-        let expectedConsent: [String: Any] =
-            [
-                "consents": [
-                    "adID": [
-                        "val": "n",
-                        "idType": "IDFA"
-                    ]
-                ]
-            ]
+        let expectedConsentJSON = #"""
+        {
+          "consents": {
+            "adID": {
+              "idType": "IDFA",
+              "val": "n"
+            }
+          }
+        }
+        """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
     }
 
     // MARK: - Starting from no ad ID
@@ -245,29 +304,44 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertEqual(newAdID, identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]],
-                    "IDFA": [["id": newAdID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
+            ],
+            "IDFA": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(newAdID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[1] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
 
-        let expectedConsent: [String: Any] =
-            [
-                "consents": [
-                    "adID": [
-                        "val": "y",
-                        "idType": "IDFA"
-                    ]
-                ]
-            ]
+        let expectedConsentJSON = #"""
+        {
+          "consents": {
+            "adID": {
+              "idType": "IDFA",
+              "val": "y"
+            }
+          }
+        }
+        """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        XCTAssertEqual(expectedConsent as NSObject, mockRuntime.dispatchedEvents[0].data as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
     }
 
     /// Test ad ID remains nil with non-ad ID event, and consent event is not dispatched
@@ -282,15 +356,22 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -306,15 +387,22 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -330,15 +418,22 @@ class IdentityAdIDTests: XCTestCase {
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
 
-        let expectedIdentity: [String: Any] =
-            [
-                "identityMap": [
-                    "ECID": [["id": propsECID, "authenticatedState": "ambiguous", "primary": 0]]
-                ]
+        let expectedIdentityJSON = #"""
+        {
+          "identityMap": {
+            "ECID": [
+              {
+                "authenticatedState": "ambiguous",
+                "id": "\#(propsECID)",
+                "primary": false
+              }
             ]
-
+          }
+        }
+        """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertEqual(expectedIdentity as NSObject, mockRuntime.createdXdmSharedStates[0] as NSObject?)
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
+                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
