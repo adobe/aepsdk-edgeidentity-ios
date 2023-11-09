@@ -14,6 +14,7 @@
 import AEPEdgeIdentity
 import AEPIdentity
 @testable import AEPServices
+import AEPTestUtils
 import XCTest
 
 class EdgeIdentityAndIdentityDirectTests: XCTestCase {
@@ -26,8 +27,9 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         continueAfterFailure = false
         UserDefaults.clear()
         FileManager.default.clearCache()
+        FileManager.default.removeAdobeCacheDirectory()
         ServiceProvider.shared.reset()
-        ServiceProvider.shared.networkService = FunctionalTestNetworkService()
+        ServiceProvider.shared.networkService = MockNetworkService()
         EventHub.reset()
         MobileCore.setLogLevel(LogLevel.trace)
     }
@@ -325,16 +327,5 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
-    }
-}
-
-class FunctionalTestNetworkService: Networking {
-    public func connectAsync(networkRequest: NetworkRequest, completionHandler: ((HttpConnection) -> Void)?) {
-        if let closure = completionHandler {
-            Log.trace(label: "TestNetworkService", "Received and ignoring request to '\(networkRequest.url)")
-            let response = HTTPURLResponse(url: networkRequest.url, statusCode: 200, httpVersion: nil, headerFields: nil)
-            let httpConnection = HttpConnection(data: "{}".data(using: .utf8), response: response, error: nil)
-            closure(httpConnection)
-        }
     }
 }

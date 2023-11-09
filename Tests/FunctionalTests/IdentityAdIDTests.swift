@@ -12,6 +12,7 @@
 @testable import AEPCore
 @testable import AEPEdgeIdentity
 import AEPServices
+import AEPTestUtils
 import XCTest
 
 class IdentityAdIDTests: XCTestCase {
@@ -82,7 +83,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: newAdID])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertEqual(newAdID, identity.state.identityProperties.advertisingIdentifier)
@@ -112,7 +113,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: initialAdID])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertEqual(initialAdID, identity.state.identityProperties.advertisingIdentifier)
@@ -138,7 +139,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: ["somekey": "someValue"])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertEqual(initialAdID, identity.state.identityProperties.advertisingIdentifier)
@@ -164,7 +165,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
@@ -201,7 +202,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
@@ -239,7 +240,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: newAdID])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertEqual(newAdID, identity.state.identityProperties.advertisingIdentifier)
@@ -276,7 +277,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: ["somekey": "someValue"])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
@@ -300,7 +301,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: ""])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
@@ -324,7 +325,7 @@ class IdentityAdIDTests: XCTestCase {
         let event = createGenericIdentityRequestEvent(withData: [IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER: IdentityConstants.Default.ZERO_ADVERTISING_ID])
 
         // Test
-        mockRuntime.simulateComingEvent(event: event)
+        mockRuntime.simulateComingEvents(event)
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
