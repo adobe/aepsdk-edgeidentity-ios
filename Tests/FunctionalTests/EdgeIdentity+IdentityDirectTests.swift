@@ -25,7 +25,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
 
     override func setUp() {
         continueAfterFailure = false
-        UserDefaults.clear()
+        UserDefaults.clearAll()
         FileManager.default.clearCache()
         FileManager.default.removeAdobeCacheDirectory()
         ServiceProvider.shared.reset()
@@ -47,7 +47,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         wait(for: [unregisterExpectation], timeout: 2)
 
         // Clear persisted data
-        UserDefaults.clear()
+        UserDefaults.clearAll()
     }
 
     // MARK: test cases

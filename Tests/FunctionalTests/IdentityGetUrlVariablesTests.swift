@@ -42,7 +42,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
         EventHub.reset()
 
         // Clear persisted data
-        UserDefaults.clear()
+        UserDefaults.clearAll()
         FileManager.default.clearCache()
         FileManager.default.removeAdobeCacheDirectory()
     }
