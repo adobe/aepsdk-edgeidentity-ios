@@ -13,6 +13,7 @@
 @testable import AEPCore
 @testable import AEPEdgeIdentity
 import AEPServices
+import AEPTestUtils
 import XCTest
 
 class IdentityStateTests: XCTestCase {
@@ -582,12 +583,6 @@ class IdentityStateTests: XCTestCase {
         XCTAssertNotEqual(props.ecid, state.identityProperties.ecid)
     }
 
-    private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
-        let data: [String: ECID?] = ["ecid": ecid]
-        let jsonData = try? JSONEncoder().encode(data)
-        mockDataStore.dict["identity.properties"] = jsonData
-    }
-
     func testResetIdentitiesAdIdIsEmptyDoesNotDispatchConsentEvent() {
         var props = IdentityProperties()
         props.advertisingIdentifier = ""
@@ -705,6 +700,16 @@ class IdentityStateTests: XCTestCase {
     /// Test ad ID is updated from all zeros to empty string and consent false is dispatched; passing all zeros is converted to empty string
     func testUpdateAdvertisingIdentifier_whenAllZeros_thenSameValue() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil, expectedConsent: "n")
+    }
+    
+    // MARK: - Private test helper methods
+    private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
+        let data: [String: ECID?] = ["ecid": ecid]
+        var setVal: Any?
+        if let encodedValue = try? JSONEncoder().encode(data), let encodedString = String(data: encodedValue, encoding: .utf8) {
+            setVal = encodedString
+        }
+        mockDataStore.dict["identity.properties"] = setVal
     }
 
     private func assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: String?, newAdId: String?, expectedAdId: String?, expectedConsent: String?) {
