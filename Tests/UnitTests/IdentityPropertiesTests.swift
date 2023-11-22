@@ -12,6 +12,7 @@
 
 @testable import AEPEdgeIdentity
 import AEPServices
+import AEPTestUtils
 import XCTest
 
 class IdentityPropertiesTests: XCTestCase {
@@ -207,7 +208,7 @@ class IdentityPropertiesTests: XCTestCase {
         properties.saveToPersistence()
 
         XCTAssertEqual(1, mockDataStore.dict.count)
-        guard let data = mockDataStore.dict[IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? Data else {
+        guard let jsonString = mockDataStore.dict[IdentityConstants.DataStoreKeys.IDENTITY_PROPERTIES] as? String, let data = jsonString.data(using: .utf8) else {
             XCTFail("Failed to find identity.properties in mock data store.")
             return
         }
@@ -257,8 +258,11 @@ class IdentityPropertiesTests: XCTestCase {
 
     private func addLegacyEcidToPersistence(ecid: ECID?) {
         let data: [String: ECID?] = ["ecid": ecid]
-        let jsonData = try? JSONEncoder().encode(data)
-        mockDataStore.dict["identity.properties"] = jsonData
+        var setVal: Any?
+        if let encodedValue = try? JSONEncoder().encode(data), let encodedString = String(data: encodedValue, encoding: .utf8) {
+            setVal = encodedString
+        }
+        mockDataStore.dict["identity.properties"] = setVal
     }
 
 }

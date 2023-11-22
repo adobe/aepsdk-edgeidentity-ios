@@ -1,22 +1,25 @@
 PODS:
-  - AEPAssurance (4.0.0):
+  - AEPAssurance (4.1.0):
     - AEPCore (>= 4.0.0)
     - AEPServices (>= 4.0.0)
-  - AEPCore (4.0.0):
+  - AEPCore (4.2.0):
     - AEPRulesEngine (>= 4.0.0)
-    - AEPServices (>= 4.0.0)
-  - AEPEdge (4.0.0):
-    - AEPCore (>= 4.0.0)
+    - AEPServices (>= 4.2.0)
+  - AEPEdge (4.3.0):
+    - AEPCore (>= 4.1.0)
     - AEPEdgeIdentity (>= 4.0.0)
   - AEPEdgeConsent (4.0.0):
     - AEPCore (>= 4.0.0)
     - AEPEdge (>= 4.0.0)
   - AEPEdgeIdentity (4.0.0):
     - AEPCore (>= 4.0.0)
-  - AEPIdentity (4.0.0):
-    - AEPCore (>= 4.0.0)
+  - AEPIdentity (4.2.0):
+    - AEPCore (>= 4.2.0)
   - AEPRulesEngine (4.0.0)
-  - AEPServices (4.0.0)
+  - AEPServices (4.2.0)
+  - AEPTestUtils (1.0.0-beta):
+    - AEPCore (>= 4.0.0)
+    - AEPServices (>= 4.0.0)
   - SwiftLint (0.52.0)
 
 DEPENDENCIES:
@@ -27,6 +30,7 @@ DEPENDENCIES:
   - AEPEdgeIdentity (from `./AEPEdgeIdentity.podspec`)
   - AEPIdentity
   - AEPServices
+  - AEPTestUtils (from `https://github.com/adobe/aepsdk-testutils-ios.git`, branch `json-comparison-custom-protocol`)
   - SwiftLint (= 0.52.0)
 
 SPEC REPOS:
@@ -43,18 +47,27 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AEPEdgeIdentity:
     :path: "./AEPEdgeIdentity.podspec"
+  AEPTestUtils:
+    :branch: json-comparison-custom-protocol
+    :git: https://github.com/adobe/aepsdk-testutils-ios.git
+
+CHECKOUT OPTIONS:
+  AEPTestUtils:
+    :commit: 566ce383cbe90ace30dc9d9e6a37c1d031bf2494
+    :git: https://github.com/adobe/aepsdk-testutils-ios.git
 
 SPEC CHECKSUMS:
-  AEPAssurance: 4fa3138ddd7308c1f9923570f4d2b0b8526a916f
-  AEPCore: dd7cd69696c768c610e6adc0307032985a381c7e
-  AEPEdge: ffea1ada1e81c9cb239aac694efa5c8635b50c1f
+  AEPAssurance: ee78c45752b29696f280854cfc4d4f8d11babad8
+  AEPCore: f80654e62b9cb776ae74df44dd24c82febc4d3fa
+  AEPEdge: 301fb849383fca513c1046fe90bac0bcd1f8e404
   AEPEdgeConsent: 54c1b6a30a3d646e3d4bc4bae1713755422b471e
   AEPEdgeIdentity: c2396b9119abd6eb530ea11efc58ec019b163bd4
-  AEPIdentity: 45ee1c3717e08ff3ca60930caf4a869d60d7bf08
+  AEPIdentity: 350893792bed309edbfd3a9938ada8e30b615e25
   AEPRulesEngine: 458450a34922823286ead045a0c2bd8c27e224c6
-  AEPServices: ca493988df250d84fda050124ff7549bcc43c65f
+  AEPServices: 842c0f94e960754ce2ac50535d78349827c52c83
+  AEPTestUtils: 756e5997318be74584057d7628941c737d358640
   SwiftLint: 13280e21cdda6786ad908dc6e416afe5acd1fcb7
 
-PODFILE CHECKSUM: 7294af1f758cc450b75d8527d34cc1513b9b962d
+PODFILE CHECKSUM: 607dec102a0c85633815e1648b872ecc019b27dc
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0
