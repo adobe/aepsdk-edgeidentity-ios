@@ -25,14 +25,14 @@ swift package generate-xcodeproj
 
 # Create a Podfile with our pod as dependency.
 echo "
-platform :ios, '11.0'
+platform :ios, '12.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 4.0'
-  pod 'AEPIdentity', '~> 4.0'
-  pod 'AEPServices', '~> 4.0'
-  pod 'AEPRulesEngine', '~> 4.0'
-  pod 'AEPEdge', '~> 4.0'
+  pod 'AEPCore', '~> 5.0'
+  pod 'AEPIdentity', '~> 5.0'
+  pod 'AEPServices', '~> 5.0'
+  pod 'AEPRulesEngine', '~> 5.0'
+  pod 'AEPEdge', '~> 5.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
@@ -68,14 +68,14 @@ swift package generate-xcodeproj
 
 # Create a Podfile with our pod as dependency.
 echo "
-platform :tvos, '11.0'
+platform :tvos, '12.0'
 target '$PROJECT_NAME' do
   use_frameworks!
-  pod 'AEPCore', '~> 4.0'
-  pod 'AEPIdentity', '~> 4.0'
-  pod 'AEPServices', '~> 4.0'
-  pod 'AEPRulesEngine', '~> 4.0'
-  pod 'AEPEdge', '~> 4.0'
+  pod 'AEPCore', '~> 5.0'
+  pod 'AEPIdentity', '~> 5.0'
+  pod 'AEPServices', '~> 5.0'
+  pod 'AEPRulesEngine', '~> 5.0'
+  pod 'AEPEdge', '~> 5.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
