@@ -87,7 +87,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
 
         // Verify
         XCTAssertEqual(newAdID, identity.state.identityProperties.advertisingIdentifier)
-        
+
         let expectedIdentityJSON = #"""
         {
           "identityMap": {
@@ -113,7 +113,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         // 1. Bootup (ECID + initial ad ID)
         // 2. Request content event with new valid ad ID (ECID + new ad ID)
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!, 
+        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
                     actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
         // No dispatched events because consent event should not happen
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
@@ -255,7 +255,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
 
         // Verify
         XCTAssertNil(identity.state.identityProperties.advertisingIdentifier)
-        
+
         let expectedIdentityJSON = #"""
         {
           "identityMap": {
