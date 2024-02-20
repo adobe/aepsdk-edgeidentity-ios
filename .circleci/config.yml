@@ -69,14 +69,14 @@ commands:
   prestart_ios_simulator:
     steps:
       - macos/preboot-simulator:
-          version: "17"
-          device: "iPhone 15"
+          version: "16.4"
+          device: "iPhone 14"
 
   prestart_tvos_simulator:
     steps:
       - macos/preboot-simulator:
           platform: "tvOS"
-          version: "17"
+          version: "16.4"
           device: "Apple TV"
 
 jobs:
