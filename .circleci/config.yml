@@ -70,7 +70,7 @@ commands:
     steps:
       - macos/preboot-simulator:
           version: "17.0"
-          device: "iPhone 14"
+          device: "iPhone 15"
 
   prestart_tvos_simulator:
     steps:
