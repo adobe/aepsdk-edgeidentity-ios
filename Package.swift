@@ -17,12 +17,12 @@ import PackageDescription
 
 let package = Package(
     name: "AEPEdgeIdentity",
-    platforms: [.iOS(.v11), .tvOS(.v11)],
+    platforms: [.iOS(.v12), .tvOS(.v12)],
     products: [
         .library(name: "AEPEdgeIdentity", targets: ["AEPEdgeIdentity"])
     ],
     dependencies: [
-        .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .upToNextMajor(from: "4.0.0"))
+        .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .upToNextMajor(from: "5.0.0"))
     ],
     targets: [
         .target(name: "AEPEdgeIdentity",

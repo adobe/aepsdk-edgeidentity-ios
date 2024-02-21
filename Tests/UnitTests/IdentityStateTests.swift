@@ -701,7 +701,7 @@ class IdentityStateTests: XCTestCase {
     func testUpdateAdvertisingIdentifier_whenAllZeros_thenSameValue() {
         assertUpdateAdvertisingIdentifierIsUpdatedWithConsentChange(persistedAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, newAdId: IdentityConstants.Default.ZERO_ADVERTISING_ID, expectedAdId: nil, expectedConsent: "n")
     }
-    
+
     // MARK: - Private test helper methods
     private func addEcidToIdentityDirectPersistence(ecid: ECID?) {
         let data: [String: ECID?] = ["ecid": ecid]
