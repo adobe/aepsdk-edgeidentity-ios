@@ -33,6 +33,7 @@ clean-ios-test-files:
 
 clean-tvos-test-files:
 	rm -rf tvosresults.xcresult
+	
 pod-install:
 	pod install --repo-update
 	cd SampleApps/$(APP_NAME) && pod install --repo-update
