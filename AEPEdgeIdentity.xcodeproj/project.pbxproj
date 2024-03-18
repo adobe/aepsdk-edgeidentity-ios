@@ -565,7 +565,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					B6F27EBB2609146800C50A04 = {
 						CreatedOnToolsVersion = 12.4;
@@ -1334,6 +1334,7 @@
 			baseConfigurationReference = F823DBDD04E1F9BF72A00CB0 /* Pods-AEPEdgeIdentity.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -1366,6 +1367,7 @@
 			baseConfigurationReference = 1DB983800FEA77BE0A7A8139 /* Pods-AEPEdgeIdentity.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";

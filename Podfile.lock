@@ -1,7 +1,7 @@
 PODS:
-  - AEPAssurance (4.1.1):
-    - AEPCore (>= 4.0.0)
-    - AEPServices (>= 4.0.0)
+  - AEPAssurance (5.0.0):
+    - AEPCore (< 6.0.0, >= 5.0.0)
+    - AEPServices (< 6.0.0, >= 5.0.0)
   - AEPCore (5.0.0):
     - AEPRulesEngine (< 6.0.0, >= 5.0.0)
     - AEPServices (< 6.0.0, >= 5.0.0)
@@ -23,7 +23,7 @@ PODS:
   - SwiftLint (0.52.0)
 
 DEPENDENCIES:
-  - AEPAssurance
+  - AEPAssurance (from `https://github.com/adobe/aepsdk-assurance-ios.git`, branch `staging`)
   - AEPCore (from `https://github.com/adobe/aepsdk-core-ios.git`, branch `staging`)
   - AEPEdge
   - AEPEdgeConsent
@@ -36,12 +36,14 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - AEPAssurance
     - AEPEdge
     - AEPEdgeConsent
     - SwiftLint
 
 EXTERNAL SOURCES:
+  AEPAssurance:
+    :branch: staging
+    :git: https://github.com/adobe/aepsdk-assurance-ios.git
   AEPCore:
     :branch: staging
     :git: https://github.com/adobe/aepsdk-core-ios.git
@@ -61,6 +63,9 @@ EXTERNAL SOURCES:
     :tag: v5.0.0
 
 CHECKOUT OPTIONS:
+  AEPAssurance:
+    :commit: f45b7600420c25b385850719f3521986ec7c3a76
+    :git: https://github.com/adobe/aepsdk-assurance-ios.git
   AEPCore:
     :commit: 2c65647d337dd94a75e119618fc3660e57e25bd0
     :git: https://github.com/adobe/aepsdk-core-ios.git
@@ -78,7 +83,7 @@ CHECKOUT OPTIONS:
     :tag: v5.0.0
 
 SPEC CHECKSUMS:
-  AEPAssurance: 765587ef65481bab544aa25efcfa294e14161d49
+  AEPAssurance: 7f260ded4df38a70a06efebade8c33a3e3221984
   AEPCore: f1c3e9238bb12e7e1103f4407c341ebc65aeab5b
   AEPEdge: 301fb849383fca513c1046fe90bac0bcd1f8e404
   AEPEdgeConsent: 54c1b6a30a3d646e3d4bc4bae1713755422b471e
