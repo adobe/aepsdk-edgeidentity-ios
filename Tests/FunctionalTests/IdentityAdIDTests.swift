@@ -113,8 +113,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         // 1. Bootup (ECID + initial ad ID)
         // 2. Request content event with new valid ad ID (ECID + new ad ID)
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[1])
         // No dispatched events because consent event should not happen
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
@@ -153,8 +152,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[0])
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -192,8 +190,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[0])
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -224,8 +221,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         """#
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[1])
 
         // Consent event should be dispatched; check that the event body matches expected format
         let expectedConsentJSON = #"""
@@ -240,8 +236,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
+        assertEqual(expected: expectedConsentJSON, actual: mockRuntime.dispatchedEvents[0].data)
     }
 
     /// Test ad ID is updated from valid to nil, and consent event is dispatched
@@ -271,8 +266,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         """#
 
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[1])
 
         let expectedConsentJSON = #"""
         {
@@ -286,8 +280,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
+        assertEqual(expected: expectedConsentJSON, actual: mockRuntime.dispatchedEvents[0].data)
     }
 
     // MARK: - Starting from no ad ID
@@ -325,8 +318,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(2, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[1])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[1])
 
         let expectedConsentJSON = #"""
         {
@@ -340,8 +332,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         """#
         XCTAssertEqual(EventType.edgeConsent, mockRuntime.dispatchedEvents[0].type)
         XCTAssertEqual(EventSource.updateConsent, mockRuntime.dispatchedEvents[0].source)
-        assertEqual(expected: getAnyCodable(expectedConsentJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.dispatchedEvents[0].data)))
+        assertEqual(expected: expectedConsentJSON, actual: mockRuntime.dispatchedEvents[0].data)
     }
 
     /// Test ad ID remains nil with non-ad ID event, and consent event is not dispatched
@@ -370,8 +361,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[0])
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -401,8 +391,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[0])
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
@@ -432,8 +421,7 @@ class IdentityAdIDTests: XCTestCase, AnyCodableAsserts {
         }
         """#
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        assertEqual(expected: getAnyCodable(expectedIdentityJSON)!,
-                    actual: AnyCodable(AnyCodable.from(dictionary: mockRuntime.createdXdmSharedStates[0])))
+        assertEqual(expected: expectedIdentityJSON, actual: mockRuntime.createdXdmSharedStates[0])
         XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
     }
 
