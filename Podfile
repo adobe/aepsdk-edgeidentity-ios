@@ -9,9 +9,9 @@ project 'AEPEdgeIdentity.xcodeproj'
 pod 'SwiftLint', '0.52.0'
 
 def core_pods
-  pod 'AEPServices', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPCore', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
-  pod 'AEPRulesEngine', :git => 'https://github.com/adobe/aepsdk-rulesengine-ios.git', :branch => 'staging'
+  pod 'AEPServices'
+  pod 'AEPCore'
+  pod 'AEPRulesEngine'
 end
 
 def edge_pods
@@ -30,14 +30,14 @@ end
 
 target 'FunctionalTests' do
   core_pods
-  pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPIdentity'
   pod 'AEPTestUtils', :git => 'https://github.com/adobe/aepsdk-testutils-ios.git', :tag => 'v5.0.0'
 end
 
 target 'TestApp' do
   core_pods
   edge_pods
-  pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPIdentity'
   pod 'AEPAssurance', :git => 'https://github.com/adobe/aepsdk-assurance-ios.git', :branch => 'staging'
   pod 'AEPEdgeIdentity', :path => './AEPEdgeIdentity.podspec'
 end
@@ -45,13 +45,13 @@ end
 target 'TestApptvOS' do
   core_pods
   edge_pods
-  pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPIdentity'
 end
 
 target 'TestAppObjC' do
   core_pods
   edge_pods
-  pod 'AEPIdentity', :git => 'https://github.com/adobe/aepsdk-core-ios.git', :branch => 'staging'
+  pod 'AEPIdentity'
 end
 
 post_install do |pi|
