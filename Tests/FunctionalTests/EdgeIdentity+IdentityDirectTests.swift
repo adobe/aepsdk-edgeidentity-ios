@@ -26,8 +26,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
         UserDefaults.clearAll()
-        FileManager.default.clearCache()
-        FileManager.default.removeAdobeCacheDirectory()
+        NamedCollectionDataStore.clear()
         ServiceProvider.shared.reset()
         ServiceProvider.shared.networkService = MockNetworkService()
         EventHub.reset()
