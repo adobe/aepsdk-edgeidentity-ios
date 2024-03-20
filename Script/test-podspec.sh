@@ -48,7 +48,6 @@ target '$PROJECT_NAME' do
   pod 'AEPIdentity', '~> 5.0'
   pod 'AEPServices', '~> 5.0'
   pod 'AEPRulesEngine', '~> 5.0'
-  pod 'AEPEdge', '~> 5.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
@@ -107,7 +106,6 @@ target '$PROJECT_NAME' do
   pod 'AEPIdentity', '~> 5.0'
   pod 'AEPServices', '~> 5.0'
   pod 'AEPRulesEngine', '~> 5.0'
-  pod 'AEPEdge', '~> 5.0'
   pod 'AEPEdgeIdentity', :path => '../AEPEdgeIdentity.podspec'
 end
 " >>Podfile
