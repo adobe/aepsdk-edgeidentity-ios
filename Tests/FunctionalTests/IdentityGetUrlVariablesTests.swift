@@ -13,6 +13,7 @@
 @testable import AEPCore
 import AEPEdgeIdentity
 @testable import AEPServices
+import AEPTestUtils
 import XCTest
 
 class IdentityGetUrlVariablesTest: XCTestCase {
@@ -37,12 +38,11 @@ class IdentityGetUrlVariablesTest: XCTestCase {
 
     private func reset() {
         ServiceProvider.shared.reset()
-        ServiceProvider.shared.networkService = FunctionalTestNetworkService()
+        ServiceProvider.shared.networkService = MockNetworkService()
         EventHub.reset()
 
         // Clear persisted data
-        UserDefaults.clear()
-        FileManager.default.clearCache()
+        NamedCollectionDataStore.clear()
     }
 
     // MARK: test cases

@@ -53,9 +53,9 @@ ci-pod-install:
 	bundle exec pod install --repo-update
 	cd SampleApps/$(APP_NAME) && bundle exec pod install --repo-update
 
-ci-archive: ci-pod-update _archive
+ci-archive: ci-pod-install _archive
 
-archive: pod-update _archive
+archive: pod-install _archive
 
 zip:
 	cd build && zip -r -X $(PROJECT_NAME).xcframework.zip $(PROJECT_NAME).xcframework/
@@ -117,7 +117,7 @@ test-ios: clean-ios-test-files
 	   final_scheme="$(EXTENSION_NAME)" ; \
 	   echo $$final_scheme ; \
 	fi; \
-	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 14' -derivedDataPath build/out -resultBundlePath iosresults.xcresult -enableCodeCoverage YES
+	xcodebuild test -workspace $(PROJECT_NAME).xcworkspace -scheme "$$final_scheme" -destination 'platform=iOS Simulator,name=iPhone 15' -derivedDataPath build/out -resultBundlePath iosresults.xcresult -enableCodeCoverage YES
 
 test-tvos: clean-tvos-test-files
 	@echo "######################################################################"
@@ -145,7 +145,7 @@ lint-autocorrect:
 lint:
 	./Pods/SwiftLint/swiftlint lint Sources SampleApps/$(APP_NAME)
 
-# make check-version VERSION=4.0.0
+# make check-version VERSION=5.0.0
 check-version:
 	sh ./Script/version.sh $(VERSION)
 
