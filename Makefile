@@ -53,9 +53,9 @@ ci-pod-install:
 	bundle exec pod install --repo-update
 	cd SampleApps/$(APP_NAME) && bundle exec pod install --repo-update
 
-ci-archive: ci-pod-update _archive
+ci-archive: ci-pod-install _archive
 
-archive: pod-update _archive
+archive: pod-install _archive
 
 zip:
 	cd build && zip -r -X $(PROJECT_NAME).xcframework.zip $(PROJECT_NAME).xcframework/
