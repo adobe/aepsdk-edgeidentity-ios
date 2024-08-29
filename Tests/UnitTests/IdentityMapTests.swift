@@ -523,8 +523,12 @@ class IdentityMapTests: XCTestCase {
     }
 
     func testFromWithInvalidDataDecode() {
-        let bogusStr = String(bytes: [0xD8, 0x00] as [UInt8], encoding: String.Encoding.utf16BigEndian)!
-        let data = ["foo": bogusStr]
+        let bytes: [UInt8] = [0xD8, 0x00]  // Invalid UTF-16 high surrogate
+        let bytesData = Data(bytes)
+        // Construct invalid String using Obj-C since iOS 18 `String` construction now returns `nil`.
+        // `! as String` validates an invalid String is actually constructed.
+        let invalidStr = NSString(data: bytesData, encoding: String.Encoding.utf16BigEndian.rawValue)! as String
+        let data = ["foo": invalidStr]
         let identityMap = IdentityMap.from(eventData: data)
         XCTAssertNil(identityMap)
     }
