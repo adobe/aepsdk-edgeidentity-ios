@@ -29,7 +29,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         NamedCollectionDataStore.clear()
         ServiceProvider.shared.reset()
         ServiceProvider.shared.networkService = MockNetworkService()
-        EventHub.reset()
+        MobileCore.resetSDK()
         MobileCore.setLogLevel(LogLevel.trace)
     }
 

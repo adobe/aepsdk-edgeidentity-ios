@@ -39,7 +39,7 @@ class IdentityGetUrlVariablesTest: XCTestCase {
     private func reset() {
         ServiceProvider.shared.reset()
         ServiceProvider.shared.networkService = MockNetworkService()
-        EventHub.reset()
+        MobileCore.resetSDK()
 
         // Clear persisted data
         NamedCollectionDataStore.clear()
