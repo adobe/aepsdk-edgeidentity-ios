@@ -41,5 +41,5 @@ jobs:
       tag: ${{ github.event.inputs.tag }}
       create-github-release: ${{ github.event.inputs.create-github-release == 'true' && 'AEPEdgeIdentity' || '' }}
       pod-publish-extensions: ${{ github.event.inputs.pod-publish-extensions == 'true' && 'AEPEdgeIdentity' || '' }}
-      version-validation-paths: AEPEdgeIdentity.podspec, AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift,
+      version-validation-paths: AEPEdgeIdentity.podspec, AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift
     secrets: inherit

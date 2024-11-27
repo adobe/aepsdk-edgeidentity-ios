@@ -41,5 +41,5 @@ jobs:
       version: ${{ github.event.inputs.version }}
       branch: ${{ github.event.inputs.branch }}
       dependencies: AEPCore ${{ github.event.inputs.core-dependency }}
-      paths: Package.swift:swift_spm, AEPEdge.podspec, AEPEdge.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift
+      paths: Package.swift:swift_spm, AEPEdgeIdentity.podspec, AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift
       update: true
