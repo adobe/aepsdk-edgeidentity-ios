@@ -40,6 +40,37 @@ enum IdentityConstants {
         }
     }
 
+    enum ProfileAttributes {
+        static let TIMEZONE = "timezone"
+        // ─── Adding a new attribute (example: push identifier) ───────────────────
+        // static let PUSH_IDENTIFIER = "pushidentifier"
+        // ─────────────────────────────────────────────────────────────────────────
+
+        static let STORE_NAME = "com.adobe.mobilecore.userattributes"
+
+        // Step 1 of 3: register the storage key so reset clears it and re-sync picks it up.
+        static let allKeys: [String] = [TIMEZONE]
+        // Example with a second attribute:
+        // static let allKeys: [String] = [TIMEZONE, PUSH_IDENTIFIER]
+
+        /// Maps each persistence storage key → XDM data key used in the Edge event payload.
+        /// Step 2 of 3: add one entry per new attribute so buildXdmData() maps it automatically.
+        static let xdmKeyMap: [String: String] = [
+            TIMEZONE: XDM.TIMEZONE_DATA_KEY
+            // PUSH_IDENTIFIER: XDM.PUSH_IDENTIFIER_DATA_KEY
+        ]
+
+        enum XDM {
+            static let XDM_KEY = "xdm"
+            static let DATA_KEY = "data"
+            static let EVENT_TYPE_KEY = "eventType"
+            static let PROFILE_UPDATE_EVENT_TYPE = "profile.updateAttributes"
+            static let TIMEZONE_DATA_KEY = "timeZone"
+            // static let PUSH_IDENTIFIER_DATA_KEY = "pushNotificationDetails"
+        }
+
+    }
+
     enum EventNames {
         static let CONSENT_UPDATE_REQUEST_AD_ID = "Consent Update Request for Ad ID"
         static let REQUEST_IDENTITY_ECID = "Edge Identity Request ECID"
@@ -50,6 +81,7 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_URL_VARIABLES = "Edge Identity Response URL Variables"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
+        static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
     }
 
     enum EventDataKeys {
@@ -79,6 +111,7 @@ enum IdentityConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
+            static let COLLECT = "collect"
             static let ID_TYPE = "idType"
             static let AD_ID = "adID"
             static let VAL = "val"
