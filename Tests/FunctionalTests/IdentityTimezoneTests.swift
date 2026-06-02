@@ -140,18 +140,15 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
     // MARK: - Consent
 
-    func testConsentNoToYes_reSyncsStoredValue() {
+    func testConsentNoToYes_noReSync_reSyncDisabled() {
+        // TODO: CJM-144861 — Re-sync on consent n→y is temporarily disabled.
+        // Update this test to assert 1 Edge event once re-sync is re-enabled.
         storeTimezone("America/Los_Angeles")
 
         mockRuntime.simulateComingEvents(makeConsentEvent(val: "y"))
 
-        // Store retains the value (no clear, direct write)
         XCTAssertEqual("America/Los_Angeles", storedTimezone())
-        // Edge event dispatched directly — not a genericProfileAttributes round trip
-        XCTAssertEqual(1, edgeEvents().count)
-        let data = edgeEvents()[0].data?[IdentityConstants.ProfileAttributes.XDM.DATA_KEY] as? [String: Any]
-        XCTAssertEqual("America/Los_Angeles",
-                       data?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+        XCTAssertTrue(edgeEvents().isEmpty)
     }
 
     func testConsentNoToYes_noStoredValue_noEdgeEvent() {

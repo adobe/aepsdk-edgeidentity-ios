@@ -22,7 +22,6 @@ import Foundation
     public static let extensionVersion = IdentityConstants.EXTENSION_VERSION
     public let metadata: [String: String]? = nil
     private(set) var state: IdentityState
-    private var lastObservedConsent: String?
 
     public let runtime: ExtensionRuntime
 
@@ -403,24 +402,13 @@ import Foundation
                                eventDispatcher: dispatch(event:))
     }
 
-    /// Handles consent response events. When collect consent transitions to granted, re-syncs stored profile attributes to Edge.
+    /// Handles consent response events.
+    /// TODO: CJM-144861 — Consent n→y re-sync is disabled until `lastObservedConsent` is seeded
+    /// from persistent consent state on cold start. Without persistence, a cold-start "y" replay
+    /// (Consent extension broadcasting the stored value on launch) is indistinguishable from a
+    /// genuine n→y transition mid-session, causing a spurious Edge re-sync on every app launch
+    /// for users who have always had consent granted.
     private func handleConsentResponse(event: Event) {
-        let newConsent = extractCollectConsent(from: event.data)
-        let wasNotGranted = lastObservedConsent == IdentityConstants.XDMKeys.Consent.NO
-        lastObservedConsent = newConsent
-        guard newConsent == IdentityConstants.XDMKeys.Consent.YES && wasNotGranted else {
-            Log.debug(label: friendlyName, "\(#function) - Consent condition not met (new=\(newConsent ?? "nil"), wasNotGranted=\(wasNotGranted)), skipping re-sync.")
-            return
-        }
-
-        reSyncStoredProfileAttributes(event: event)
-    }
-
-    private func extractCollectConsent(from eventData: [String: Any]?) -> String? {
-        guard let consents = eventData?[IdentityConstants.XDMKeys.Consent.CONSENTS] as? [String: Any],
-              let collect = consents[IdentityConstants.XDMKeys.Consent.COLLECT] as? [String: Any],
-              let val = collect[IdentityConstants.XDMKeys.Consent.VAL] as? String else { return nil }
-        return val
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.
