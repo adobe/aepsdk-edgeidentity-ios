@@ -78,11 +78,15 @@ struct GetIdentitiesView: View {
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
 
     private func sendTimezone(_ identifier: String) {
-        guard let tz = TimeZone(identifier: identifier) else {
+        guard TimeZone(identifier: identifier) != nil else {
             lastTimezoneStatus = "Invalid: \(identifier)"
             return
         }
-        MobileCore.updateProfileAttributes().setTimezone(tz).send()
+        // Dispatch directly until MobileCore.updateProfileAttributes is in the published pod.
+        MobileCore.dispatch(event: Event(name: "Update Profile Attributes",
+                                         type: "com.adobe.eventType.generic.profileAttributes",
+                                         source: "com.adobe.eventSource.requestContent",
+                                         data: ["timezone": identifier]))
         lastTimezoneStatus = "Sent: \(identifier)"
     }
 
