@@ -35,7 +35,7 @@ import Foundation
     public func onRegistered() {
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
-        registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributesContent)
+        registerListener(type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES, source: EventSource.requestContent, listener: handleProfileAttributesContent)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
