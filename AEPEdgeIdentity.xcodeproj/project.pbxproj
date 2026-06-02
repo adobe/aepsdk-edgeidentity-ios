@@ -33,6 +33,8 @@
 		2EE7E6EA27FE5C3B00C4B12A /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */; };
 		2EE7E6ED27FE9D8600C4B12A /* URLUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */; };
 		4C4B7D8C27A0CA2F00C0CE25 /* IdentityAdIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */; };
+		AA000002000000000000AA01 /* IdentityTimezoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AA01 /* IdentityTimezoneTests.swift */; };
+		AA000004000000000000AA01 /* IdentityTimezoneEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */; };
 		4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
@@ -137,6 +139,8 @@
 		3F04018E98F361A0DA81EAF3 /* Pods-TestAppObjC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestAppObjC.release.xcconfig"; path = "Target Support Files/Pods-TestAppObjC/Pods-TestAppObjC.release.xcconfig"; sourceTree = "<group>"; };
 		3F955AF4EC8D3303E0E75A85 /* Pods_AEPEdgeIdentity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPEdgeIdentity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityAdIDTests.swift; sourceTree = "<group>"; };
+		AA000001000000000000AA01 /* IdentityTimezoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneTests.swift; sourceTree = "<group>"; };
+		AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneEventTests.swift; sourceTree = "<group>"; };
 		4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		4C820A872836F19C00609575 /* AdIdUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdIdUtils.swift; sourceTree = "<group>"; };
 		4CAD0F78283C155E00490A1F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -377,6 +381,7 @@
 				BFF6497925C09ED80012A4C5 /* IdentityPublicAPITests.swift */,
 				BFF649A025C0D29D0012A4C5 /* IdentityStateTests.swift */,
 				D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */,
+				AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */,
 				2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */,
 				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
 			);
@@ -390,6 +395,7 @@
 				BFF64A5A25C4C5410012A4C5 /* EdgeIdentity+IdentityDirectTests.swift */,
 				4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */,
 				2ED365D428496BD600D2F717 /* IdentityGetUrlVariablesTests.swift */,
+				AA000001000000000000AA01 /* IdentityTimezoneTests.swift */,
 				D43BAB3A25BBA8C700B08CC0 /* Info.plist */,
 			);
 			name = FunctionalTests;
@@ -1025,6 +1031,7 @@
 				BFF649A125C0D29D0012A4C5 /* IdentityStateTests.swift in Sources */,
 				BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 				D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */,
+				AA000004000000000000AA01 /* IdentityTimezoneEventTests.swift in Sources */,
 				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1038,6 +1045,7 @@
 				4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */,
 				4C4B7D8C27A0CA2F00C0CE25 /* IdentityAdIDTests.swift in Sources */,
 				2ED365D528496BD600D2F717 /* IdentityGetUrlVariablesTests.swift in Sources */,
+				AA000002000000000000AA01 /* IdentityTimezoneTests.swift in Sources */,
 				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
