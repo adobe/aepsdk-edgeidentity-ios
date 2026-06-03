@@ -205,4 +205,84 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         XCTAssertEqual(1, edgeEvents().count)
     }
+
+    // MARK: - XDM shared state
+
+    private func lastSharedStateProfileAttributes() -> [String: Any]? {
+        let lastState = mockRuntime.createdXdmSharedStates.last ?? nil
+        return lastState?[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]
+    }
+
+    func testTimezoneSync_createsXdmSharedStateWithTimezone() {
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
+
+        XCTAssertEqual("Europe/London",
+                       lastSharedStateProfileAttributes()?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+    }
+
+    func testTimezoneSync_xdmSharedStatePreservesIdentityMap() {
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
+
+        // The ECID generated at bootup must survive alongside the profile-attributes section.
+        let lastState = mockRuntime.createdXdmSharedStates.last ?? nil
+        XCTAssertNotNil(lastState?[IdentityConstants.XDMKeys.IDENTITY_MAP])
+    }
+
+    func testTimezoneSync_dedup_stillResolvesSharedState() {
+        storeTimezone("Europe/London")
+
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
+
+        // Deduped: no Edge event, but the pending shared state must still be resolved (never left hanging).
+        XCTAssertTrue(edgeEvents().isEmpty)
+        XCTAssertFalse(mockRuntime.createdXdmSharedStates.isEmpty)
+    }
+
+    // MARK: - Invalid / missing input
+
+    func testTimezoneSync_invalidIANA_noEdgeEventAndNotStored() {
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Not/AReal/Zone"))
+
+        XCTAssertTrue(edgeEvents().isEmpty)
+        XCTAssertNil(storedTimezone())
+    }
+
+    func testTimezoneSync_missingTimezoneData_noEdgeEventAndNotStored() {
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
+                          type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                          source: EventSource.requestContent,
+                          data: ["unrelated": "value"])
+
+        mockRuntime.simulateComingEvents(event)
+
+        XCTAssertTrue(edgeEvents().isEmpty)
+        XCTAssertNil(storedTimezone())
+    }
+
+    // MARK: - Cold-start hydration
+
+    func testColdStartHydration_storedTimezoneSurfacesInSharedState() {
+        // Fresh extension whose store already holds a timezone from a previous session.
+        let store = MockDataStore()
+        ServiceProvider.shared.namedKeyValueService = store
+        store.set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
+                  key: IdentityConstants.ProfileAttributes.TIMEZONE,
+                  value: "Asia/Kolkata")
+
+        let runtime = TestableExtensionRuntime()
+        guard let freshIdentity = Identity(runtime: runtime) else {
+            XCTFail("Failed to initialize Identity")
+            return
+        }
+        freshIdentity.onRegistered()
+        XCTAssertTrue(freshIdentity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
+
+        // The bootup XDM shared state should carry the hydrated timezone.
+        let hydrated = runtime.createdXdmSharedStates.compactMap { $0 }.first {
+            ($0[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]) != nil
+        }
+        let attrs = hydrated?[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]
+        XCTAssertEqual("Asia/Kolkata",
+                       attrs?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+    }
 }

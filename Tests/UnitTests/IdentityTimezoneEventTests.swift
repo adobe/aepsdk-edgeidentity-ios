@@ -42,4 +42,16 @@ class IdentityTimezoneEventTests: XCTestCase {
         let event = makeEvent(data: [IdentityConstants.ProfileAttributes.TIMEZONE: 99])
         XCTAssertNil(event.timezone)
     }
+
+    /// The extractor is a pure value read — it does NOT validate the IANA identifier.
+    /// An empty string passes through as-is; validation is `handleTimezoneSync`'s job.
+    func testTimezone_returnsEmptyString_whenEmpty() {
+        let event = makeEvent(data: [IdentityConstants.ProfileAttributes.TIMEZONE: ""])
+        XCTAssertEqual("", event.timezone)
+    }
+
+    func testTimezone_ignoresOtherProfileAttributeKeys() {
+        let event = makeEvent(data: ["pushidentifier": "token-123"])
+        XCTAssertNil(event.timezone)
+    }
 }
