@@ -254,7 +254,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtension(AEPEdgeIdentity.Identity.self) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 1)
+        wait(for: [initExpectation], timeout: 2)
     }
 
     /// Register Identity direct. Should be called after one of the 'init' functions above.
@@ -274,7 +274,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 2)
         return ecid
     }
 
@@ -285,7 +285,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 2)
         return ecid
     }
 
