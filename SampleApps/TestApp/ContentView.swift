@@ -79,7 +79,7 @@ struct GetIdentitiesView: View {
 
     private func sendTimezone(_ identifier: String) {
         // TODO: revert once MobileCore.updateProfileAttributes is available in the published AEPCore pod.
-        // MobileCore.updateProfileAttributes().setTimezone(identifier)
+        // MobileCore.updateProfileAttributes().setTimezone(TimeZone(identifier: identifier)!)
         lastTimezoneStatus = "Pending (API not yet in pod): \(identifier)"
     }
 
