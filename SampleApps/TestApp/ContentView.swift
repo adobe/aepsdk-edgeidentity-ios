@@ -82,11 +82,7 @@ struct GetIdentitiesView: View {
             lastTimezoneStatus = "Invalid: \(identifier)"
             return
         }
-        // Dispatch directly until MobileCore.updateProfileAttributes is in the published pod.
-        MobileCore.dispatch(event: Event(name: "Update Profile Attributes",
-                                         type: "com.adobe.eventType.generic.profileAttributes",
-                                         source: "com.adobe.eventSource.requestContent",
-                                         data: ["timezone": identifier]))
+        MobileCore.updateProfileAttributes().setTimezone(identifier)
         lastTimezoneStatus = "Sent: \(identifier)"
     }
 
