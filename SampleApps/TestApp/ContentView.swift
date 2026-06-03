@@ -78,12 +78,9 @@ struct GetIdentitiesView: View {
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
 
     private func sendTimezone(_ identifier: String) {
-        guard TimeZone(identifier: identifier) != nil else {
-            lastTimezoneStatus = "Invalid: \(identifier)"
-            return
-        }
-        MobileCore.updateProfileAttributes().setTimezone(identifier)
-        lastTimezoneStatus = "Sent: \(identifier)"
+        // TODO: revert once MobileCore.updateProfileAttributes is available in the published AEPCore pod.
+        // MobileCore.updateProfileAttributes().setTimezone(identifier)
+        lastTimezoneStatus = "Pending (API not yet in pod): \(identifier)"
     }
 
     var body: some View {
