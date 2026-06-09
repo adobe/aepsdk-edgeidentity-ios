@@ -38,7 +38,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         return Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
                      type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
                      source: EventSource.requestContent,
-                     data: [IdentityConstants.ProfileAttributes.TIMEZONE: timezone])
+                     data: [TimeZoneAttributeHandler.key: timezone])
     }
 
     private func makeConsentEvent(val: String) -> Event {
@@ -57,13 +57,13 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
     private func storeTimezone(_ timezone: String) {
         mockDataStore.set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
-                          key: IdentityConstants.ProfileAttributes.TIMEZONE,
+                          key: TimeZoneAttributeHandler.key,
                           value: timezone)
     }
 
     private func storedTimezone() -> String? {
         return mockDataStore.get(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
-                                 key: IdentityConstants.ProfileAttributes.TIMEZONE) as? String
+                                 key: TimeZoneAttributeHandler.key) as? String
     }
 
     private func edgeEvents() -> [Event] {
@@ -129,7 +129,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         let data = edgeEvents()[0].data?[IdentityConstants.ProfileAttributes.XDM.DATA_KEY] as? [String: Any]
         XCTAssertEqual("Europe/London",
-                       data?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+                       data?[TimeZoneAttributeHandler.key] as? String)
     }
 
     func testTimezoneEdgeEvent_storesTimezone() {
@@ -138,21 +138,9 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         XCTAssertEqual("Pacific/Auckland", storedTimezone())
     }
 
-    // MARK: - Consent
-
-    func testConsentNoToYes_noReSync_reSyncDisabled() {
-        // TODO: CJM-144861 — Re-sync on consent n→y is temporarily disabled.
-        // Update this test to assert 1 Edge event once re-sync is re-enabled.
-        storeTimezone("America/Los_Angeles")
-
-        mockRuntime.simulateComingEvents(makeConsentEvent(val: "y"))
-
-        XCTAssertEqual("America/Los_Angeles", storedTimezone())
-        XCTAssertTrue(edgeEvents().isEmpty)
-    }
+    // MARK: - Consent (no re-sync; consent events are not handled)
 
     func testConsentNoToYes_noStoredValue_noEdgeEvent() {
-        // user never called updateProfileAttributes — nothing pending
         mockRuntime.simulateComingEvents(makeConsentEvent(val: "y"))
 
         XCTAssertTrue(edgeEvents().isEmpty)
@@ -217,7 +205,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
 
         XCTAssertEqual("Europe/London",
-                       lastSharedStateProfileAttributes()?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+                       lastSharedStateProfileAttributes()?[TimeZoneAttributeHandler.key] as? String)
     }
 
     func testTimezoneSync_xdmSharedStatePreservesIdentityMap() {
@@ -266,7 +254,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         let store = MockDataStore()
         ServiceProvider.shared.namedKeyValueService = store
         store.set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
-                  key: IdentityConstants.ProfileAttributes.TIMEZONE,
+                  key: TimeZoneAttributeHandler.key,
                   value: "Asia/Kolkata")
 
         let runtime = TestableExtensionRuntime()
@@ -283,6 +271,6 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         }
         let attrs = hydrated?[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]
         XCTAssertEqual("Asia/Kolkata",
-                       attrs?[IdentityConstants.ProfileAttributes.XDM.TIMEZONE_DATA_KEY] as? String)
+                       attrs?[TimeZoneAttributeHandler.key] as? String)
     }
 }

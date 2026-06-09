@@ -38,35 +38,24 @@ enum IdentityConstants {
             static let SHARED_OWNER_NAME = "com.adobe.module.eventhub"
             static let EXTENSIONS = "extensions"
         }
+
+        enum Consent {
+            static let SHARED_OWNER_NAME = "com.adobe.edge.consent"
+        }
     }
 
     enum ProfileAttributes {
-        static let TIMEZONE = "timezone"
-        // ─── Adding a new attribute (example: push identifier) ───────────────────
-        // static let PUSH_IDENTIFIER = "pushidentifier"
-        // ─────────────────────────────────────────────────────────────────────────
+        // Per-attribute keys (event data, persistence, and XDM payload) are owned by each
+        // ProfileAttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
+        // Add a new attribute by creating a new ProfileAttributeHandler conforming type.
 
-        static let STORE_NAME = "com.adobe.mobilecore.userattributes"
-
-        // Step 1 of 3: register the storage key so reset clears it and re-sync picks it up.
-        static let allKeys: [String] = [TIMEZONE]
-        // Example with a second attribute:
-        // static let allKeys: [String] = [TIMEZONE, PUSH_IDENTIFIER]
-
-        /// Maps each persistence storage key → XDM data key used in the Edge event payload.
-        /// Step 2 of 3: add one entry per new attribute so buildXdmData() maps it automatically.
-        static let xdmKeyMap: [String: String] = [
-            TIMEZONE: XDM.TIMEZONE_DATA_KEY
-            // PUSH_IDENTIFIER: XDM.PUSH_IDENTIFIER_DATA_KEY
-        ]
+        static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
 
         enum XDM {
             static let XDM_KEY = "xdm"
             static let DATA_KEY = "data"
             static let EVENT_TYPE_KEY = "eventType"
             static let PROFILE_UPDATE_EVENT_TYPE = "profile.updateAttributes"
-            static let TIMEZONE_DATA_KEY = "timeZone"
-            // static let PUSH_IDENTIFIER_DATA_KEY = "pushNotificationDetails"
         }
 
     }
@@ -85,8 +74,8 @@ enum IdentityConstants {
     }
 
     enum EventTypes {
-        // EventType.genericProfileAttributes is not yet in the published AEPCore pod; use the raw string.
-        static let GENERIC_PROFILE_ATTRIBUTES = "com.adobe.eventType.generic.profileAttributes"
+        // Matches EventType.genericProfileAttributes in AEPCore (raw string kept to avoid pod version dependency).
+        static let GENERIC_PROFILE_ATTRIBUTES = "com.adobe.eventType.profileAttribute"
     }
 
     enum EventDataKeys {

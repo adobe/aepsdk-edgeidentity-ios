@@ -24,7 +24,7 @@ class IdentityTimezoneEventTests: XCTestCase {
     // MARK: - timezone
 
     func testTimezone_returnsValue() {
-        let event = makeEvent(data: [IdentityConstants.ProfileAttributes.TIMEZONE: "Asia/Kolkata"])
+        let event = makeEvent(data: [TimeZoneAttributeHandler.key: "Asia/Kolkata"])
         XCTAssertEqual("Asia/Kolkata", event.timezone)
     }
 
@@ -39,14 +39,14 @@ class IdentityTimezoneEventTests: XCTestCase {
     }
 
     func testTimezone_returnsNil_whenNotString() {
-        let event = makeEvent(data: [IdentityConstants.ProfileAttributes.TIMEZONE: 99])
+        let event = makeEvent(data: [TimeZoneAttributeHandler.key: 99])
         XCTAssertNil(event.timezone)
     }
 
     /// The extractor is a pure value read — it does NOT validate the IANA identifier.
-    /// An empty string passes through as-is; validation is `handleTimezoneSync`'s job.
+    /// An empty string passes through as-is; validation is `TimeZoneAttributeHandler.collectFromEvent`'s job.
     func testTimezone_returnsEmptyString_whenEmpty() {
-        let event = makeEvent(data: [IdentityConstants.ProfileAttributes.TIMEZONE: ""])
+        let event = makeEvent(data: [TimeZoneAttributeHandler.key: ""])
         XCTAssertEqual("", event.timezone)
     }
 

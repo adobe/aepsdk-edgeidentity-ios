@@ -45,16 +45,10 @@ extension Event {
     }
 
     var timezone: String? {
-        return data?[IdentityConstants.ProfileAttributes.TIMEZONE] as? String
+        return data?[TimeZoneAttributeHandler.key] as? String
     }
 
     // ─── Adding a new profile-attribute accessor ─────────────────────────────
-    // The `genericProfileAttributes/requestContent` listener is single-purpose, so handlers
-    // self-discriminate via `guard let foo = event.foo` rather than via an `isFooEvent` predicate.
-    // Each new attribute needs exactly one extractor here:
-    //
-    // var pushIdentifier: String? {
-    //     return data?[IdentityConstants.ProfileAttributes.PUSH_IDENTIFIER] as? String
-    // }
+    // var locale: String? { return data?[LocaleAttributeHandler.key] as? String }
     // ─────────────────────────────────────────────────────────────────────────
 }
