@@ -78,11 +78,14 @@ struct GetIdentitiesView: View {
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
 
     private func sendTimezone(_ identifier: String) {
-        guard let tz = TimeZone(identifier: identifier) else {
+        guard !identifier.isEmpty, let tz = TimeZone(identifier: identifier) else {
             lastTimezoneStatus = "Invalid IANA timezone: \(identifier)"
             return
         }
-        MobileCore.updateProfileAttributes().setTimezone(tz)
+        let attributes = ProfileAttributes.Builder()
+            .setTimezone(tz)
+            .build()
+        MobileCore.updateProfileAttributes(attributes)
         lastTimezoneStatus = "Sent: \(identifier)"
     }
 
@@ -493,7 +496,7 @@ struct MultipleIdentityView: View {
 // MARK: TODO remove this once Assurance has tvOS support.
 #if os(iOS)
 struct AssuranceView: View {
-    @State private var assuranceSessionUrl: String = "edgetutorialapp://?adb_validation_sessionid=aa46e49e-0efa-49f8-82b1-703473301ff3"
+    @State private var assuranceSessionUrl: String = ""
 
     var body: some View {
         VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
