@@ -76,17 +76,20 @@ struct GetIdentitiesView: View {
     @State var lastTimezoneStatus: String = ""
 
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
+    // Matches IdentityTimezoneTests.testTimezoneSync_spam5x_onlyOneEdgeEvent — self-contained dedup check.
+    private let spamTestTimezone = "America/New_York"
 
-    private func sendTimezone(_ identifier: String) {
+    private func sendTimezone(_ identifier: String, updateStatus: Bool = true) {
         guard !identifier.isEmpty, let tz = TimeZone(identifier: identifier) else {
-            lastTimezoneStatus = "Invalid IANA timezone: \(identifier)"
+            if updateStatus {
+                lastTimezoneStatus = "Invalid IANA timezone: \(identifier)"
+            }
             return
         }
-        let attributes = ProfileAttributes.Builder()
-            .setTimezone(tz)
-            .build()
-        MobileCore.updateProfileAttributes(attributes)
-        lastTimezoneStatus = "Sent: \(identifier)"
+        MobileCore.updateProfileAttributes(ProfileAttributes(timeZone: tz))
+        if updateStatus {
+            lastTimezoneStatus = "Sent: \(identifier)"
+        }
     }
 
     var body: some View {
@@ -192,15 +195,13 @@ struct GetIdentitiesView: View {
                 }
 
                 Button {
-                    let id = timezoneInput.trimmingCharacters(in: .whitespaces)
-                    guard !id.isEmpty, TimeZone(identifier: id) != nil else {
-                        lastTimezoneStatus = "Invalid timezone for spam test"
-                        return
+                    timezoneInput = spamTestTimezone
+                    for _ in 1...5 {
+                        sendTimezone(spamTestTimezone, updateStatus: false)
                     }
-                    for _ in 1...5 { sendTimezone(id) }
-                    lastTimezoneStatus = "Spammed x5: \(id)"
+                    lastTimezoneStatus = "Spammed x5: \(spamTestTimezone) (dedup — expect 1 Edge event)"
                 } label: {
-                    Text("Spam Send (x5)")
+                    Text("Spam Update Attributes (x5)")
                 }
                 .padding(.top, 4)
 
@@ -496,7 +497,7 @@ struct MultipleIdentityView: View {
 // MARK: TODO remove this once Assurance has tvOS support.
 #if os(iOS)
 struct AssuranceView: View {
-    @State private var assuranceSessionUrl: String = ""
+    @State private var assuranceSessionUrl: String = "edgetutorialapp://?adb_validation_sessionid=fbd16be6-ab74-4854-b695-aa21a896279f&env=qa"
 
     var body: some View {
         VStack(alignment: HorizontalAlignment.leading, spacing: 12) {

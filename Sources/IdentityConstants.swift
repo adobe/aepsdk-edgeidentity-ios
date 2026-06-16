@@ -75,7 +75,7 @@ enum IdentityConstants {
 
     enum EventTypes {
         // Matches EventType.genericProfileAttributes in AEPCore (raw string kept to avoid pod version dependency).
-        static let GENERIC_PROFILE_ATTRIBUTES = "com.adobe.eventType.profileAttribute"
+        static let GENERIC_PROFILE_ATTRIBUTES = "com.adobe.eventType.generic.profileAttributes"
     }
 
     enum EventDataKeys {
