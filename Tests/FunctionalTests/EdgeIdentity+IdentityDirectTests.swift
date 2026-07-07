@@ -80,10 +80,10 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     /// Test Edge Identity bootup will load ECID from legacy Identity direct extension
     func testLegacyEcidLoadedOnBootup() {
         registerIdentityDirectAndStart() // register Identity Direct first to allow bootup and shared state creation
-        let ecidLegacy = getLegacyEcidFromIdentity()
+        let ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         registerEdgeIdentityAndWait() // register Edge Identity alone
-        let ecidEdge = getEcidFromEdgeIdentity()
+        let ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -94,16 +94,16 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     /// Test Edge Identity will include legacy ECID in IdentityMap when read from Identity Direct shared state
     func testLegacyEcidAddedToIdentityMapAfterBootup() {
         registerEdgeIdentityAndStart() // register and boot Edge Identity
-        let ecidEdge = getEcidFromEdgeIdentity()
+        let ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         registerIdentityDirectAndWait()
-        let ecidLegacy = getLegacyEcidFromIdentity()
+        let ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         XCTAssertNotNil(ecidEdge)
         XCTAssertNotNil(ecidLegacy)
         XCTAssertNotEqual(ecidLegacy, ecidEdge)
 
-        let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        let (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
         XCTAssertEqual(false, primaryEcidItem?.primary)
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
@@ -114,10 +114,10 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     func testEcidsAreDifferentAfterReset() {
         // 1) Register Identity then Edge Identity and verify both have same ECID
         registerIdentityDirectAndStart()
-        var ecidLegacy = getLegacyEcidFromIdentity()
+        var ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         registerEdgeIdentityAndWait()
-        let ecidEdge = getEcidFromEdgeIdentity()
+        let ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -133,12 +133,12 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
 
         // 3) Identity Direct state change will add legacy ECID to Identity Map
         Identity.syncIdentifiers(identifiers: ["email": "email@example.com"])
-        ecidLegacy = getLegacyEcidFromIdentity() // causes test to wait for state change from sync call
 
         (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
         XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
+        ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
         XCTAssertEqual(ecidLegacy, legacyEcidItem?.id)
     }
 
@@ -146,10 +146,10 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     func testEcidsAreDifferentAfterPrivacyChange() {
         // 1) Register Identity then Edge Identity and verify both have same ECID
         registerIdentityDirectAndStart()
-        var ecidLegacy = getLegacyEcidFromIdentity()
+        var ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         registerEdgeIdentityAndWait()
-        let ecidEdge = getEcidFromEdgeIdentity()
+        let ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -158,8 +158,8 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
 
         // 2) Toggle privacy and verify legacy ECID added to IdentityMap
         toggleGlobalPrivacy()
-        ecidLegacy = getLegacyEcidFromIdentity()
-        let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        let (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
+        ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
         XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
@@ -171,10 +171,10 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     func testEcidsAreDifferentAfterResetIdentitiesAndPrivacyChange() {
         // 1) Register Identity then Edge Identity and verify both have same ECID
         registerIdentityDirectAndStart()
-        var ecidLegacy = getLegacyEcidFromIdentity()
+        var ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         registerEdgeIdentityAndWait()
-        var ecidEdge = getEcidFromEdgeIdentity()
+        var ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         // verify ECIDs from both extensions are the same
         XCTAssertNotNil(ecidEdge)
@@ -184,10 +184,9 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
         MobileCore.resetIdentities()
         toggleGlobalPrivacy()
-        ecidLegacy = getLegacyEcidFromIdentity()
-        ecidEdge = getEcidFromEdgeIdentity()
-
-        let (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        let (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
+        ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
+        ecidEdge = waitForNonNilEcidFromEdgeIdentity()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
         XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
@@ -199,16 +198,16 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
     func testLegacyEcidIsRemovedOnPrivacyOptOut() {
         // 1) Register Edge Identity then Identity and verify ECIDs are different
         registerEdgeIdentityAndStart() // register and boot Edge Identity
-        let ecidEdge = getEcidFromEdgeIdentity()
+        let ecidEdge = waitForNonNilEcidFromEdgeIdentity()
 
         registerIdentityDirectAndWait()
-        var ecidLegacy = getLegacyEcidFromIdentity()
+        var ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
 
         XCTAssertNotNil(ecidEdge)
         XCTAssertNotNil(ecidLegacy)
         XCTAssertNotEqual(ecidLegacy, ecidEdge)
 
-        var (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        var (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
 
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
@@ -218,8 +217,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
 
         // 2) Set privacy opted-out and verify legacy ECID is removed
         setPrivacyStatus(PrivacyStatus.optedOut)
-        ecidLegacy = getLegacyEcidFromIdentity() // call gives time for Edge Identity to process Identity state change
-        (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidRemovedFromIdentityMap()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertEqual(ecidEdge, primaryEcidItem?.id)
         XCTAssertNil(legacyEcidItem)
@@ -267,36 +265,58 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         wait(for: [initExpectation], timeout: 5)
     }
 
-    func getEcidFromEdgeIdentity() -> String? {
+    func getEcidFromEdgeIdentity(timeout: TimeInterval = 5) -> String? {
         let expectation = XCTestExpectation(description: "AEPEdgeIdentity.Identity.getExperienceCloudId callback")
         var ecid: String?
         AEPEdgeIdentity.Identity.getExperienceCloudId { id, _ in
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 10)
+        wait(for: [expectation], timeout: timeout)
         return ecid
     }
 
-    func getLegacyEcidFromIdentity() -> String? {
+    func getLegacyEcidFromIdentity(timeout: TimeInterval = 5) -> String? {
         let expectation = XCTestExpectation(description: "AEPIdentity.Identity.getExperienceCloudId callback")
         var ecid: String?
         AEPIdentity.Identity.getExperienceCloudId { id, _ in
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 10)
+        wait(for: [expectation], timeout: timeout)
         return ecid
     }
 
-    func getPrimaryAndLegacyEcidIdentityItems() -> (IdentityItem?, IdentityItem?) {
+    func waitForNonNilEcidFromEdgeIdentity(timeout: TimeInterval = 15) -> String? {
+        let deadline = Date().addingTimeInterval(timeout)
+        var ecid: String?
+        repeat {
+            ecid = getEcidFromEdgeIdentity()
+            if ecid != nil { break }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return ecid
+    }
+
+    func waitForNonNilLegacyEcidFromIdentity(timeout: TimeInterval = 15) -> String? {
+        let deadline = Date().addingTimeInterval(timeout)
+        var ecid: String?
+        repeat {
+            ecid = getLegacyEcidFromIdentity()
+            if ecid != nil { break }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return ecid
+    }
+
+    func getPrimaryAndLegacyEcidIdentityItems(timeout: TimeInterval = 5) -> (IdentityItem?, IdentityItem?) {
         let expectation = XCTestExpectation(description: "AEPEdgeIdentity.Identity.getIdentities callback")
         var identities: IdentityMap?
         Identity.getIdentities { identityMap, _ in
             identities = identityMap
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 15)
+        wait(for: [expectation], timeout: timeout)
 
         guard let identityMap = identities, let ecids = identityMap.getItems(withNamespace: "ECID") else {
             return (nil, nil)
@@ -317,6 +337,19 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         repeat {
             (primary, legacy) = getPrimaryAndLegacyEcidIdentityItems()
             if legacy != nil { break }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return (primary, legacy)
+    }
+
+    /// Polls until the legacy ECID is removed from the identity map while a primary ECID remains.
+    func waitForLegacyEcidRemovedFromIdentityMap(timeout: TimeInterval = 15) -> (IdentityItem?, IdentityItem?) {
+        let deadline = Date().addingTimeInterval(timeout)
+        var primary: IdentityItem?
+        var legacy: IdentityItem?
+        repeat {
+            (primary, legacy) = getPrimaryAndLegacyEcidIdentityItems()
+            if primary != nil && legacy == nil { break }
             Thread.sleep(forTimeInterval: 0.1)
         } while Date() < deadline
         return (primary, legacy)
