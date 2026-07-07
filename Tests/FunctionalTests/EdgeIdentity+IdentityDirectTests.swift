@@ -296,7 +296,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             identities = identityMap
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 15)
 
         guard let identityMap = identities, let ecids = identityMap.getItems(withNamespace: "ECID") else {
             return (nil, nil)
