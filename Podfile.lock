@@ -13,8 +13,8 @@ PODS:
     - AEPEdge (< 6.0.0, >= 5.0.0)
   - AEPEdgeIdentity (5.0.0):
     - AEPCore (< 6.0.0, >= 5.10.0)
-  - AEPIdentity (5.9.0):
-    - AEPCore (< 6.0.0, >= 5.9.0)
+  - AEPIdentity (5.10.0):
+    - AEPCore (< 6.0.0, >= 5.10.0)
   - AEPRulesEngine (5.0.0)
   - AEPServices (5.10.0)
   - AEPTestUtils (5.6.0):
@@ -62,7 +62,7 @@ SPEC CHECKSUMS:
   AEPEdge: 105afc7958acd7c016d57f7ac1d6f632bf05e6ee
   AEPEdgeConsent: b5a54985b79ee0222b1f1fc4b0859f8b8afed07a
   AEPEdgeIdentity: fdc39ef09ec53a8f3fe6a9d5d534e2ce5e7c56cb
-  AEPIdentity: e65a1511029b5626c6312f8e44cd37889c85b0fc
+  AEPIdentity: c08e13f575c11f862e6d37da4b35fb7074b7860a
   AEPRulesEngine: fe5800653a4bee07b1e41e61b4d5551f0dba557b
   AEPServices: eaa574567b585ba5588a633dfd0f3e2c2d50f525
   AEPTestUtils: 2bbed995c8974f6f6d92058db88d6cd2e4a7f869
