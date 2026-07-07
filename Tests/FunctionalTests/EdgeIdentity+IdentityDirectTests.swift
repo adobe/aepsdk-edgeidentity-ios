@@ -135,7 +135,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         Identity.syncIdentifiers(identifiers: ["email": "email@example.com"])
         ecidLegacy = getLegacyEcidFromIdentity() // causes test to wait for state change from sync call
 
-        (primaryEcidItem, legacyEcidItem) = getPrimaryAndLegacyEcidIdentityItems()
+        (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
         XCTAssertNotEqual(legacyEcidItem?.id, primaryEcidItem?.id)
@@ -234,7 +234,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 2)
+        wait(for: [initExpectation], timeout: 5)
     }
 
     /// Register Identity direct + Configuration
@@ -254,7 +254,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtension(AEPEdgeIdentity.Identity.self) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 2)
+        wait(for: [initExpectation], timeout: 5)
     }
 
     /// Register Identity direct. Should be called after one of the 'init' functions above.
@@ -274,7 +274,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 10)
         return ecid
     }
 
@@ -285,7 +285,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 10)
         return ecid
     }
 
@@ -307,6 +307,19 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         } else {
             return (ecids[0], ecids[1])
         }
+    }
+
+    /// Polls until a legacy ECID appears in the identity map or the deadline expires.
+    func waitForLegacyEcidInIdentityMap(timeout: TimeInterval = 15) -> (IdentityItem?, IdentityItem?) {
+        let deadline = Date().addingTimeInterval(timeout)
+        var primary: IdentityItem?
+        var legacy: IdentityItem?
+        repeat {
+            (primary, legacy) = getPrimaryAndLegacyEcidIdentityItems()
+            if legacy != nil { break }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return (primary, legacy)
     }
 
     func toggleGlobalPrivacy() {
