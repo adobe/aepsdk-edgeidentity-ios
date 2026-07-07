@@ -497,7 +497,7 @@ struct MultipleIdentityView: View {
 // MARK: TODO remove this once Assurance has tvOS support.
 #if os(iOS)
 struct AssuranceView: View {
-    @State private var assuranceSessionUrl: String = "edgetutorialapp://?adb_validation_sessionid=fbd16be6-ab74-4854-b695-aa21a896279f&env=qa"
+    @State private var assuranceSessionUrl: String = ""
 
     var body: some View {
         VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
