@@ -16,7 +16,7 @@ class IdentityTimezoneEventTests: XCTestCase {
 
     private func makeEvent(data: [String: Any]?) -> Event {
         return Event(name: "Test Timezone",
-                     type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                     type: EventType.genericProfileAttributes,
                      source: EventSource.requestContent,
                      data: data)
     }

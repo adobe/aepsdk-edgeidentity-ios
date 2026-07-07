@@ -12,7 +12,7 @@ import AEPCore
 import Foundation
 
 /// Handles a single profile attribute end-to-end: it claims a key on the incoming
-/// `GENERIC_PROFILE_ATTRIBUTES` event, owns its dedup and persistence, and reports its
+/// `genericProfileAttributes` event, owns its dedup and persistence, and reports its
 /// contribution to the outgoing collated `profile.updateAttributes` Edge payload and to the
 /// profile-attributes XDM shared state.
 ///

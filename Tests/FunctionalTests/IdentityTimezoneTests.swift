@@ -36,7 +36,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
     private func makeTimezoneEvent(_ timezone: String) -> Event {
         return Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
-                     type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                     type: EventType.genericProfileAttributes,
                      source: EventSource.requestContent,
                      data: [TimeZoneAttributeHandler.key: timezone])
     }
@@ -237,7 +237,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
     func testTimezoneSync_missingTimezoneData_noEdgeEventAndNotStored() {
         let event = Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
-                          type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                          type: EventType.genericProfileAttributes,
                           source: EventSource.requestContent,
                           data: ["unrelated": "value"])
 

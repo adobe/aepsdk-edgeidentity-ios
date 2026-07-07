@@ -69,7 +69,7 @@ class TimeZoneAttributeHandlerTests: XCTestCase {
 
     func testCollectFromEvent_whenKeyAbsent_returnsNil() {
         let event = Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
-                          type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                          type: EventType.genericProfileAttributes,
                           source: EventSource.requestContent,
                           data: ["otherKey": "value"])
 
@@ -89,7 +89,7 @@ class TimeZoneAttributeHandlerTests: XCTestCase {
 
     func testCollectFromEvent_whenNilEventData_returnsNil() {
         let event = Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
-                          type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                          type: EventType.genericProfileAttributes,
                           source: EventSource.requestContent,
                           data: nil)
 
@@ -118,7 +118,7 @@ class TimeZoneAttributeHandlerTests: XCTestCase {
 
     private func makeEvent(_ timezone: String) -> Event {
         return Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
-                     type: IdentityConstants.EventTypes.GENERIC_PROFILE_ATTRIBUTES,
+                     type: EventType.genericProfileAttributes,
                      source: EventSource.requestContent,
                      data: [key: timezone])
     }
