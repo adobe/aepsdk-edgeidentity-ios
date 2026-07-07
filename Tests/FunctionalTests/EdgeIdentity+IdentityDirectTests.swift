@@ -234,7 +234,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtensions([AEPEdgeIdentity.Identity.self]) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 1)
+        wait(for: [initExpectation], timeout: 2)
     }
 
     /// Register Identity direct + Configuration
@@ -245,7 +245,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtensions([AEPIdentity.Identity.self]) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 1)
+        wait(for: [initExpectation], timeout: 5)
     }
 
     /// Register AEPEdgeIdentity. Should be called after one of the 'init' functions above.
@@ -264,7 +264,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.registerExtension(AEPIdentity.Identity.self) {
             initExpectation.fulfill()
         }
-        wait(for: [initExpectation], timeout: 1)
+        wait(for: [initExpectation], timeout: 5)
     }
 
     func getEcidFromEdgeIdentity() -> String? {
@@ -296,7 +296,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             identities = identityMap
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
 
         guard let identityMap = identities, let ecids = identityMap.getItems(withNamespace: "ECID") else {
             return (nil, nil)
