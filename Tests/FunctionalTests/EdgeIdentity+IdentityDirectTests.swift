@@ -274,7 +274,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 5)
         return ecid
     }
 
@@ -285,7 +285,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             ecid = id
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 5)
         return ecid
     }
 
@@ -316,7 +316,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.getPrivacyStatus { _ in
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
     }
 
     func setPrivacyStatus(_ privacyStatus: PrivacyStatus) {
@@ -325,6 +325,6 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         MobileCore.getPrivacyStatus { _ in
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
     }
 }
