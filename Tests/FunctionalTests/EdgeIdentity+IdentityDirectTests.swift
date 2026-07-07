@@ -184,8 +184,11 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
         MobileCore.resetIdentities()
         toggleGlobalPrivacy()
-        let (primaryEcidItem, legacyEcidItem) = waitForLegacyEcidInIdentityMap()
-        ecidLegacy = waitForNonNilLegacyEcidFromIdentity()
+        // Edge Identity syncs the legacy ECID into its IdentityMap asynchronously via the Identity
+        // Direct shared state listener, so poll until the map has caught up to Identity Direct's
+        // current ECID before comparing values.
+        let (primaryEcidItem, legacyEcidItem, ecidLegacyStable) = waitForLegacyEcidToStabilize()
+        ecidLegacy = ecidLegacyStable
         ecidEdge = waitForNonNilEcidFromEdgeIdentity()
         XCTAssertNotNil(primaryEcidItem)
         XCTAssertNotNil(legacyEcidItem)
@@ -340,6 +343,26 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
             Thread.sleep(forTimeInterval: 0.1)
         } while Date() < deadline
         return (primary, legacy)
+    }
+
+    /// Polls until the legacy ECID in Edge Identity's IdentityMap matches Identity Direct's current
+    /// ECID. After a reset + privacy toggle, Identity Direct regenerates its ECID and Edge Identity
+    /// syncs it into the map asynchronously, so the map can briefly hold a stale legacy ECID.
+    /// Returns the map items alongside the Identity Direct ECID captured in the same converged state.
+    func waitForLegacyEcidToStabilize(timeout: TimeInterval = 15) -> (IdentityItem?, IdentityItem?, String?) {
+        let deadline = Date().addingTimeInterval(timeout)
+        var primary: IdentityItem?
+        var legacy: IdentityItem?
+        var legacyEcid: String?
+        repeat {
+            legacyEcid = getLegacyEcidFromIdentity()
+            (primary, legacy) = getPrimaryAndLegacyEcidIdentityItems()
+            if primary != nil, legacyEcid != nil, legacy?.id == legacyEcid {
+                break
+            }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while Date() < deadline
+        return (primary, legacy, legacyEcid)
     }
 
     /// Polls until the legacy ECID is removed from the identity map while a primary ECID remains.
