@@ -184,9 +184,9 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         // 2) Reset identities and toggle privacy and verify legacy ECID added to IdentityMap
         MobileCore.resetIdentities()
         toggleGlobalPrivacy()
-        // Edge Identity syncs the legacy ECID into its IdentityMap asynchronously via the Identity
-        // Direct shared state listener, so poll until the map has caught up to Identity Direct's
-        // current ECID before comparing values.
+        // Reset plus a privacy toggle gives Identity Direct a new legacy ECID right away, but Edge
+        // Identity's map can still show the old mirrored value for a bit. Let both sources settle
+        // before we compare them.
         let (primaryEcidItem, legacyEcidItem, ecidLegacyStable) = waitForLegacyEcidToStabilize()
         ecidLegacy = ecidLegacyStable
         ecidEdge = waitForNonNilEcidFromEdgeIdentity()
@@ -290,6 +290,12 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         return ecid
     }
 
+    // Identity Direct and Edge Identity keep ECIDs in sync asynchronously, so a single API
+    // callback isn't a reliable way to synchronize in these tests. Slow CI makes it worse—with
+    // no network, ConfigurationDownloader fails and generation takes longer, and we'd flake
+    // on nil reads, unset identity maps, or two sources that both had values but hadn't
+    // matched yet. The wait helpers below poll until the state we actually care about is true.
+
     func waitForNonNilEcidFromEdgeIdentity(timeout: TimeInterval = 15) -> String? {
         let deadline = Date().addingTimeInterval(timeout)
         var ecid: String?
@@ -345,10 +351,7 @@ class EdgeIdentityAndIdentityDirectTests: XCTestCase {
         return (primary, legacy)
     }
 
-    /// Polls until the legacy ECID in Edge Identity's IdentityMap matches Identity Direct's current
-    /// ECID. After a reset + privacy toggle, Identity Direct regenerates its ECID and Edge Identity
-    /// syncs it into the map asynchronously, so the map can briefly hold a stale legacy ECID.
-    /// Returns the map items alongside the Identity Direct ECID captured in the same converged state.
+    /// Waits until Identity Direct's legacy ECID and Edge Identity's mirrored map entry agree.
     func waitForLegacyEcidToStabilize(timeout: TimeInterval = 15) -> (IdentityItem?, IdentityItem?, String?) {
         let deadline = Date().addingTimeInterval(timeout)
         var primary: IdentityItem?
