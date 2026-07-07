@@ -26,8 +26,8 @@ import AEPAssurance
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // TODO: Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
-    private let ENVIRONMENT_FILE_ID = "3149c49c3910/473386a6e5b0/launch-6099493a8c97-development"
-        private let isStaging = false
+    private let ENVIRONMENT_FILE_ID = ""
+    private let isStaging = false
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -46,10 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Sync profile attributes as early as possible so the Edge Network has accurate data
         // before any personalization or notification requests are made.
-        // The app is responsible for supplying the correct timezone — the SDK does not read from the OS.
-        if let tz = TimeZone(identifier: "America/Los_Angeles") {
-            MobileCore.updateProfileAttributes(ProfileAttributes(timeZone: tz))
-        }
+        // Production apps supply the timezone explicitly; the demo app uses the device timezone.
+        MobileCore.updateProfileAttributes(ProfileAttributes(timeZone: .current))
 
         return true
     }
