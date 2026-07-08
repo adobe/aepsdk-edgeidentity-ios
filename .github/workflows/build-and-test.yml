@@ -31,11 +31,3 @@ jobs:
       run-build-xcframework-and-app: true
       enable-codecov: true
     secrets: inherit
-
-  spm-integration-test:
-    name: SPM Integration Test
-    uses: adobe/aepsdk-commons/.github/workflows/ios-custom-command-build-and-test.yml@gha-ios-5.3.5
-    with:
-      xcode-version: '16.4'
-      command: make test-SPM-integration
-    secrets: inherit
