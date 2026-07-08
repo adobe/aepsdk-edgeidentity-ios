@@ -16,7 +16,7 @@ import Foundation
 enum IdentityConstants {
     static let EXTENSION_NAME = "com.adobe.edge.identity"
     static let FRIENDLY_NAME = "Edge Identity"
-    static let EXTENSION_VERSION = "5.0.0"
+    static let EXTENSION_VERSION = "5.1.0"
     static let DATASTORE_NAME = EXTENSION_NAME
     static let LOG_TAG = FRIENDLY_NAME
 
@@ -38,6 +38,26 @@ enum IdentityConstants {
             static let SHARED_OWNER_NAME = "com.adobe.module.eventhub"
             static let EXTENSIONS = "extensions"
         }
+
+        enum Consent {
+            static let SHARED_OWNER_NAME = "com.adobe.edge.consent"
+        }
+    }
+
+    enum ProfileAttributes {
+        // Per-attribute keys (event data, persistence, and XDM payload) are owned by each
+        // ProfileAttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
+        // Add a new attribute by creating a new ProfileAttributeHandler conforming type.
+
+        static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
+
+        enum XDM {
+            static let XDM_KEY = "xdm"
+            static let DATA_KEY = "data"
+            static let EVENT_TYPE_KEY = "eventType"
+            static let PROFILE_UPDATE_EVENT_TYPE = "profile.updateAttributes"
+        }
+
     }
 
     enum EventNames {
@@ -50,6 +70,7 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_URL_VARIABLES = "Edge Identity Response URL Variables"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
+        static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
     }
 
     enum EventDataKeys {
@@ -79,6 +100,7 @@ enum IdentityConstants {
 
         enum Consent {
             static let CONSENTS = "consents"
+            static let COLLECT = "collect"
             static let ID_TYPE = "idType"
             static let AD_ID = "adID"
             static let VAL = "val"

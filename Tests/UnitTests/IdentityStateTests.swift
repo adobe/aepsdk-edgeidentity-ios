@@ -25,10 +25,16 @@ class IdentityStateTests: XCTestCase {
 
     override func setUp() {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
+        NamedCollectionDataStore.clear()
         state = IdentityState(identityProperties: IdentityProperties())
     }
 
     // MARK: bootupIfReady(...) tests
+
+    private func ecidFromXdmSharedState(_ data: [String: Any]) -> String? {
+        let ecidItems = (data["identityMap"] as? [String: Any])?["ECID"] as? [[String: Any]]
+        return ecidItems?.first?["id"] as? String
+    }
 
     /// Tests bootup generates ECID
     func testBootupIfReadyGeneratesECID() {
@@ -41,7 +47,7 @@ class IdentityStateTests: XCTestCase {
                 return nil
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertNotNil(sharedEcid)
                 expectation.fulfill()
             })
@@ -65,7 +71,7 @@ class IdentityStateTests: XCTestCase {
                 return nil
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertEqual(ecid.ecidString, sharedEcid)
                 expectation.fulfill()
             })
@@ -91,7 +97,7 @@ class IdentityStateTests: XCTestCase {
                 return nil
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertEqual(properties.ecid, sharedEcid)
                 expectation.fulfill()
             })
@@ -118,7 +124,7 @@ class IdentityStateTests: XCTestCase {
                 return nil
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertEqual(legacyEcid.ecidString, sharedEcid)
                 expectation.fulfill()
             })
@@ -186,7 +192,7 @@ class IdentityStateTests: XCTestCase {
                 return SharedStateResult(status: .none, value: [:])
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertNotNil(sharedEcid)
                 expectation.fulfill()
             })
@@ -216,7 +222,7 @@ class IdentityStateTests: XCTestCase {
                 return SharedStateResult(status: .set, value: ["mid": "1234"])
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertEqual("1234", sharedEcid)
                 expectation.fulfill()
             })
@@ -246,7 +252,7 @@ class IdentityStateTests: XCTestCase {
                 return SharedStateResult(status: .set, value: [:])
             },
             createXDMSharedState: {data, _ in
-                let sharedEcid = ((data.flattening()["identityMap.ECID"] as? [Any])?[0] as? [String: Any])?["id"] as? String
+                let sharedEcid = ecidFromXdmSharedState(data)
                 XCTAssertNotNil(sharedEcid)
                 expectation.fulfill()
             })

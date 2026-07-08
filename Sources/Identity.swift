@@ -25,6 +25,10 @@ import Foundation
 
     public let runtime: ExtensionRuntime
 
+    // Central registry of every ProfileAttributeHandler. Add a new conforming type here to support
+    // an additional attribute — the collector in handleProfileAttributes is attribute-agnostic.
+    private let profileAttributeHandlers: [ProfileAttributeHandler] = [TimeZoneAttributeHandler()]
+
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         state = IdentityState(identityProperties: IdentityProperties())
@@ -34,6 +38,7 @@ import Foundation
     public func onRegistered() {
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
+        registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
@@ -44,8 +49,15 @@ import Foundation
     }
 
     public func readyForEvent(_ event: Event) -> Bool {
+        // The closure passed to bootupIfReady is wrapped so that when identity properties are first
+        // published, hydrated profile attributes are merged in — preventing the bootup publish from
+        // wiping the profile attributes section that `onRegistered` populated.
         guard state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
-                                  createXDMSharedState: createXDMSharedState(data:event:)) else {
+                                  createXDMSharedState: { [weak self] data, sharedStateEvent in
+                                      self?.createXDMSharedState(
+                                          data: self?.enrichWithProfileAttributes(baseData: data) ?? data,
+                                          event: sharedStateEvent)
+                                  }) else {
             return false
         }
 
@@ -56,16 +68,89 @@ import Foundation
         return true
     }
 
+    /// Collects every handler's persisted contribution into a single map.
+    /// Mirrors Android's `collectStoredAttributes()` in `IdentityState`.
+    private func collectStoredAttributes() -> [String: String] {
+        var merged: [String: String] = [:]
+        for handler in profileAttributeHandlers {
+            guard let contribution = handler.collectFromStorage() else { continue }
+            merged.merge(contribution) { _, new in new }
+        }
+        return merged
+    }
+
+    /// Merges stored profile attributes into the given XDM shared state dict under the
+    /// profile-attributes store key. iOS-specific: Android publishes these as a separate
+    /// non-XDM shared state rather than embedding them in the identity shared state.
+    private func enrichWithProfileAttributes(baseData: [String: Any]) -> [String: Any] {
+        var data = baseData
+        let merged = collectStoredAttributes()
+        if !merged.isEmpty {
+            data[IdentityConstants.ProfileAttributes.STORE_NAME] = merged
+        }
+        return data
+    }
+
     // MARK: Event Listeners
 
-    /// Handles events to set the advertising identifier. Called by listener registered with event hub.
-    /// - Parameter event: event containing `advertisingIdentifier` data
+    /// Handles `genericIdentity + requestContent` events (advertising identifier only).
     private func handleRequestContent(event: Event) {
         if event.isAdIdEvent {
             state.updateAdvertisingIdentifier(event: event,
                                               createXDMSharedState: createXDMSharedState(data:event:),
                                               eventDispatcher: dispatch(event:))
         }
+    }
+
+    /// Handles `genericProfileAttributes + requestContent` events. Runs every registered
+    /// `ProfileAttributeHandler` whose key is present in the event, merges contributions, and
+    /// dispatches one Edge event if anything changed. To add a new attribute, create a conforming
+    /// type and append it to `profileAttributeHandlers` — this function needs no changes.
+    private func handleProfileAttributes(event: Event) {
+        guard let eventData = event.data, !eventData.isEmpty else {
+            Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
+            let resolver = createPendingXDMSharedState(event: event)
+            resolver(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
+            return
+        }
+        let resolver = createPendingXDMSharedState(event: event)
+        var merged: [String: String] = [:]
+        for handler in profileAttributeHandlers {
+            guard eventData.keys.contains(handler.attributeKey) else { continue }
+            guard let contribution = handler.collectFromEvent(event) else { continue }
+            merged.merge(contribution) { _, new in new }
+        }
+        guard !merged.isEmpty else {
+            Log.debug(label: friendlyName, "\(#function) - No attribute changes from any handler, skipping dispatch.")
+            resolver(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
+            return
+        }
+        publishProfileAttributesSharedState(merged, event: event, resolveSharedState: resolver)
+    }
+
+    // MARK: - Shared state + Edge dispatch
+
+    private func publishProfileAttributesSharedState(_ xdm: [String: String], event: Event, resolveSharedState: ([String: Any]) -> Void) {
+        resolveSharedState(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
+        dispatchProfileAttributesEdgeEvent(xdmData: xdm)
+    }
+
+    // MARK: - Edge event dispatch
+
+    /// Collects all XDM-mapped profile attribute data and dispatches a single Edge event.
+    /// Future attributes are merged into the same `data` payload automatically.
+    private func dispatchProfileAttributesEdgeEvent(xdmData: [String: String]) {
+        let eventData: [String: Any] = [
+            IdentityConstants.ProfileAttributes.XDM.XDM_KEY: [
+                IdentityConstants.ProfileAttributes.XDM.EVENT_TYPE_KEY: IdentityConstants.ProfileAttributes.XDM.PROFILE_UPDATE_EVENT_TYPE
+            ],
+            IdentityConstants.ProfileAttributes.XDM.DATA_KEY: xdmData
+        ]
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
+                          type: EventType.edge,
+                          source: EventSource.requestContent,
+                          data: eventData)
+        dispatch(event: event)
     }
 
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
@@ -153,7 +238,10 @@ import Foundation
     /// Handles `EventType.edgeIdentity` request reset events.
     /// - Parameter event: the identity request reset event
     private func handleRequestReset(event: Event) {
-        // Adding pending shared state to avoid race condition between updating and reading identity map
+        for handler in profileAttributeHandlers {
+            ServiceProvider.shared.namedKeyValueService.remove(
+                collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: handler.attributeKey)
+        }
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,
@@ -178,7 +266,8 @@ import Foundation
         let legacyEcid = identitySharedState[IdentityConstants.SharedState.IdentityDirect.VISITOR_ID_ECID] as? String ?? ""
 
         if state.updateLegacyExperienceCloudId(legacyEcid) {
-            createXDMSharedState(data: state.identityProperties.toXdmData(), event: event)
+            createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)
         }
     }
 }
+
