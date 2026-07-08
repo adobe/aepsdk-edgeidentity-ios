@@ -72,6 +72,25 @@ struct GetIdentitiesView: View {
     @State var ecidIdentityText: String = ""
     @State var identityMapText: String = ""
     @State var urlVariablesText: String = ""
+    @State var timezoneInput: String = ""
+    @State var lastTimezoneStatus: String = ""
+
+    private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
+    // Matches IdentityTimezoneTests.testTimezoneSync_spam5x_onlyOneEdgeEvent — self-contained dedup check.
+    private let spamTestTimezone = "America/New_York"
+
+    private func sendTimezone(_ identifier: String, updateStatus: Bool = true) {
+        guard !identifier.isEmpty, let tz = TimeZone(identifier: identifier) else {
+            if updateStatus {
+                lastTimezoneStatus = "Invalid IANA timezone: \(identifier)"
+            }
+            return
+        }
+        MobileCore.updateProfileAttributes(ProfileAttributes(timeZone: tz))
+        if updateStatus {
+            lastTimezoneStatus = "Sent: \(identifier)"
+        }
+    }
 
     var body: some View {
         VStack {
@@ -137,6 +156,92 @@ struct GetIdentitiesView: View {
                     Text("Reset Identities")
                 }
                 .padding()
+
+                Divider().padding(.vertical, 4)
+
+                // MARK: - Timezone
+                Text("Profile Attributes — Timezone")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack {
+                    TextField("IANA timezone (e.g. Asia/Kolkata)", text: $timezoneInput)
+                        #if os(iOS)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+                        #endif
+                    Button("Send") {
+                        sendTimezone(timezoneInput.trimmingCharacters(in: .whitespaces))
+                    }
+                }
+                .padding(.horizontal)
+
+                // Preset zone chips
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(presetZones, id: \.self) { zone in
+                            Button(zone) {
+                                timezoneInput = zone
+                                sendTimezone(zone)
+                            }
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                Button {
+                    timezoneInput = spamTestTimezone
+                    for _ in 1...5 {
+                        sendTimezone(spamTestTimezone, updateStatus: false)
+                    }
+                    lastTimezoneStatus = "Spammed x5: \(spamTestTimezone) (dedup — expect 1 Edge event)"
+                } label: {
+                    Text("Spam Update Attributes (x5)")
+                }
+                .padding(.top, 4)
+
+                if !lastTimezoneStatus.isEmpty {
+                    Text(lastTimezoneStatus)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 2)
+                }
+
+                Divider().padding(.vertical, 4)
+
+                // MARK: - Consent simulation
+                Text("Consent Simulation")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack {
+                    Button {
+                        let event = Event(name: "Test Consent Response",
+                                          type: EventType.edgeConsent,
+                                          source: EventSource.responseContent,
+                                          data: ["consents": ["collect": ["val": "y"]]])
+                        MobileCore.dispatch(event: event)
+                    } label: {
+                        Text("Consent → Yes")
+                    }
+                    .padding()
+
+                    Button {
+                        let event = Event(name: "Test Consent Response",
+                                          type: EventType.edgeConsent,
+                                          source: EventSource.responseContent,
+                                          data: ["consents": ["collect": ["val": "n"]]])
+                        MobileCore.dispatch(event: event)
+                    } label: {
+                        Text("Consent → No")
+                    }
+                    .padding()
+                }
             }
             ScrollView {
                 Text(identityMapText)
@@ -145,7 +250,6 @@ struct GetIdentitiesView: View {
                     .overlay(RoundedRectangle(cornerRadius: 15).stroke(lineWidth: 1))
             }
         }
-
     }
 }
 

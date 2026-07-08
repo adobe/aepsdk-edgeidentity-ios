@@ -18,12 +18,12 @@ on:
 jobs:
   build-and-test:
     name: "CI"
-    uses: adobe/aepsdk-commons/.github/workflows/ios-build-and-test.yml@gha-ios-5.2.0
+    uses: adobe/aepsdk-commons/.github/workflows/ios-build-and-test.yml@gha-ios-5.3.5
     with:
-      ios-device-names: '["iPhone 15"]'
-      ios-versions: '["18.1"]'
+      ios-device-names: '["iPhone 16"]'
+      ios-versions: '["18.5"]'
       tvos-device-names: '["Apple TV"]'
-      tvos-versions: '["18.1"]'
+      tvos-versions: '["18.5"]'
       run-test-ios-unit: true
       run-test-ios-functional: true
       run-test-tvos-unit: true

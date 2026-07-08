@@ -43,4 +43,12 @@ extension Event {
     var isAdIdEvent: Bool {
         return data?.keys.contains(IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER) ?? false && data?[IdentityConstants.EventDataKeys.ADVERTISING_IDENTIFIER] is String
     }
+
+    var timezone: String? {
+        return data?[TimeZoneAttributeHandler.key] as? String
+    }
+
+    // ─── Adding a new profile-attribute accessor ─────────────────────────────
+    // var locale: String? { return data?[LocaleAttributeHandler.key] as? String }
+    // ─────────────────────────────────────────────────────────────────────────
 }
