@@ -316,4 +316,66 @@ class IdentityAPITests: XCTestCase {
         // test
         Identity.removeIdentity(item: IdentityItem(id: ""), withNamespace: "")
     }
+
+    // MARK: - updateDeviceAttributesBypassConsent
+
+    /// Tests that updateDeviceAttributesBypassConsent builds the correct event data from the struct and dispatches it.
+    func testUpdateDeviceAttributes_dispatchesEventWithMappedData() {
+        // setup
+        let expectation = XCTestExpectation(description: "updateDeviceAttributesBypassConsent should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { event in
+            XCTAssertEqual(IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES, event.name)
+            XCTAssertEqual("America/Los_Angeles", event.data?[TimeZoneAttributeHandler.key] as? String)
+            XCTAssertEqual("push-token-123", event.data?[PushTokenAttributeHandler.key] as? String)
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.updateDeviceAttributesBypassConsent(DeviceAttributes(timeZone: TimeZone(identifier: "America/Los_Angeles"),
+                                                         pushToken: "push-token-123"))
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that updateDeviceAttributesBypassConsent with only a timezone dispatches only the timezone key.
+    func testUpdateDeviceAttributes_timezoneOnly_dispatchesTimezoneOnly() {
+        // setup
+        let expectation = XCTestExpectation(description: "updateDeviceAttributesBypassConsent should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { event in
+            XCTAssertEqual("Asia/Kolkata", event.data?[TimeZoneAttributeHandler.key] as? String)
+            XCTAssertNil(event.data?[PushTokenAttributeHandler.key])
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.updateDeviceAttributesBypassConsent(DeviceAttributes(timeZone: TimeZone(identifier: "Asia/Kolkata")))
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that updateDeviceAttributesBypassConsent with all nil values does not dispatch an event.
+    func testUpdateDeviceAttributes_allNil_doesNotDispatch() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { _ in
+            XCTFail("updateDeviceAttributesBypassConsent should not dispatch an event when all attributes are nil")
+        }
+
+        // test
+        Identity.updateDeviceAttributesBypassConsent(DeviceAttributes())
+    }
+
+    /// Tests that updateDeviceAttributesBypassConsent with an empty push token and no timezone does not dispatch.
+    func testUpdateDeviceAttributes_emptyPushAndNoTimezone_doesNotDispatch() {
+        // setup
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { _ in
+            XCTFail("updateDeviceAttributesBypassConsent should not dispatch an event for empty/nil values")
+        }
+
+        // test
+        Identity.updateDeviceAttributesBypassConsent(DeviceAttributes(timeZone: nil, pushToken: ""))
+    }
 }

@@ -74,6 +74,9 @@ struct GetIdentitiesView: View {
     @State var urlVariablesText: String = ""
     @State var timezoneInput: String = ""
     @State var lastTimezoneStatus: String = ""
+    @State var deviceAttrPushToken: String = "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899"
+    @State var deviceAttrTimezone: String = TimeZone.current.identifier
+    @State var lastDeviceAttrStatus: String = ""
 
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
     // Matches IdentityTimezoneTests.testTimezoneSync_spam5x_onlyOneEdgeEvent — self-contained dedup check.
@@ -207,6 +210,48 @@ struct GetIdentitiesView: View {
 
                 if !lastTimezoneStatus.isEmpty {
                     Text(lastTimezoneStatus)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 2)
+                }
+
+                Divider().padding(.vertical, 4)
+
+                // MARK: - Device Attributes (updateDeviceAttributesBypassConsent — consent-independent)
+                Text("Device Attributes — updateDeviceAttributesBypassConsent")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                TextField("Push token", text: $deviceAttrPushToken)
+                    #if os(iOS)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    #endif
+                    .padding(.horizontal)
+
+                TextField("Timezone (IANA, e.g. Asia/Kolkata)", text: $deviceAttrTimezone)
+                    #if os(iOS)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    #endif
+                    .padding(.horizontal)
+
+                Button {
+                    let tz = deviceAttrTimezone.trimmingCharacters(in: .whitespaces)
+                    let token = deviceAttrPushToken.trimmingCharacters(in: .whitespaces)
+                    // Change the field values before tapping — unchanged values are deduped and won't dispatch.
+                    AEPEdgeIdentity.Identity.updateDeviceAttributesBypassConsent(
+                        DeviceAttributes(
+                            timeZone: tz.isEmpty ? nil : TimeZone(identifier: tz),
+                            pushToken: token.isEmpty ? nil : token))
+                    lastDeviceAttrStatus = "Called updateDeviceAttributesBypassConsent(tz: \(tz.isEmpty ? "nil" : tz), push: \(token.isEmpty ? "nil" : String(token.prefix(12)) + "…"))"
+                } label: {
+                    Text("Send updateDeviceAttributesBypassConsent")
+                }
+                .padding(.top, 4)
+
+                if !lastDeviceAttrStatus.isEmpty {
+                    Text(lastDeviceAttrStatus)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.top, 2)
