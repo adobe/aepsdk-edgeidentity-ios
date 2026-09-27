@@ -25,9 +25,19 @@ import Foundation
 
     public let runtime: ExtensionRuntime
 
-    // Central registry of every ProfileAttributeHandler. Add a new conforming type here to support
-    // an additional attribute — the collector in handleProfileAttributes is attribute-agnostic.
-    private let profileAttributeHandlers: [ProfileAttributeHandler] = [TimeZoneAttributeHandler()]
+    // Central registry of every profile-path AttributeHandler, each bound to the PROFILE_ATTRIBUTES
+    // dedup store. Add a new conforming type here to support an additional attribute — the collector in
+    // handleProfileAttributes is attribute-agnostic.
+    private let profileAttributeHandlers: [AttributeHandler] =
+        [TimeZoneAttributeHandler(storeName: IdentityConstants.Store.PROFILE_ATTRIBUTES)]
+
+    // Registry for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent`). Bound to a
+    // SEPARATE DEVICE_ATTRIBUTES dedup store so identical values on the profile path and device path do
+    // not cross-suppress each other. Add a new conforming type here to support an additional device
+    // attribute.
+    private let deviceAttributeHandlers: [AttributeHandler] =
+        [TimeZoneAttributeHandler(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES),
+         PushTokenAttributeHandler(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES)]
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
@@ -39,6 +49,7 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
+        registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent, listener: handleDeviceAttributes)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
@@ -103,7 +114,7 @@ import Foundation
     }
 
     /// Handles `genericProfileAttributes + requestContent` events. Runs every registered
-    /// `ProfileAttributeHandler` whose key is present in the event, merges contributions, and
+    /// `AttributeHandler` whose key is present in the event, merges contributions, and
     /// dispatches one Edge event if anything changed. To add a new attribute, create a conforming
     /// type and append it to `profileAttributeHandlers` — this function needs no changes.
     private func handleProfileAttributes(event: Event) {
@@ -117,7 +128,9 @@ import Foundation
         var merged: [String: String] = [:]
         for handler in profileAttributeHandlers {
             guard eventData.keys.contains(handler.attributeKey) else { continue }
-            guard let contribution = handler.collectFromEvent(event) else { continue }
+            // Profile path always dedups (dedup: true) — this preserves the pre-existing profile-sync
+            // behavior; the dedup config flag applies only to the device path.
+            guard let contribution = handler.collectFromEvent(event, dedup: true) else { continue }
             merged.merge(contribution) { _, new in new }
         }
         guard !merged.isEmpty else {
@@ -151,6 +164,74 @@ import Foundation
                           source: EventSource.requestContent,
                           data: eventData)
         dispatch(event: event)
+    }
+
+    // MARK: - Device attributes (consent-independent) -> operational-data event
+
+    /// Handles the internal `edgeIdentity + requestContent` device-attribute request dispatched by the
+    /// `updateDeviceAttributesBypassConsent` public API. Runs every registered device-attribute handler (dedup +
+    /// persist against the shared store), collates only the changed attributes into an operational-data
+    /// payload, and — when anything changed — dispatches a `generic.operationalData` event. The Launch
+    /// Rules Engine matches that event and forwards it to Edge with a consent override. Nothing is
+    /// dispatched when every attribute is unchanged (dedup), keeping this path minimal.
+    private func handleDeviceAttributes(event: Event) {
+        guard let eventData = event.data, !eventData.isEmpty else {
+            Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
+            return
+        }
+
+        // Dedup is configurable for the device path: when `edgeidentity.deviceAttributes.dedup` is
+        // false, every update dispatches even if the value is unchanged. Defaults to true.
+        let config = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.value
+        let dedup = config?[IdentityConstants.ConfigKeys.DEVICE_ATTRIBUTES_DEDUP] as? Bool ?? true
+
+        var payload: [String: Any] = [:]
+        for handler in deviceAttributeHandlers {
+            guard eventData.keys.contains(handler.attributeKey) else { continue }
+            guard let contribution = handler.collectFromEvent(event, dedup: dedup),
+                  let value = contribution[handler.attributeKey] else { continue }
+            payload[handler.operationalDataKey] = value
+        }
+
+        guard !payload.isEmpty else {
+            Log.debug(label: friendlyName, "\(#function) - No device attribute changes after dedup, skipping dispatch.")
+            return
+        }
+
+        // Push routing requires app context (bundle id + APNs environment); add it only when a push
+        // identifier is part of this update.
+        if payload[IdentityConstants.DeviceAttributes.PUSH_NOTIFICATION] != nil, let appId = Bundle.main.bundleIdentifier {
+            payload[IdentityConstants.DeviceAttributes.APP] = [
+                IdentityConstants.DeviceAttributes.APP_ID: appId,
+                IdentityConstants.DeviceAttributes.APP_PLATFORM: pushPlatform(for: event)
+            ]
+        }
+
+        let operationalEvent = event.createChainedEvent(
+            name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_TO_RULES_ENGINE,
+            type: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_TYPE,
+            source: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_SOURCE,
+            data: payload)
+        Log.debug(label: friendlyName, "\(#function) - Dispatching operational-data event with changed device attributes: \(Array(payload.keys)).")
+        dispatch(event: operationalEvent)
+    }
+
+    /// Derives the APNs platform ("apns" / "apnsSandbox") for push routing from the Messaging sandbox
+    /// configuration, defaulting to production APNs when the config is unavailable.
+    ///
+    /// Why read `messaging.useSandbox` rather than auto-detect or introduce a dedicated EdgeIdentity key:
+    /// the APNs environment is a build/provisioning fact carried in the `aps-environment` entitlement
+    /// (`development` vs `production`). That entitlement cannot be reliably read at runtime — it is
+    /// stripped from App Store / TestFlight builds — so there is no dependable way to auto-detect the
+    /// environment on device. `messaging.useSandbox` is the single source of truth the developer already
+    /// sets to select the APNs environment for the Messaging extension. Adding a separate EdgeIdentity
+    /// config key for the same fact would fragment configuration and risk the two keys disagreeing
+    /// (tokens routed to the wrong APNs environment, silently dropping notifications). Reading
+    /// `messaging.useSandbox` here is therefore a deliberate single-source-of-truth coupling.
+    private func pushPlatform(for event: Event) -> String {
+        let configState = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.value
+        let useSandbox = configState?[IdentityConstants.DeviceAttributes.MESSAGING_USE_SANDBOX] as? Bool ?? false
+        return useSandbox ? IdentityConstants.DeviceAttributes.PLATFORM_APNS_SANDBOX : IdentityConstants.DeviceAttributes.PLATFORM_APNS
     }
 
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
@@ -240,7 +321,7 @@ import Foundation
     private func handleRequestReset(event: Event) {
         for handler in profileAttributeHandlers {
             ServiceProvider.shared.namedKeyValueService.remove(
-                collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: handler.attributeKey)
+                collectionName: handler.storeName, key: handler.attributeKey)
         }
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,

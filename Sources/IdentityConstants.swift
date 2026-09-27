@@ -44,12 +44,29 @@ enum IdentityConstants {
         }
     }
 
+    /// Persistence (dedup) namespaces injected into each `AttributeHandler`. These two MUST stay
+    /// distinct: dedup keys on `<store>.<attributeKey>`, so if the profile path and the device path
+    /// shared one store, a prior profile timezone write would make the device path see the value as
+    /// "unchanged" and silently skip the consent-override operational-data dispatch — i.e. data loss on
+    /// the consent-independent path. Keeping them separate guarantees the same value on both paths
+    /// dispatches on both.
+    enum Store {
+        // Existing profile-attributes store — value unchanged so profile persistence/hydration is
+        // preserved across upgrades. MUST differ from DEVICE_ATTRIBUTES (see enum note above).
+        static let PROFILE_ATTRIBUTES = "com.adobe.mobilecore.profileAttributes"
+        // Dedicated store for the consent-independent device-attribute path. MUST differ from
+        // PROFILE_ATTRIBUTES: a shared store would let a profile write suppress the device dispatch.
+        static let DEVICE_ATTRIBUTES = "com.adobe.mobilecore.deviceAttributes"
+    }
+
     enum ProfileAttributes {
         // Per-attribute keys (event data, persistence, and XDM payload) are owned by each
-        // ProfileAttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
-        // Add a new attribute by creating a new ProfileAttributeHandler conforming type.
+        // AttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
+        // Add a new attribute by creating a new AttributeHandler conforming type.
 
-        static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
+        // Also used as the profile-attributes XDM shared-state section key. Mirrors the profile store
+        // namespace so the value is unchanged.
+        static let STORE_NAME = Store.PROFILE_ATTRIBUTES
 
         enum XDM {
             static let XDM_KEY = "xdm"
@@ -58,6 +75,32 @@ enum IdentityConstants {
             static let PROFILE_UPDATE_EVENT_TYPE = "profile.updateAttributes"
         }
 
+    }
+
+    /// Constants for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent` API).
+    /// The public API dedups attributes (via the device `AttributeHandler`s) and fires a generic
+    /// operational-data event that the Launch Rules Engine matches and forwards to Edge with a
+    /// consent override. Keys here must match the tokens authored in the Launch rule.
+    enum DeviceAttributes {
+        // The operational-data event the Launch Rules Engine matches. Must equal the rule condition
+        // (`~type == generic.operationalData`, `~source == requestContent`).
+        static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
+        static let OPERATIONAL_DATA_SOURCE = "com.adobe.eventSource.requestContent"
+
+        // Operational-data payload keys (must match the rule's {%...%} tokens).
+        static let TIMEZONE = "timezone"
+        // Rule token key {%pushNotification%} in the operational-data payload.
+        static let PUSH_NOTIFICATION = "pushNotification"
+        // Input/persistence (dedup) key for the push token; separate from the payload/token key above.
+        static let PUSH_IDENTIFIER = "pushidentifier"
+        static let APP = "app"
+        static let APP_ID = "id"
+        static let APP_PLATFORM = "platform"
+
+        // Config key (owned by the Messaging extension) used to derive the APNs platform for push.
+        static let MESSAGING_USE_SANDBOX = "messaging.useSandbox"
+        static let PLATFORM_APNS = "apns"
+        static let PLATFORM_APNS_SANDBOX = "apnsSandbox"
     }
 
     enum EventNames {
@@ -71,6 +114,9 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
         static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
+        // Internal request event dispatched by updateDeviceAttributesBypassConsent; and the outgoing operational-data event.
+        static let UPDATE_DEVICE_ATTRIBUTES = "Update Device Attributes"
+        static let DEVICE_ATTRIBUTES_TO_RULES_ENGINE = "Device attributes for rules engine"
     }
 
     enum EventDataKeys {
@@ -111,6 +157,12 @@ enum IdentityConstants {
 
     enum ConfigurationKeys {
         static let EXPERIENCE_CLOUD_ORGID = "experienceCloud.org"
+    }
+
+    enum ConfigKeys {
+        // When true (default), the device-attribute path skips dispatching unchanged values (dedup).
+        // Set to false to always dispatch on every `updateDeviceAttributesBypassConsent` call.
+        static let DEVICE_ATTRIBUTES_DEDUP = "edgeidentity.deviceAttributes.dedup"
     }
 
     enum URLKeys {

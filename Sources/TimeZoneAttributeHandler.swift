@@ -12,10 +12,10 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// `ProfileAttributeHandler` for the device timezone. Reads the IANA identifier from the
-/// incoming event under `"timeZone"`, persists it, and contributes to the outgoing payload
+/// `AttributeHandler` for the device timezone. Reads the IANA identifier from the incoming event under
+/// `"timeZone"`, persists it against the injected `storeName`, and contributes to the outgoing payload
 /// under the same `"timeZone"` key.
-struct TimeZoneAttributeHandler: ProfileAttributeHandler {
+struct TimeZoneAttributeHandler: AttributeHandler {
 
     // NOTE: IANA timezone validation (TimeZone(identifier:)) is present here but absent in the
     // Android implementation. Android should add equivalent validation to reject non-IANA strings.
@@ -28,7 +28,18 @@ struct TimeZoneAttributeHandler: ProfileAttributeHandler {
 
     var attributeKey: String { TimeZoneAttributeHandler.key }
 
-    func collectFromEvent(_ event: Event) -> [String: String]? {
+    // Storage/profile key is "timeZone"; the Launch rule token is "timezone".
+    var operationalDataKey: String { IdentityConstants.DeviceAttributes.TIMEZONE }
+
+    // Injected dedup namespace: the profile path and device path use different stores so identical
+    // timezone values on the two paths do not cross-suppress.
+    let storeName: String
+
+    init(storeName: String) {
+        self.storeName = storeName
+    }
+
+    func collectFromEvent(_ event: Event, dedup: Bool) -> [String: String]? {
         guard let timezone = event.data?[attributeKey] as? String, !timezone.isEmpty else {
             Log.debug(label: Self.LOG_TAG, "TimeZoneAttributeHandler - Timezone missing or empty in event data, ignoring.")
             return nil
@@ -37,7 +48,7 @@ struct TimeZoneAttributeHandler: ProfileAttributeHandler {
             Log.warning(label: Self.LOG_TAG, "TimeZoneAttributeHandler - '\(timezone)' is not a valid IANA timezone identifier, ignoring.")
             return nil
         }
-        guard readStored() != timezone else {
+        if dedup, readStored() == timezone {
             Log.debug(label: Self.LOG_TAG, "TimeZoneAttributeHandler - Timezone unchanged, skipping.")
             return nil
         }
@@ -52,11 +63,11 @@ struct TimeZoneAttributeHandler: ProfileAttributeHandler {
 
     private func readStored() -> String? {
         return ServiceProvider.shared.namedKeyValueService
-            .get(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: attributeKey) as? String
+            .get(collectionName: storeName, key: attributeKey) as? String
     }
 
     private func writeStored(_ value: String) {
         ServiceProvider.shared.namedKeyValueService
-            .set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: attributeKey, value: value)
+            .set(collectionName: storeName, key: attributeKey, value: value)
     }
 }

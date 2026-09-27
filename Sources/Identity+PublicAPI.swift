@@ -125,6 +125,35 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
+    /// Updates one or more device attributes that should be delivered to the Edge Network
+    /// **independently of collect consent**.
+    ///
+    /// Each provided attribute is (by default) de-duplicated against the last synced value; only changed
+    /// attributes are included in the resulting event. When at least one attribute changed, the Identity
+    /// extension fires an operational-data event that the Launch Rules Engine matches and forwards to
+    /// Edge with a consent override. Passing all `nil`/empty values is a no-op.
+    ///
+    /// This API is extensible: future device attributes can be added as new fields on `DeviceAttributes`
+    /// (and matching handlers) without changing the call site or event flow.
+    ///
+    /// - Note: This is a Swift-only API. It cannot be marked `@objc` because its parameter is a Swift
+    ///   `struct` (`DeviceAttributes`), which has no Objective-C representation. Keeping `DeviceAttributes`
+    ///   a `struct` (per the design's source-compatible extensibility requirement) precludes ObjC exposure.
+    /// - Parameter attributes: The device attributes to sync. Unset fields are omitted.
+    @nonobjc
+    static func updateDeviceAttributesBypassConsent(_ attributes: DeviceAttributes) {
+        var data: [String: Any] = [:]
+        if let tz = attributes.timeZone { data[TimeZoneAttributeHandler.key] = tz.identifier }
+        if let push = attributes.pushToken, !push.isEmpty { data[PushTokenAttributeHandler.key] = push }
+        guard !data.isEmpty else {
+            Log.debug(label: IdentityConstants.LOG_TAG, "Identity - updateDeviceAttributesBypassConsent: no attributes provided, ignoring.")
+            return
+        }
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,
+                          type: EventType.edgeIdentity, source: EventSource.requestContent, data: data)
+        MobileCore.dispatch(event: event)
+    }
+
     /// Removes the identity from the stored client-side `IdentityMap`. The Identity extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
     /// - Parameters:
