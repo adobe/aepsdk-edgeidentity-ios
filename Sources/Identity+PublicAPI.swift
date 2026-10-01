@@ -128,29 +128,24 @@ import Foundation
     /// Updates one or more device attributes that should be delivered to the Edge Network
     /// **independently of collect consent**.
     ///
-    /// Each provided attribute is (by default) de-duplicated against the last synced value; only changed
-    /// attributes are included in the resulting event. When at least one attribute changed, the Identity
-    /// extension fires an operational-data event that the Launch Rules Engine matches and forwards to
-    /// Edge with a consent override. Passing all `nil`/empty values is a no-op.
+    /// Accepts an open map; the SDK does not define the supported keys. Keys are de-duplicated by value:
+    /// a key is sent only when it has not been synced before or its value changed since the last sync
+    /// (disable with `edgeidentity.deviceAttributes.dedup: false`). The remaining entries are forwarded as-is
+    /// in an operational-data event that the Launch Rules Engine matches and forwards to Edge with a consent
+    /// override, so keys must match the `{%token%}` names used in that rule. Every dispatched update also
+    /// carries an `app { id, platform }` entry unless the map already contains `app`.
     ///
-    /// This API is extensible: future device attributes can be added as new fields on `DeviceAttributes`
-    /// (and matching handlers) without changing the call site or event flow.
-    ///
-    /// - Note: This is a Swift-only API. It cannot be marked `@objc` because its parameter is a Swift
-    ///   `struct` (`DeviceAttributes`), which has no Objective-C representation. Keeping `DeviceAttributes`
-    ///   a `struct` (per the design's source-compatible extensibility requirement) precludes ObjC exposure.
-    /// - Parameter attributes: The device attributes to sync. Unset fields are omitted.
-    @nonobjc
-    static func updateDeviceAttributesBypassConsent(_ attributes: DeviceAttributes) {
-        var data: [String: Any] = [:]
-        if let tz = attributes.timeZone { data[TimeZoneAttributeHandler.key] = tz.identifier }
-        if let push = attributes.pushToken, !push.isEmpty { data[PushTokenAttributeHandler.key] = push }
-        guard !data.isEmpty else {
+    /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
+    ///   `NSNull`, or arrays/dictionaries of those). Entries with other value types are dropped. An empty map
+    ///   is a no-op.
+    @objc(updateDeviceAttributesBypassConsent:)
+    static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
+        guard !attributes.isEmpty else {
             Log.debug(label: IdentityConstants.LOG_TAG, "Identity - updateDeviceAttributesBypassConsent: no attributes provided, ignoring.")
             return
         }
         let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,
-                          type: EventType.edgeIdentity, source: EventSource.requestContent, data: data)
+                          type: EventType.edgeIdentity, source: EventSource.requestContent, data: attributes)
         MobileCore.dispatch(event: event)
     }
 

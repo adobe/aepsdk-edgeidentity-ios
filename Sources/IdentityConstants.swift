@@ -78,21 +78,20 @@ enum IdentityConstants {
     }
 
     /// Constants for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent` API).
-    /// The public API dedups attributes (via the device `AttributeHandler`s) and fires a generic
-    /// operational-data event that the Launch Rules Engine matches and forwards to Edge with a
-    /// consent override. Keys here must match the tokens authored in the Launch rule.
+    /// The API accepts an open map; changed entries are forwarded as-is in a generic operational-data event
+    /// that the Launch Rules Engine matches and forwards to Edge with a consent override. Map keys are the
+    /// rule's `{%...%}` tokens.
     enum DeviceAttributes {
         // The operational-data event the Launch Rules Engine matches. Must equal the rule condition
         // (`~type == generic.operationalData`, `~source == requestContent`).
         static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
         static let OPERATIONAL_DATA_SOURCE = "com.adobe.eventSource.requestContent"
 
-        // Operational-data payload keys (must match the rule's {%...%} tokens).
-        static let TIMEZONE = "timezone"
-        // Rule token key {%pushNotification%} in the operational-data payload.
-        static let PUSH_NOTIFICATION = "pushNotification"
-        // Input/persistence (dedup) key for the push token; separate from the payload/token key above.
-        static let PUSH_IDENTIFIER = "pushidentifier"
+        // Persistence key (inside the DEVICE_ATTRIBUTES store) holding the last synced
+        // `[key: canonicalValue]` map used for dedup.
+        static let SYNCED_VALUES = "syncedAttributes"
+
+        // App context added to every dispatched update so tokens can be routed.
         static let APP = "app"
         static let APP_ID = "id"
         static let APP_PLATFORM = "platform"

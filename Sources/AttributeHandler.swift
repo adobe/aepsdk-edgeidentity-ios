@@ -28,16 +28,7 @@ protocol AttributeHandler {
     /// profile-path output payload. (e.g. `"timeZone"`).
     var attributeKey: String { get }
 
-    /// The key this handler emits in the consent-independent **operational-data** (device-path) payload
-    /// consumed by the Launch rule tokens (e.g. `"timezone"`). Defaults to `attributeKey` (see the
-    /// protocol extension below); override ONLY when the Launch rule token name differs from the
-    /// storage/profile key — e.g. storage `"timeZone"` vs token `"timezone"`, or `"pushidentifier"` vs
-    /// `"pushNotification"`.
-    var operationalDataKey: String { get }
-
-    /// The persistence (dedup) namespace this handler reads/writes, injected at registration. The same
-    /// handler type can be registered on the profile path and the device path with different stores so
-    /// identical values on the two paths do not cross-suppress.
+    /// The persistence (dedup) namespace this handler reads/writes, injected at registration.
     var storeName: String { get }
 
     /// Reads this handler's value from the update event and returns its contribution to add to the
@@ -52,10 +43,4 @@ protocol AttributeHandler {
     /// Returns this handler's persisted contribution as it should appear in shared state, or `nil` when
     /// nothing is stored.
     func collectFromStorage() -> [String: String]?
-}
-
-extension AttributeHandler {
-    /// By default the operational-data (device-path) output key equals `attributeKey`. Conforming types
-    /// override this only when the Launch rule token name differs from the storage/profile key.
-    var operationalDataKey: String { attributeKey }
 }

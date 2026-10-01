@@ -44,7 +44,6 @@
 		50641308119217B7683A86AA /* Pods_AEPEdgeIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F955AF4EC8D3303E0E75A85 /* Pods_AEPEdgeIdentity.framework */; };
 		5E219F778EB54EE70710C0D2 /* CollectionAwareMockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583F02E600BC8F9ABC6A675B /* CollectionAwareMockDataStore.swift */; };
 		61F41CC3CE6E392653635464 /* CollectionAwareMockDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583F02E600BC8F9ABC6A675B /* CollectionAwareMockDataStore.swift */; };
-		63D9FD64CDFF5D631C5CE187 /* DeviceAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9560626C71D0BDC4BA8FBCA /* DeviceAttributes.swift */; };
 		6C83D252831B862FDB67D2E8 /* Pods_TestApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5912AA86D48F7E66E10AC83 /* Pods_TestApp.framework */; };
 		6E80E481DE3A53282C35B828 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C134E35F086FEE3EBB3C1E8 /* Pods_FunctionalTests.framework */; };
 		7B1D076BED1CBA5F1B3A2646 /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D32C1448F1838E6E028C4D67 /* Pods_UnitTests.framework */; };
@@ -57,10 +56,8 @@
 		AA000014000000000000AA01 /* TimeZoneAttributeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */; };
 		AA000016000000000000AA01 /* AttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* AttributeHandler.swift */; };
 		AA000018000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
-		AA000021000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000020000000000000AA01 /* PushTokenAttributeHandler.swift */; };
-		AA000022000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000020000000000000AA01 /* PushTokenAttributeHandler.swift */; };
-		AA000023000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000020000000000000AA01 /* PushTokenAttributeHandler.swift */; };
 		ADA08ECF8DE574D4021875E2 /* Pods_TestApptvOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD402FC404C7E0DF4F16DC0 /* Pods_TestApptvOS.framework */; };
+		B26F1EF96B502216B5F82530 /* DeviceAttributeDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EBFDBFC79A1385DAD82221A /* DeviceAttributeDeduplicator.swift */; };
 		B4C3683F014E484CC244191C /* Pods_TestAppObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21DA6B9159175183322A361 /* Pods_TestAppObjC.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
 		B6F27EC62609146800C50A04 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EC52609146800C50A04 /* ViewController.m */; };
@@ -82,7 +79,6 @@
 		BFF64A6025C4C63F0012A4C5 /* EdgeIdentity+IdentityDirectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64A5A25C4C5410012A4C5 /* EdgeIdentity+IdentityDirectTests.swift */; };
 		BFF64AEB25C8A9B40012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */; };
 		BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF64AE725C8A9B40012A4C5 /* MockExtension.swift */; };
-		C82693EDDFAB4487908A0D99 /* PushTokenAttributeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD6B2F2633CA55C98BC51A5 /* PushTokenAttributeHandlerTests.swift */; };
 		D43BAB1525BBA4F700B08CC0 /* AEPEdgeIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = D43BAB1325BBA4F700B08CC0 /* AEPEdgeIdentity.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D43BAB2825BBA8A900B08CC0 /* IdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB2725BBA8A900B08CC0 /* IdentityTests.swift */; };
 		D43BAB2A25BBA8A900B08CC0 /* AEPEdgeIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D43BAB1025BBA4F700B08CC0 /* AEPEdgeIdentity.framework */; };
@@ -94,7 +90,8 @@
 		D43BABB125BBC4BB00B08CC0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */; };
 		D4498376284AB0A000468A95 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */; };
 		D4498378284AB27300468A95 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4498377284AB27300468A95 /* AdSupport.framework */; };
-		F0D8C8EEF53E977C079D07AA /* AttributeHandlerRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA94B5F55766017CCF3D16D0 /* AttributeHandlerRoutingTests.swift */; };
+		EB9EE9227905ADA242294C8D /* DeviceAttributeDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EBFDBFC79A1385DAD82221A /* DeviceAttributeDeduplicator.swift */; };
+		FE556EFCFFFCCCFC8DEB7679 /* DeviceAttributeDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EBFDBFC79A1385DAD82221A /* DeviceAttributeDeduplicator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,7 +158,7 @@
 		4CAD0F7A283C302400490A1F /* TestApp.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TestApp.storyboard; sourceTree = "<group>"; };
 		4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 		583F02E600BC8F9ABC6A675B /* CollectionAwareMockDataStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CollectionAwareMockDataStore.swift; sourceTree = "<group>"; };
-		7AD6B2F2633CA55C98BC51A5 /* PushTokenAttributeHandlerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PushTokenAttributeHandlerTests.swift; sourceTree = "<group>"; };
+		5EBFDBFC79A1385DAD82221A /* DeviceAttributeDeduplicator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeviceAttributeDeduplicator.swift; sourceTree = "<group>"; };
 		7E694C5C8D2173BAD8F11953 /* Pods-TestApptvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestApptvOS.debug.xcconfig"; path = "Target Support Files/Pods-TestApptvOS/Pods-TestApptvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		871856BEA5EA74D401BE6EB9 /* IdentityDeviceAttributesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdentityDeviceAttributesTests.swift; sourceTree = "<group>"; };
 		A5912AA86D48F7E66E10AC83 /* Pods_TestApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,8 +167,6 @@
 		AA000005000000000000AA01 /* AttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeHandler.swift; sourceTree = "<group>"; };
 		AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandler.swift; sourceTree = "<group>"; };
 		AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandlerTests.swift; sourceTree = "<group>"; };
-		AA000020000000000000AA01 /* PushTokenAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushTokenAttributeHandler.swift; sourceTree = "<group>"; };
-		AA94B5F55766017CCF3D16D0 /* AttributeHandlerRoutingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AttributeHandlerRoutingTests.swift; sourceTree = "<group>"; };
 		AD3C06AABA5F980EB6685383 /* Pods-TestAppObjC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestAppObjC.debug.xcconfig"; path = "Target Support Files/Pods-TestAppObjC/Pods-TestAppObjC.debug.xcconfig"; sourceTree = "<group>"; };
 		B6F27EBC2609146800C50A04 /* TestAppObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestAppObjC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F27EBE2609146800C50A04 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -218,7 +213,6 @@
 		D43BABB025BBC4BB00B08CC0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D43BABB225BBC4BB00B08CC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4498377284AB27300468A95 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
-		D9560626C71D0BDC4BA8FBCA /* DeviceAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeviceAttributes.swift; sourceTree = "<group>"; };
 		E21DA6B9159175183322A361 /* Pods_TestAppObjC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestAppObjC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECA750BAE73E19BC1FBF3E2E /* Pods-UnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UnitTests.debug.xcconfig"; path = "Target Support Files/Pods-UnitTests/Pods-UnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F823DBDD04E1F9BF72A00CB0 /* Pods-AEPEdgeIdentity.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AEPEdgeIdentity.debug.xcconfig"; path = "Target Support Files/Pods-AEPEdgeIdentity/Pods-AEPEdgeIdentity.debug.xcconfig"; sourceTree = "<group>"; };
@@ -396,8 +390,7 @@
 				2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */,
 				AA000005000000000000AA01 /* AttributeHandler.swift */,
 				AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */,
-				AA000020000000000000AA01 /* PushTokenAttributeHandler.swift */,
-				D9560626C71D0BDC4BA8FBCA /* DeviceAttributes.swift */,
+				5EBFDBFC79A1385DAD82221A /* DeviceAttributeDeduplicator.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -415,8 +408,6 @@
 				AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */,
 				2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */,
 				D43BAB2925BBA8A900B08CC0 /* Info.plist */,
-				7AD6B2F2633CA55C98BC51A5 /* PushTokenAttributeHandlerTests.swift */,
-				AA94B5F55766017CCF3D16D0 /* AttributeHandlerRoutingTests.swift */,
 			);
 			name = UnitTests;
 			path = Tests/UnitTests;
@@ -1052,8 +1043,7 @@
 				BFF649AD25C0EFE10012A4C5 /* IdentityMap.swift in Sources */,
 				AA000006000000000000AA01 /* AttributeHandler.swift in Sources */,
 				AA000008000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */,
-				AA000021000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */,
-				63D9FD64CDFF5D631C5CE187 /* DeviceAttributes.swift in Sources */,
+				EB9EE9227905ADA242294C8D /* DeviceAttributeDeduplicator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1073,11 +1063,9 @@
 				AA000014000000000000AA01 /* TimeZoneAttributeHandlerTests.swift in Sources */,
 				AA000010000000000000AA01 /* AttributeHandler.swift in Sources */,
 				AA000012000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */,
-				AA000022000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */,
 				BFF649B725C0FC810012A4C5 /* IdentityMapTests.swift in Sources */,
-				C82693EDDFAB4487908A0D99 /* PushTokenAttributeHandlerTests.swift in Sources */,
 				5E219F778EB54EE70710C0D2 /* CollectionAwareMockDataStore.swift in Sources */,
-				F0D8C8EEF53E977C079D07AA /* AttributeHandlerRoutingTests.swift in Sources */,
+				FE556EFCFFFCCCFC8DEB7679 /* DeviceAttributeDeduplicator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1094,9 +1082,9 @@
 				BFF64AEC25C8A9B40012A4C5 /* MockExtension.swift in Sources */,
 				AA000016000000000000AA01 /* AttributeHandler.swift in Sources */,
 				AA000018000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */,
-				AA000023000000000000AA01 /* PushTokenAttributeHandler.swift in Sources */,
 				3E5401F1480C92FDBCEEC907 /* IdentityDeviceAttributesTests.swift in Sources */,
 				61F41CC3CE6E392653635464 /* CollectionAwareMockDataStore.swift in Sources */,
+				B26F1EF96B502216B5F82530 /* DeviceAttributeDeduplicator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
