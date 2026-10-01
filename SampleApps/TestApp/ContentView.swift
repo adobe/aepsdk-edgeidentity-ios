@@ -74,8 +74,8 @@ struct GetIdentitiesView: View {
     @State var urlVariablesText: String = ""
     @State var timezoneInput: String = ""
     @State var lastTimezoneStatus: String = ""
-    @State var deviceAttrPushToken: String = "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899"
-    @State var deviceAttrTimezone: String = TimeZone.current.identifier
+    // Exact input passed to updateDeviceAttributesBypassConsent (backend shape). Edit any value to send it again.
+    @State var deviceAttrJSON: String = #"{"timezone": "America/Los_Angeles", "tokens": {"pushNotification": "804EB6EDB22D-push-token-TEST", "liveActivityStart": [{"attributeType": "GameScoreLiveActivityAttributes", "value": "la-push-to-start-token-TEST"}], "liveActivityUpdate": [{"liveActivityID": "Test2", "token": "la-update-token-TEST"}]}}"#
     @State var lastDeviceAttrStatus: String = ""
 
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
@@ -222,29 +222,24 @@ struct GetIdentitiesView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                TextField("Push token", text: $deviceAttrPushToken)
+                TextField("Device attributes JSON (backend shape)", text: $deviceAttrJSON)
                     #if os(iOS)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
-                    #endif
-                    .padding(.horizontal)
-
-                TextField("Timezone (IANA, e.g. Asia/Kolkata)", text: $deviceAttrTimezone)
-                    #if os(iOS)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                     #endif
                     .padding(.horizontal)
 
                 Button {
-                    let tz = deviceAttrTimezone.trimmingCharacters(in: .whitespaces)
-                    let token = deviceAttrPushToken.trimmingCharacters(in: .whitespaces)
-                    // Change the field values before tapping — unchanged values are deduped and won't dispatch.
-                    AEPEdgeIdentity.Identity.updateDeviceAttributesBypassConsent(
-                        DeviceAttributes(
-                            timeZone: tz.isEmpty ? nil : TimeZone(identifier: tz),
-                            pushToken: token.isEmpty ? nil : token))
-                    lastDeviceAttrStatus = "Called updateDeviceAttributesBypassConsent(tz: \(tz.isEmpty ? "nil" : tz), push: \(token.isEmpty ? "nil" : String(token.prefix(12)) + "…"))"
+                    // The JSON text is only converted to a dictionary; it is passed to the API exactly as written.
+                    // Unchanged values are deduped by the SDK and won't be sent again.
+                    guard let data = deviceAttrJSON.data(using: .utf8),
+                          let attributes = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+                        lastDeviceAttrStatus = "Invalid JSON object, nothing sent"
+                        return
+                    }
+                    AEPEdgeIdentity.Identity.updateDeviceAttributesBypassConsent(attributes)
+                    lastDeviceAttrStatus = "Called updateDeviceAttributesBypassConsent with keys: \(attributes.keys.sorted())"
                 } label: {
                     Text("Send updateDeviceAttributesBypassConsent")
                 }

@@ -31,13 +31,10 @@ import Foundation
     private let profileAttributeHandlers: [AttributeHandler] =
         [TimeZoneAttributeHandler(storeName: IdentityConstants.Store.PROFILE_ATTRIBUTES)]
 
-    // Registry for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent`). Bound to a
-    // SEPARATE DEVICE_ATTRIBUTES dedup store so identical values on the profile path and device path do
-    // not cross-suppress each other. Add a new conforming type here to support an additional device
-    // attribute.
-    private let deviceAttributeHandlers: [AttributeHandler] =
-        [TimeZoneAttributeHandler(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES),
-         PushTokenAttributeHandler(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES)]
+    // Key-based dedup for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent`).
+    // Bound to a SEPARATE DEVICE_ATTRIBUTES store so identical values on the profile path and device path
+    // do not cross-suppress each other.
+    private let deviceAttributeDeduplicator = DeviceAttributeDeduplicator(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES)
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
@@ -169,12 +166,17 @@ import Foundation
     // MARK: - Device attributes (consent-independent) -> operational-data event
 
     /// Handles the internal `edgeIdentity + requestContent` device-attribute request dispatched by the
-    /// `updateDeviceAttributesBypassConsent` public API. Runs every registered device-attribute handler (dedup +
-    /// persist against the shared store), collates only the changed attributes into an operational-data
-    /// payload, and — when anything changed — dispatches a `generic.operationalData` event. The Launch
-    /// Rules Engine matches that event and forwards it to Edge with a consent override. Nothing is
-    /// dispatched when every attribute is unchanged (dedup), keeping this path minimal.
+    /// `updateDeviceAttributesBypassConsent` public API. Drops keys whose value is unchanged since the last
+    /// sync (dedup), and — when anything is left — dispatches those entries as-is in a
+    /// `generic.operationalData` event. The Launch Rules Engine matches that event and forwards it to Edge
+    /// with a consent override.
     private func handleDeviceAttributes(event: Event) {
+        // The edgeIdentity/requestContent pair is shared; only the API's own request may be forwarded,
+        // so data from any other event on this pair never reaches the consent-independent path.
+        guard event.name == IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES else {
+            Log.trace(label: friendlyName, "\(#function) - Ignoring event '\(event.name)', not a device-attributes request.")
+            return
+        }
         guard let eventData = event.data, !eventData.isEmpty else {
             Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
             return
@@ -185,22 +187,17 @@ import Foundation
         let config = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME, event: event)?.value
         let dedup = config?[IdentityConstants.ConfigKeys.DEVICE_ATTRIBUTES_DEDUP] as? Bool ?? true
 
-        var payload: [String: Any] = [:]
-        for handler in deviceAttributeHandlers {
-            guard eventData.keys.contains(handler.attributeKey) else { continue }
-            guard let contribution = handler.collectFromEvent(event, dedup: dedup),
-                  let value = contribution[handler.attributeKey] else { continue }
-            payload[handler.operationalDataKey] = value
-        }
+        var payload = deviceAttributeDeduplicator.filter(eventData, dedup: dedup)
 
         guard !payload.isEmpty else {
             Log.debug(label: friendlyName, "\(#function) - No device attribute changes after dedup, skipping dispatch.")
             return
         }
 
-        // Push routing requires app context (bundle id + APNs environment); add it only when a push
-        // identifier is part of this update.
-        if payload[IdentityConstants.DeviceAttributes.PUSH_NOTIFICATION] != nil, let appId = Bundle.main.bundleIdentifier {
+        // Token routing (push, live activities) requires app context (bundle id + APNs environment), so it is
+        // added to every update unless the caller provided its own "app" entry.
+        if payload[IdentityConstants.DeviceAttributes.APP] == nil,
+           let appId = Bundle.main.bundleIdentifier {
             payload[IdentityConstants.DeviceAttributes.APP] = [
                 IdentityConstants.DeviceAttributes.APP_ID: appId,
                 IdentityConstants.DeviceAttributes.APP_PLATFORM: pushPlatform(for: event)
@@ -323,6 +320,8 @@ import Foundation
             ServiceProvider.shared.namedKeyValueService.remove(
                 collectionName: handler.storeName, key: handler.attributeKey)
         }
+        // Forget synced device attributes so they are sent again for the new identity.
+        deviceAttributeDeduplicator.clear()
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,

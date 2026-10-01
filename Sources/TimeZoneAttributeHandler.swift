@@ -28,11 +28,7 @@ struct TimeZoneAttributeHandler: AttributeHandler {
 
     var attributeKey: String { TimeZoneAttributeHandler.key }
 
-    // Storage/profile key is "timeZone"; the Launch rule token is "timezone".
-    var operationalDataKey: String { IdentityConstants.DeviceAttributes.TIMEZONE }
-
-    // Injected dedup namespace: the profile path and device path use different stores so identical
-    // timezone values on the two paths do not cross-suppress.
+    // Injected dedup namespace (the profile-attributes store).
     let storeName: String
 
     init(storeName: String) {
