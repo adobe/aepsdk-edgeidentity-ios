@@ -11,24 +11,12 @@ The Adobe Experience Platform Identity for Edge Network extension has the follow
 > The following instructions are for configuring an application using Adobe Experience Platform Edge mobile extensions. If an application will include both Edge Network and Adobe Solution extensions, both the Identity for Edge Network and Identity for Experience Cloud ID Service extensions are required. Find more details in the [Frequently Asked Questions](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network/identity-faq) page.
 
 
-1. Add the Mobile Core and Edge extensions to your project using CocoaPods. Add following pods in your `Podfile`:
+1. Add the Mobile Core, Edge, and Edge Identity packages to your project using Swift Package Manager. In Xcode, select `File > Add Packages...` and add:
+  - `https://github.com/adobe/aepsdk-core-ios.git`
+  - `https://github.com/adobe/aepsdk-edge-ios.git`
+  - `https://github.com/adobe/aepsdk-edgeidentity-ios.git`
 
-  ```ruby
-  use_frameworks!
-  target 'YourTargetApp' do
-     pod 'AEPCore'
-     pod 'AEPEdge'
-     pod 'AEPEdgeIdentity'
-  end
-  ```
-
-2. Install [Cocoapods](https://cocoapods.org/) dependencies. Replace `YourTargetApp` and then, in the `Podfile` directory, type:
-
-  ```bash
-  $ pod install
-  ```
-
-3. Import the Mobile Core and Edge libraries and register Edge Extension with MobileCore:
+2. Import the Mobile Core and Edge libraries and register Edge Extension with MobileCore:
 
 #### Swift
   ```swift

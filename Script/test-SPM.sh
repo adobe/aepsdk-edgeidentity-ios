@@ -20,7 +20,7 @@ rm -rf $PROJECT_NAME
 mkdir -p $PROJECT_NAME && cd $PROJECT_NAME
 
 # Create the package.
-swift package init
+xcrun swift package init
 
 # Create the Package.swift.
 echo "// swift-tools-version:5.3
@@ -39,7 +39,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: \"AEPCore\", url: \"https://github.com/adobe/aepsdk-core-ios.git\", .branch(\"main\")),
+        .package(name: \"AEPCore\", url: \"https://github.com/shushinde/aepsdk-core-ios.git\", .upToNextMajor(from: \"5.10.0\")),
         .package(name: \"AEPEdgeIdentity\", path: \"../\")
     ],
     targets: [
@@ -57,7 +57,7 @@ let package = Package(
 )
 " >Package.swift
 
-swift package update
+xcrun swift package update
 
 # Archive for generic iOS device
 echo '############# Archive for generic iOS device ###############'

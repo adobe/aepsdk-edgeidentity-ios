@@ -21,13 +21,7 @@ on:
         required: true
 
       create-github-release:
-        description: 'Create a GitHub release with uploaded artifacts. If the provided `tag` does not exist, it will be created.'
-        type: boolean
-        required: true
-        default: true
-
-      pod-publish-extensions:
-        description: 'Publish AEPEdgeIdentity to Cocoapods.'
+        description: 'Create a GitHub release with the AEPEdgeIdentity XCFramework attached. SPM consumers can also build from source via the tag. If the provided `tag` does not exist, it will be created.'
         type: boolean
         required: true
         default: true
@@ -36,11 +30,12 @@ jobs:
   release:
     permissions:
         contents: write
-    uses: adobe/aepsdk-commons/.github/workflows/ios-release.yml@gha-ios-5.3.5
+    uses: shushinde/aepsdk-commons/.github/workflows/ios-spm-release.yml@main
     with:
       tag: ${{ github.event.inputs.tag }}
-      xcode-version: '16.4'
+      xcode-version: '26.3.0'
       create-github-release: ${{ github.event.inputs.create-github-release == 'true' && 'AEPEdgeIdentity' || '' }}
-      pod-publish-extensions: ${{ github.event.inputs.pod-publish-extensions == 'true' && 'AEPEdgeIdentity' || '' }}
-      version-validation-paths: AEPEdgeIdentity.podspec, AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift
+      tag-only: false
+      simulator-platforms: 'iOS, tvOS'
+      version-validation-paths: AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift
     secrets: inherit

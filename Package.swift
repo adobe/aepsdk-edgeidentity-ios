@@ -22,11 +22,43 @@ let package = Package(
         .library(name: "AEPEdgeIdentity", targets: ["AEPEdgeIdentity"])
     ],
     dependencies: [
-        .package(url: "https://github.com/adobe/aepsdk-core-ios.git", .upToNextMajor(from: "5.10.0"))
+        .package(url: "https://github.com/shushinde/aepsdk-core-ios.git", .upToNextMajor(from: "5.10.0")),
+        .package(url: "https://github.com/shushinde/aepsdk-testutils-ios.git", .upToNextMajor(from: "5.2.3"))
     ],
     targets: [
         .target(name: "AEPEdgeIdentity",
-                dependencies: [.product(name: "AEPCore", package: "aepsdk-core-ios")],
-                path: "Sources")
+                dependencies: [
+                    .product(name: "AEPCore", package: "aepsdk-core-ios"),
+                    .product(name: "AEPServices", package: "aepsdk-core-ios")
+                ],
+                path: "Sources",
+                exclude: ["Info.plist"]),
+        .testTarget(name: "AEPEdgeIdentityUnitTests",
+                    dependencies: [
+                        "AEPEdgeIdentity",
+                        .product(name: "AEPCore", package: "aepsdk-core-ios"),
+                        .product(name: "AEPServices", package: "aepsdk-core-ios"),
+                        .product(name: "AEPTestUtils", package: "aepsdk-testutils-ios")
+                    ],
+                    path: "Tests",
+                    exclude: [
+                        ".swiftlint.yml",
+                        "FunctionalTests",
+                        "UnitTests/Info.plist"
+                    ],
+                    sources: [
+                        "Mocks",
+                        "UnitTests"
+                    ]),
+        .testTarget(name: "AEPEdgeIdentityFunctionalTests",
+                    dependencies: [
+                        "AEPEdgeIdentity",
+                        .product(name: "AEPCore", package: "aepsdk-core-ios"),
+                        .product(name: "AEPIdentity", package: "aepsdk-core-ios"),
+                        .product(name: "AEPServices", package: "aepsdk-core-ios"),
+                        .product(name: "AEPTestUtils", package: "aepsdk-testutils-ios")
+                    ],
+                    path: "Tests/FunctionalTests",
+                    exclude: ["Info.plist"])
     ]
 )

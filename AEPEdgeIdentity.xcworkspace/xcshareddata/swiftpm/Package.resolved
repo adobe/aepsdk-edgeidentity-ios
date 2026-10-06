@@ -1,0 +1,33 @@
+{
+  "originHash" : "008dfb6c8d5886e88da04c92fe2ee6283d6f5d63f465ded0fea12bd928c16c5e",
+  "pins" : [
+    {
+      "identity" : "aepsdk-core-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shushinde/aepsdk-core-ios",
+      "state" : {
+        "revision" : "530442464baa90074f9f8e7e8c8034a06b25169a",
+        "version" : "5.13.0"
+      }
+    },
+    {
+      "identity" : "aepsdk-rulesengine-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adobe/aepsdk-rulesengine-ios.git",
+      "state" : {
+        "revision" : "514d2b3787c545bfa6749ffce5dd3e6f560c9319",
+        "version" : "5.0.0"
+      }
+    },
+    {
+      "identity" : "aepsdk-testutils-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shushinde/aepsdk-testutils-ios",
+      "state" : {
+        "revision" : "aac0948e0b3ddffbee2758b1c4e61ad6992dbf8a",
+        "version" : "5.2.3"
+      }
+    }
+  ],
+  "version" : 3
+}
