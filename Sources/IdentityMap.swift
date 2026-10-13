@@ -169,6 +169,14 @@ public class IdentityMap: NSObject, Codable {
         }
     }
 
+    /// Remove all identities from this `IdentityMap` for the given namespace.
+    /// - Parameter withNamespace: the namespace whose identities should be removed
+    /// - Returns: true if the namespace existed and its identities were removed, false otherwise
+    @discardableResult
+    func clearItems(withNamespace: String) -> Bool {
+        return items.removeValue(forKey: withNamespace) != nil
+    }
+
     /// Decodes a `[String: Any]` dictionary into an `IdentityMap`
     /// - Parameter eventData: the event data representing `IdentityMap`
     /// - Returns: an `IdentityMap` that is represented in the event data, nil if data is not in the correct format

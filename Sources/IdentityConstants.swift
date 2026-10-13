@@ -67,10 +67,15 @@ enum IdentityConstants {
         static let REQUEST_IDENTITIES = "Edge Identity Request Identities"
         static let UPDATE_IDENTITIES = "Edge Identity Update Identities"
         static let REMOVE_IDENTITIES = "Edge Identity Remove Identities"
+        static let REMOVE_ALL_IDENTITIES = "Edge Identity Remove All Identities"
         static let IDENTITY_RESPONSE_URL_VARIABLES = "Edge Identity Response URL Variables"
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
         static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
+    }
+
+    enum EventSources {
+        static let REMOVE_ALL_IDENTITIES = "com.adobe.eventSource.removeAllIdentities"
     }
 
     enum EventDataKeys {

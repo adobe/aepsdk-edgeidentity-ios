@@ -542,6 +542,59 @@ class IdentityStateTests: XCTestCase {
         XCTAssertEqual("identifier", state.identityProperties.identityMap.getItems(withNamespace: "space")?[0].id)
     }
 
+    // MARK: removeAllCustomerIdentifiers(...)
+
+    func testRemoveAllCustomerIdentifiers() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
+
+        state = IdentityState(identityProperties: props)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
+        state.removeAllCustomerIdentifiers(resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertFalse(mockDataStore.dict.isEmpty) // identity properties should have been saved to persistence
+        XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "space"))
+        XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "email"))
+        XCTAssertEqual("primaryEcid", state.identityProperties.ecid)
+    }
+
+    func testRemoveAllCustomerIdentifiersRetainsReservedNamespaces() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.advertisingIdentifier = "adid"
+        props.identityMap.add(item: IdentityItem(id: "gaid"), withNamespace: IdentityConstants.Namespaces.GAID)
+        props.identityMap.add(item: IdentityItem(id: "identifier"), withNamespace: "space")
+
+        state = IdentityState(identityProperties: props)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
+        state.removeAllCustomerIdentifiers(resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertNil(state.identityProperties.identityMap.getItems(withNamespace: "space"))
+        XCTAssertEqual("primaryEcid", state.identityProperties.ecid)
+        XCTAssertEqual("adid", state.identityProperties.advertisingIdentifier)
+        XCTAssertEqual(1, state.identityProperties.identityMap.getItems(withNamespace: IdentityConstants.Namespaces.GAID)?.count)
+    }
+
+    func testRemoveAllCustomerIdentifiersWhenNothingToRemoveResolvesSharedStateWithoutSaving() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+
+        state = IdentityState(identityProperties: props)
+
+        let xdmSharedStateExpectation = XCTestExpectation(description: "XDM shared state should be resolved")
+        state.removeAllCustomerIdentifiers(resolveXDMSharedState: { _ in xdmSharedStateExpectation.fulfill() })
+
+        wait(for: [xdmSharedStateExpectation], timeout: 1)
+        XCTAssertTrue(mockDataStore.dict.isEmpty) // identity properties should not have been saved to persistence
+        XCTAssertEqual("primaryEcid", state.identityProperties.ecid)
+    }
+
     // MARK: resetIdentities(...)
 
     func testResetIdentities() {

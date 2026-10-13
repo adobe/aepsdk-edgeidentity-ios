@@ -147,4 +147,17 @@ import Foundation
 
         MobileCore.dispatch(event: event)
     }
+
+    /// Removes all customer identifiers from the stored client-side `IdentityMap`. The Identity extension will stop sending these identifiers.
+    /// The ECID is retained, as are the advertising identifiers (GAID and IDFA), which are managed through `MobileCore.setAdvertisingIdentifier`.
+    /// This does not clear the identifiers from the User Profile Graph.
+    @objc(removeAllIdentities)
+    static func removeAllIdentities() {
+        let event = Event(name: IdentityConstants.EventNames.REMOVE_ALL_IDENTITIES,
+                          type: EventType.edgeIdentity,
+                          source: IdentityConstants.EventSources.REMOVE_ALL_IDENTITIES,
+                          data: nil)
+
+        MobileCore.dispatch(event: event)
+    }
 }

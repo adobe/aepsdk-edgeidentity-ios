@@ -168,6 +168,17 @@ class IdentityState {
         saveToPersistence(and: resolveXDMSharedState)
     }
 
+    /// Removes all customer identifiers from the current `IdentityMap`. Reserved namespaces (ECID, GAID, IDFA) are retained.
+    /// Saves to persistence only if something was removed, and always resolves the pending XDM shared state.
+    /// - Parameter resolveXDMSharedState: function which resolves pending XDM shared state
+    func removeAllCustomerIdentifiers(resolveXDMSharedState: ([String: Any]) -> Void) {
+        if identityProperties.removeAllCustomerIdentifiers() {
+            saveToPersistence(and: resolveXDMSharedState)
+        } else {
+            resolveXDMSharedState(identityProperties.toXdmData())
+        }
+    }
+
     /// Clears all identities and regenerates a new ECID value.
     /// Saves identities to persistence and creates a new XDM shared state and dispatches a new` resetComplete` event after operation completes.
     /// Dispatches Consent request event setting `adId` to 'no' if previous advertising identifier is nil or empty
