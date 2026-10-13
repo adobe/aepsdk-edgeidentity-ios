@@ -42,20 +42,19 @@ enum IdentityConstants {
         enum Consent {
             static let SHARED_OWNER_NAME = "com.adobe.edge.consent"
         }
+
+        enum Messaging {
+            static let SHARED_OWNER_NAME = "com.adobe.messaging"
+            static let PUSH_IDENTIFIER = "pushidentifier"
+            static let LIVE_ACTIVITY = "liveActivity"
+            static let PUSH_TO_START_TOKENS = "pushToStartTokens"
+            static let UPDATE_TOKENS = "updateTokens"
+        }
     }
 
-    /// Persistence (dedup) namespaces injected into each `AttributeHandler`. These two MUST stay
-    /// distinct: dedup keys on `<store>.<attributeKey>`, so if the profile path and the device path
-    /// shared one store, a prior profile timezone write would make the device path see the value as
-    /// "unchanged" and silently skip the consent-override operational-data dispatch — i.e. data loss on
-    /// the consent-independent path. Keeping them separate guarantees the same value on both paths
-    /// dispatches on both.
+    /// Existing profile values and Edge-confirmed bypass values remain in separate stores.
     enum Store {
-        // Existing profile-attributes store — value unchanged so profile persistence/hydration is
-        // preserved across upgrades. MUST differ from DEVICE_ATTRIBUTES (see enum note above).
         static let PROFILE_ATTRIBUTES = "com.adobe.mobilecore.profileAttributes"
-        // Dedicated store for the consent-independent device-attribute path. MUST differ from
-        // PROFILE_ATTRIBUTES: a shared store would let a profile write suppress the device dispatch.
         static let DEVICE_ATTRIBUTES = "com.adobe.mobilecore.deviceAttributes"
     }
 
@@ -78,20 +77,19 @@ enum IdentityConstants {
     }
 
     /// Constants for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent` API).
-    /// The API accepts an open map; changed entries are forwarded as-is in a generic operational-data event
-    /// that the Launch Rules Engine matches and forwards to Edge with a consent override. Map keys are the
-    /// rule's `{%...%}` tokens.
+    /// Rules return allow-listed values to Identity, which deduplicates them before sending to Edge.
     enum DeviceAttributes {
+        static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
+        static let BYPASS_TYPE = "com.adobe.eventType.edgeBypassConsent"
         // The operational-data event the Launch Rules Engine matches. Must equal the rule condition
         // (`~type == generic.operationalData`, `~source == requestContent`).
         static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
         static let OPERATIONAL_DATA_SOURCE = "com.adobe.eventSource.requestContent"
 
-        // Persistence key (inside the DEVICE_ATTRIBUTES store) holding the last synced
-        // `[key: canonicalValue]` map used for dedup.
-        static let SYNCED_VALUES = "syncedAttributes"
+        // Persistence key holding confirmed `[encodedPath: canonicalValue]` entries.
+        static let SYNCED_VALUES = "confirmedAttributes"
 
-        // App context added to every dispatched update so tokens can be routed.
+        // SDK-owned app details added to every Edge update at send time.
         static let APP = "app"
         static let APP_ID = "id"
         static let APP_PLATFORM = "platform"
@@ -116,6 +114,7 @@ enum IdentityConstants {
         // Internal request event dispatched by updateDeviceAttributesBypassConsent; and the outgoing operational-data event.
         static let UPDATE_DEVICE_ATTRIBUTES = "Update Device Attributes"
         static let DEVICE_ATTRIBUTES_TO_RULES_ENGINE = "Device attributes for rules engine"
+        static let DEVICE_ATTRIBUTES_CONFIRMED = "Device attributes confirmed"
     }
 
     enum EventDataKeys {

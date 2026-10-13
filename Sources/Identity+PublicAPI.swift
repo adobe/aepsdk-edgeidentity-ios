@@ -128,16 +128,18 @@ import Foundation
     /// Updates one or more device attributes that should be delivered to the Edge Network
     /// **independently of collect consent**.
     ///
-    /// Accepts an open map; the SDK does not define the supported keys. Keys are de-duplicated by value:
-    /// a key is sent only when it has not been synced before or its value changed since the last sync
-    /// (disable with `edgeidentity.deviceAttributes.dedup: false`). The remaining entries are forwarded as-is
-    /// in an operational-data event that the Launch Rules Engine matches and forwards to Edge with a consent
-    /// override, so keys must match the `{%token%}` names used in that rule. Every dispatched update also
-    /// carries an `app { id, platform }` entry unless the map already contains `app`.
+    /// Accepts an open map. Only values returned by an allow-list Launch rule are sent to Edge.
+    /// Allowed values are de-duplicated against confirmed bypass values at every consent state.
+    /// The existing timezone store and Messaging's push/Live Activity shared state are compared only when
+    /// collect consent is explicitly `"y"` (disable all comparisons with `edgeidentity.deviceAttributes.dedup: false`).
+    /// A failed request does not mark values
+    /// as synced, so a later API call may send them again. Every dispatched update also
+    /// carries an SDK-generated `app { id, platform }` entry, using the bundle identifier and the latest
+    /// `messaging.useSandbox` setting at send time. Caller-provided `app` values do not override routing.
     ///
     /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
-    ///   `NSNull`, or arrays/dictionaries of those). Entries with other value types are dropped. An empty map
-    ///   is a no-op.
+    ///   or arrays/dictionaries of those). Null attribute values and entries with other value types are dropped.
+    ///   Empty strings, including empty tokens, are preserved. An empty map is a no-op.
     @objc(updateDeviceAttributesBypassConsent:)
     static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
         guard !attributes.isEmpty else {
@@ -145,7 +147,9 @@ import Foundation
             return
         }
         let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,
-                          type: EventType.edgeIdentity, source: EventSource.requestContent, data: attributes)
+                          type: EventType.edgeIdentity,
+                          source: EventSource.requestContent,
+                          data: attributes)
         MobileCore.dispatch(event: event)
     }
 

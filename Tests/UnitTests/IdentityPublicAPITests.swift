@@ -328,14 +328,16 @@ class IdentityAPITests: XCTestCase {
             XCTAssertEqual(IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES, event.name)
             XCTAssertEqual("America/Los_Angeles", event.data?["timezone"] as? String)
             XCTAssertEqual("push-token-123", event.data?["pushNotification"] as? String)
+            XCTAssertEqual("", (event.data?["tokens"] as? [String: Any])?["pushNotification"] as? String)
             XCTAssertEqual(5, event.data?["customCount"] as? Int)
-            XCTAssertEqual(3, event.data?.count)
+            XCTAssertEqual(4, event.data?.count)
             expectation.fulfill()
         }
 
         // test
         Identity.updateDeviceAttributesBypassConsent(["timezone": "America/Los_Angeles",
                                                       "pushNotification": "push-token-123",
+                                                      "tokens": ["pushNotification": ""],
                                                       "customCount": 5])
 
         // verify
@@ -345,11 +347,14 @@ class IdentityAPITests: XCTestCase {
     /// Tests that updateDeviceAttributesBypassConsent with an empty map does not dispatch an event.
     func testUpdateDeviceAttributes_emptyMap_doesNotDispatch() {
         // setup
+        let expectation = XCTestExpectation(description: "Empty attributes must not dispatch")
+        expectation.isInverted = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { _ in
-            XCTFail("updateDeviceAttributesBypassConsent should not dispatch an event for an empty map")
+            expectation.fulfill()
         }
 
         // test
         Identity.updateDeviceAttributesBypassConsent([:])
+        wait(for: [expectation], timeout: 0.1)
     }
 }
