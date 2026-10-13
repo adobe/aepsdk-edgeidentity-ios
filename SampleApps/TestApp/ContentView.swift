@@ -397,6 +397,12 @@ struct CustomIdentifierView: View {
                     Text("Remove Identity")
                 }
                 .padding()
+                Button {
+                    AEPEdgeIdentity.Identity.removeAllIdentities()
+                } label: {
+                    Text("Remove All Identities")
+                }
+                .padding()
             }
 
         }
