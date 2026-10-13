@@ -25,6 +25,95 @@ class IdentityPropertiesTests: XCTestCase {
         ServiceProvider.shared.namedKeyValueService = MockDataStore()
     }
 
+    // MARK: removeAllCustomerIdentifiers()
+
+    func testRemoveAllCustomerIdentifiersRemovesAllCustomerIdentifiers() {
+        var props = IdentityProperties()
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "id2"), withNamespace: "space")
+        props.identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
+
+        let isRemoved = props.removeAllCustomerIdentifiers()
+
+        XCTAssertTrue(isRemoved)
+        XCTAssertTrue(props.identityMap.isEmpty)
+    }
+
+    func testRemoveAllCustomerIdentifiersDoesNotRemoveReservedNamespaces() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.advertisingIdentifier = "adid"
+        props.identityMap.add(item: IdentityItem(id: "gaid"), withNamespace: IdentityConstants.Namespaces.GAID)
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
+
+        let isRemoved = props.removeAllCustomerIdentifiers()
+
+        XCTAssertTrue(isRemoved)
+        XCTAssertNil(props.identityMap.getItems(withNamespace: "space"))
+        XCTAssertEqual("primaryEcid", props.ecid)
+        XCTAssertEqual("adid", props.advertisingIdentifier)
+        XCTAssertEqual("gaid", props.identityMap.getItems(withNamespace: IdentityConstants.Namespaces.GAID)?[0].id)
+    }
+
+    func testRemoveAllCustomerIdentifiersRetainsSecondaryECID() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.ecidSecondary = "secondaryEcid"
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
+
+        props.removeAllCustomerIdentifiers()
+
+        XCTAssertEqual("primaryEcid", props.ecid)
+        XCTAssertEqual("secondaryEcid", props.ecidSecondary)
+    }
+
+    func testRemoveAllCustomerIdentifiersWhenOnlyReservedIdentifiersReturnsFalseAndNoChange() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.advertisingIdentifier = "adid"
+
+        let isRemoved = props.removeAllCustomerIdentifiers()
+
+        XCTAssertFalse(isRemoved)
+        XCTAssertEqual("primaryEcid", props.ecid)
+        XCTAssertEqual("adid", props.advertisingIdentifier)
+    }
+
+    func testRemoveAllCustomerIdentifiersOnEmptyPropertiesReturnsFalse() {
+        var props = IdentityProperties()
+
+        XCTAssertFalse(props.removeAllCustomerIdentifiers())
+        XCTAssertTrue(props.identityMap.isEmpty)
+    }
+
+    func testRemoveAllCustomerIdentifiersRetainsReservedNamespacesCaseInsensitive() {
+        var props = IdentityProperties()
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "ecid")
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "idfa")
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "gaid")
+
+        let isRemoved = props.removeAllCustomerIdentifiers()
+
+        XCTAssertFalse(isRemoved)
+        XCTAssertEqual(1, props.identityMap.getItems(withNamespace: "ecid")?.count)
+        XCTAssertEqual(1, props.identityMap.getItems(withNamespace: "idfa")?.count)
+        XCTAssertEqual(1, props.identityMap.getItems(withNamespace: "gaid")?.count)
+    }
+
+    func testRemoveAllCustomerIdentifiersRemovesNamespacesThatOnlyResembleReservedNames() {
+        var props = IdentityProperties()
+        props.ecid = "primaryEcid"
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "ECID2")
+        props.identityMap.add(item: IdentityItem(id: "id"), withNamespace: "myECID")
+
+        let isRemoved = props.removeAllCustomerIdentifiers()
+
+        XCTAssertTrue(isRemoved)
+        XCTAssertNil(props.identityMap.getItems(withNamespace: "ECID2"))
+        XCTAssertNil(props.identityMap.getItems(withNamespace: "myECID"))
+        XCTAssertEqual("primaryEcid", props.ecid)
+    }
+
     /// When all properties all nil, the xdm data should be empty
     func testToXdmDataEmpty() {
         // setup

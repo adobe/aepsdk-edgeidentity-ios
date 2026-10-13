@@ -316,4 +316,22 @@ class IdentityAPITests: XCTestCase {
         // test
         Identity.removeIdentity(item: IdentityItem(id: ""), withNamespace: "")
     }
+
+    /// Tests that removeAllIdentities dispatches a remove all identities event with no data
+    func testRemoveAllIdentities() {
+        // setup
+        let expectation = XCTestExpectation(description: "removeAllIdentities should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: IdentityConstants.EventSources.REMOVE_ALL_IDENTITIES) { event in
+            XCTAssertEqual(IdentityConstants.EventNames.REMOVE_ALL_IDENTITIES, event.name)
+            XCTAssertNil(event.data)
+            expectation.fulfill()
+        }
+
+        // test
+        Identity.removeAllIdentities()
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
 }

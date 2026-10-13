@@ -321,6 +321,50 @@ class IdentityTests: XCTestCase {
         XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
     }
 
+    // MARK: handleRemoveAllIdentities
+
+    /// Tests when Identity receives a remove all identities event the customer identifiers are removed and reserved namespaces are retained
+    func testIdentityRemoveAllIdentitiesRemovesCustomerIdentifiersAndRetainsEcid() {
+        // set default identities
+        let defaultIdentities = IdentityMap()
+        defaultIdentities.add(item: IdentityItem(id: "id", authenticatedState: .authenticated, primary: true), withNamespace: "customer")
+        defaultIdentities.add(item: IdentityItem(id: "id2"), withNamespace: "email")
+        identity.state.identityProperties.updateCustomerIdentifiers(defaultIdentities)
+        identity.state.identityProperties.ecid = "primaryEcid"
+        // verify setup
+        XCTAssertEqual("id", identity.state.identityProperties.identityMap.getItems(withNamespace: "customer")?[0].id)
+        XCTAssertEqual("id2", identity.state.identityProperties.identityMap.getItems(withNamespace: "email")?[0].id)
+
+        // setup
+        let event = Event(name: "Test Remove All Identities",
+                          type: EventType.edgeIdentity,
+                          source: IdentityConstants.EventSources.REMOVE_ALL_IDENTITIES,
+                          data: nil)
+        // test
+        mockRuntime.simulateComingEvents(event)
+
+        // verify
+        XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "customer"))
+        XCTAssertNil(identity.state.identityProperties.identityMap.getItems(withNamespace: "email"))
+        XCTAssertEqual("primaryEcid", identity.state.identityProperties.ecid)
+    }
+
+    /// Tests when Identity receives a remove all identities event with no customer identifiers the identity map is unchanged
+    func testIdentityRemoveAllIdentitiesWithNoCustomerIdentifiers() {
+        // setup
+        identity.state.identityProperties.ecid = "primaryEcid"
+        let event = Event(name: "Test Remove All Identities",
+                          type: EventType.edgeIdentity,
+                          source: IdentityConstants.EventSources.REMOVE_ALL_IDENTITIES,
+                          data: nil)
+        // test
+        mockRuntime.simulateComingEvents(event)
+
+        // verify
+        XCTAssertEqual("primaryEcid", identity.state.identityProperties.ecid)
+        XCTAssertEqual(1, identity.state.identityProperties.identityMap.namespaces.count)
+    }
+
     // MARK: handleRequestReset
 
     /// Tests when Identity receives a request reset event that identifiers are cleared and ECID is regenerated

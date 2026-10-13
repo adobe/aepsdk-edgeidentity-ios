@@ -41,6 +41,7 @@ import Foundation
         registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
+        registerListener(type: EventType.edgeIdentity, source: IdentityConstants.EventSources.REMOVE_ALL_IDENTITIES, listener: handleRemoveAllIdentities)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
     }
@@ -233,6 +234,15 @@ import Foundation
         // Adding pending shared state to avoid race condition between updating and reading identity map
         let resolver = createPendingXDMSharedState(event: event)
         state.removeCustomerIdentifiers(event: event, resolveXDMSharedState: resolver)
+    }
+
+    /// Handles remove all identities requests to remove all customer identifiers.
+    /// Identifiers in reserved namespaces (ECID, GAID, IDFA) are retained.
+    /// - Parameter event: the remove all identities request event
+    private func handleRemoveAllIdentities(event: Event) {
+        // Adding pending shared state to avoid race condition between updating and reading identity map
+        let resolver = createPendingXDMSharedState(event: event)
+        state.removeAllCustomerIdentifiers(resolveXDMSharedState: resolver)
     }
 
     /// Handles `EventType.edgeIdentity` request reset events.

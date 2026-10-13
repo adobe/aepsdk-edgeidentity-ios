@@ -98,6 +98,38 @@ class IdentityMapTests: XCTestCase {
         XCTAssertNil(identityMap.getItems(withNamespace: ""))
     }
 
+    // MARK: clearItems(withNamespace:)
+
+    func testClearItemsWithNamespace() {
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "id2"), withNamespace: "space")
+        identityMap.add(item: IdentityItem(id: "example@adobe.com"), withNamespace: "email")
+
+        let isCleared = identityMap.clearItems(withNamespace: "space")
+
+        XCTAssertTrue(isCleared)
+        XCTAssertNil(identityMap.getItems(withNamespace: "space"))
+        XCTAssertEqual(1, identityMap.getItems(withNamespace: "email")?.count)
+    }
+
+    func testClearItemsWithNamespaceNotExist() {
+        let identityMap = IdentityMap()
+        identityMap.add(item: IdentityItem(id: "id"), withNamespace: "space")
+
+        let isCleared = identityMap.clearItems(withNamespace: "galaxy")
+
+        XCTAssertFalse(isCleared)
+        XCTAssertEqual(1, identityMap.getItems(withNamespace: "space")?.count)
+    }
+
+    func testClearItemsWithNamespaceOnEmptyMap() {
+        let identityMap = IdentityMap()
+
+        XCTAssertFalse(identityMap.clearItems(withNamespace: "space"))
+        XCTAssertTrue(identityMap.isEmpty)
+    }
+
     // MARK: remove(item:withNamespace:)
 
     func testRemoveItemWithNamespace() {

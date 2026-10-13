@@ -120,6 +120,20 @@ struct IdentityProperties: Codable {
         identityMap.remove(map: identifiersMap)
     }
 
+    /// Removes all customer identifiers from the current properties.
+    /// Identifiers under the reserved namespaces "ECID", "IDFA" and "GAID" are retained.
+    /// - Returns: true if any identifier was removed, false otherwise
+    @discardableResult
+    mutating func removeAllCustomerIdentifiers() -> Bool {
+        var isRemoved = false
+
+        for namespace in identityMap.namespaces where !isReservedNamespace(namespace) {
+            isRemoved = identityMap.clearItems(withNamespace: namespace) || isRemoved
+        }
+
+        return isRemoved
+    }
+
     /// Clear all identifiers
     mutating func clear() {
         identityMap = IdentityMap()
@@ -202,6 +216,14 @@ struct IdentityProperties: Codable {
         }
 
         return adIdList[0].id
+    }
+
+    /// Checks if the given namespace is a reserved namespace, ignoring case.
+    /// The list of reserved namespaces can be found at `reservedNamespaces`.
+    /// - Parameter namespace: the namespace to check
+    /// - Returns: true if `namespace` is a reserved namespace
+    private func isReservedNamespace(_ namespace: String) -> Bool {
+        return IdentityProperties.reservedNamespaces.contains { $0.caseInsensitiveCompare(namespace) == .orderedSame }
     }
 
     /// Filter out any items contained in reserved namespaces from the given `identityMap`.
