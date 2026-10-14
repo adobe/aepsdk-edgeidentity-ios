@@ -13,6 +13,7 @@ Refer to the [Getting Started Guide](getting-started.md)
 | [getIdentities](#getIdentities)                       |
 | [getUrlVariables](#getUrlVariables)                   |
 | [registerExtension](#registerExtension)               |
+| [removeAllIdentities](#removeAllIdentities)           |
 | [removeIdentity](#removeIdentity)                     |
 | [resetIdentities](#resetIdentities)                   |
 | [setAdvertisingIdentifier](#setAdvertisingIdentifier) |
@@ -237,6 +238,44 @@ MobileCore.registerExtensions([Identity.self])
 
 ------
 
+### removeAllIdentities
+
+Remove all customer identifiers from the stored client-side [IdentityMap](#identitymap). The Identity extension will stop sending these identifiers to the Edge Network. Using this API does not remove the identifiers from the server-side User Profile Graph or Identity Graph.
+
+Identifiers in the following reserved namespaces are retained:
+
+* ECID
+* IDFA
+* GAID
+
+To also generate a new ECID, use [`resetIdentities`](#resetidentities) instead.
+
+#### Swift
+
+##### Syntax
+```swift
+static func removeAllIdentities()
+```
+
+##### Example
+```swift
+Identity.removeAllIdentities()
+```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) removeAllIdentities
+```
+
+##### Example
+```objectivec
+[AEPMobileEdgeIdentity removeAllIdentities];
+```
+
+------
+
 ### removeIdentity
 
 Remove the identity from the stored client-side [IdentityMap](#identitymap). The Identity extension will stop sending the identifier to the Edge Network. Using this API does not remove the identifier from the server-side User Profile Graph or Identity Graph.
@@ -290,7 +329,7 @@ Some example use cases for this API are:
 
 This API is not recommended for:
 * Resetting a user's consent and privacy settings; see [Privacy and GDPR](https://aep-sdks.gitbook.io/docs/resources/privacy-and-gdpr).
-* Removing existing custom identifiers; use the [`removeIdentity`](#removeidentity) API instead.
+* Removing existing custom identifiers; use the [`removeIdentity`](#removeidentity) or [`removeAllIdentities`](#removeallidentities) API instead.
 * Removing a previously synced advertising identifier after the advertising tracking settings were changed by the user; use the [`setAdvertisingIdentifier`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/identity/identity-api-reference#setadvertisingidentifier) API instead.
 
 > **Warning**
