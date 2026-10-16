@@ -131,7 +131,8 @@ import Foundation
     /// Accepts an open map. Only values returned by an allow-list Launch rule are sent to Edge.
     /// Allowed values are de-duplicated against confirmed bypass values at every consent state.
     /// The existing timezone store and Messaging's push/Live Activity shared state are compared only when
-    /// collect consent is explicitly `"y"` (disable all comparisons with `edgeidentity.deviceAttributes.dedup: false`).
+    /// collect consent is `"y"`, or the Consent extension is not registered
+    /// (disable all comparisons with `edgeidentity.optimizeOperationalProfileDataSync: false`).
     /// A failed request does not mark values
     /// as synced, so a later API call may send them again. Every dispatched update also
     /// carries an SDK-generated `app { id, platform }` entry, using the bundle identifier and the latest
@@ -143,7 +144,7 @@ import Foundation
     @objc(updateDeviceAttributesBypassConsent:)
     static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
         guard !attributes.isEmpty else {
-            Log.debug(label: IdentityConstants.LOG_TAG, "Identity - updateDeviceAttributesBypassConsent: no attributes provided, ignoring.")
+            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - updateDeviceAttributesBypassConsent: no attributes provided, ignoring.")
             return
         }
         let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,

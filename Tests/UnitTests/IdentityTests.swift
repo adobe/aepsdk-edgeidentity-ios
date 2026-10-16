@@ -31,7 +31,8 @@ class IdentityTests: XCTestCase {
         XCTAssertTrue(identity.readyForEvent(event))
 
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
+        // Bootup also publishes the persisted profile attributes in the standard shared state.
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
     }
 
     // MARK: handleIdentifiersRequest
