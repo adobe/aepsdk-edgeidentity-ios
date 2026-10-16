@@ -31,51 +31,63 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
 
     func testFilterDoesNotWriteUntilCommit() {
         let attributes: [String: Any] = ["timezone": "Europe/London", "tokens": ["pushNotification": "push"]]
-        XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true) as NSDictionary)
-        XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true) as NSDictionary)
+        XCTAssertEqual(attributes as NSDictionary, deduplicator.toSend(attributes, dedup: true) as NSDictionary)
+        XCTAssertEqual(attributes as NSDictionary, deduplicator.toSend(attributes, dedup: true) as NSDictionary)
         XCTAssertNil(store.get(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES))
 
         deduplicator.commit(attributes)
 
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true).isEmpty)
         XCTAssertEqual(2, deduplicator.readSynced().count)
     }
 
     func testNestedAttributesAreDeduplicatedIndependently() {
         deduplicator.commit(["tokens": ["pushNotification": "push", "liveActivityUpdate": []]])
-        let filtered = deduplicator.filter(
+        let filtered = deduplicator.toSend(
             ["tokens": ["pushNotification": "push", "liveActivityUpdate": [["liveActivityID": "A", "token": "new"]]]],
             dedup: true)
         let expected: [String: Any] = ["tokens": ["liveActivityUpdate": [["liveActivityID": "A", "token": "new"]]]]
         XCTAssertEqual(expected as NSDictionary, filtered as NSDictionary)
     }
 
-    func testConfirmedParentAndChildUpdatesInvalidateEachOther() {
+    func testCommitWithEmptyMapReplacesSubtreeAndMapMergesBack() {
         let children: [String: Any] = ["settings": ["theme": "dark", "language": "en"]]
         let parent: [String: Any] = ["settings": [String: Any]()]
         deduplicator.commit(children)
         deduplicator.commit(parent)
-        XCTAssertEqual(1, deduplicator.readSynced().count)
-        XCTAssertEqual(children as NSDictionary, deduplicator.filter(children, dedup: true) as NSDictionary)
+        XCTAssertEqual(parent as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(children as NSDictionary, deduplicator.toSend(children, dedup: true) as NSDictionary)
         deduplicator.commit(children)
-        XCTAssertEqual(2, deduplicator.readSynced().count)
-        XCTAssertEqual(parent as NSDictionary, deduplicator.filter(parent, dedup: true) as NSDictionary)
+        XCTAssertEqual(children as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(parent as NSDictionary, deduplicator.toSend(parent, dedup: true) as NSDictionary)
+    }
+
+    func testCommitDeepMergesMapsAndReplacesSubtreeWithNonMapValue() {
+        deduplicator.commit(["tokens": ["pushNotification": "push", "liveActivityStart": [["attributeType": "A", "value": "a"]]],
+                             "nested": ["a": ["b": 1, "c": 2]]])
+        deduplicator.commit(["tokens": ["pushNotification": "new"], "nested": ["a": "scalar"]])
+
+        let expected: [String: Any] = ["tokens": ["pushNotification": "new", "liveActivityStart": [["attributeType": "A", "value": "a"]]],
+                                       "nested": ["a": "scalar"]]
+        XCTAssertEqual(expected as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(["nested": ["a": ["b": 1]]] as NSDictionary,
+                       deduplicator.toSend(["nested": ["a": ["b": 1]]], dedup: true) as NSDictionary)
     }
 
     func testConfirmedChildUpdatePreservesSiblingAndLiteralDottedPaths() {
         let attributes: [String: Any] = ["a.b": "literal", "a": ["b": "old", "c": "sibling"]]
         deduplicator.commit(attributes)
         deduplicator.commit(["a": ["b": "new"]])
-        XCTAssertEqual(3, deduplicator.readSynced().count)
-        XCTAssertTrue(deduplicator.filter(["a.b": "literal", "a": ["b": "new", "c": "sibling"]], dedup: true).isEmpty)
-        XCTAssertEqual(["a": ["b": "old"]] as NSDictionary, deduplicator.filter(attributes, dedup: true) as NSDictionary)
+        XCTAssertEqual(3, DeviceAttributeDeduplicator.paths(in: deduplicator.readSynced()).count)
+        XCTAssertTrue(deduplicator.toSend(["a.b": "literal", "a": ["b": "new", "c": "sibling"]], dedup: true).isEmpty)
+        XCTAssertEqual(["a": ["b": "old"]] as NSDictionary, deduplicator.toSend(attributes, dedup: true) as NSDictionary)
     }
 
     func testFilteredPayloadDoesNotRetainMutableFoundationValues() {
         let push = NSMutableString(string: "push")
         let update = NSMutableString(string: "update")
         let entries = NSMutableArray(object: ["liveActivityID": "1", "token": update])
-        let filtered = deduplicator.filter(["tokens": ["pushNotification": push, "liveActivityUpdate": entries]], dedup: true)
+        let filtered = deduplicator.toSend(["tokens": ["pushNotification": push, "liveActivityUpdate": entries]], dedup: true)
         push.setString("changed-push")
         update.setString("changed-update")
         entries.removeAllObjects()
@@ -84,29 +96,29 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         ]]
         XCTAssertEqual(expected as NSDictionary, filtered as NSDictionary)
         deduplicator.commit(filtered)
-        XCTAssertTrue(deduplicator.filter(expected, dedup: true).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(expected, dedup: true).isEmpty)
     }
 
     func testTimezoneOwnerRequiresExactStringMatchAndDoesNotCommit() {
         let attributes: [String: Any] = ["timezone": "Europe/London"]
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true, timezone: "Europe/London").isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true, timezone: "Europe/London").isEmpty)
         for timezone in [nil, "", "Asia/Kolkata"] as [String?] {
             XCTAssertEqual(attributes as NSDictionary,
-                           deduplicator.filter(attributes, dedup: true, timezone: timezone) as NSDictionary)
+                           deduplicator.toSend(attributes, dedup: true, timezone: timezone) as NSDictionary)
         }
         XCTAssertTrue(deduplicator.readSynced().isEmpty)
     }
 
     func testPushOwnerUsesOnlyMessagingPushIdentifierForTheNestedPath() {
         let attributes: [String: Any] = ["tokens": ["pushNotification": "push"]]
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true, messagingState: ["pushidentifier": "push"]).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true, messagingState: ["pushidentifier": "push"]).isEmpty)
         let owners: [[String: Any]] = [[:], ["pushNotification": "push"], ["pushidentifier": "other"], ["pushidentifier": 1]]
         for owner in owners {
             XCTAssertEqual(attributes as NSDictionary,
-                           deduplicator.filter(attributes, dedup: true, messagingState: owner) as NSDictionary)
+                           deduplicator.toSend(attributes, dedup: true, messagingState: owner) as NSDictionary)
         }
         XCTAssertEqual(["pushNotification": "push"] as NSDictionary,
-                       deduplicator.filter(["pushNotification": "push"],
+                       deduplicator.toSend(["pushNotification": "push"],
                                            dedup: true,
                                            messagingState: ["pushidentifier": "push"]) as NSDictionary)
         XCTAssertTrue(deduplicator.readSynced().isEmpty)
@@ -129,7 +141,7 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
                 "extra": ["token": "unused"]
             ]
         ]]
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true, messagingState: owner).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true, messagingState: owner).isEmpty)
         XCTAssertTrue(deduplicator.readSynced().isEmpty)
     }
 
@@ -147,7 +159,7 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
             ] {
                 let owner: [String: Any] = ["liveActivity": [ownerKey: stored]]
                 XCTAssertEqual(attributes as NSDictionary,
-                               deduplicator.filter(attributes, dedup: true, messagingState: owner) as NSDictionary)
+                               deduplicator.toSend(attributes, dedup: true, messagingState: owner) as NSDictionary)
             }
         }
     }
@@ -156,12 +168,12 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         for (path, ownerKey) in [("liveActivityStart", "pushToStartTokens"), ("liveActivityUpdate", "updateTokens")] {
             let attributes: [String: Any] = ["tokens": [path: [Any]()]]
             let emptyOwner: [String: Any] = ["liveActivity": [ownerKey: [String: [String: Any]]()]]
-            XCTAssertTrue(deduplicator.filter(attributes, dedup: true, messagingState: emptyOwner).isEmpty)
+            XCTAssertTrue(deduplicator.toSend(attributes, dedup: true, messagingState: emptyOwner).isEmpty)
             let owners: [[String: Any]] = [[:], ["liveActivity": [:]],
                                           ["liveActivity": [ownerKey: ["A": ["token": "token"]]]]]
             for owner in owners {
                 XCTAssertEqual(attributes as NSDictionary,
-                               deduplicator.filter(attributes, dedup: true, messagingState: owner) as NSDictionary)
+                               deduplicator.toSend(attributes, dedup: true, messagingState: owner) as NSDictionary)
             }
         }
     }
@@ -182,7 +194,7 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         for (path, entries) in cases {
             let attributes: [String: Any] = ["tokens": [path: entries]]
             XCTAssertEqual(attributes as NSDictionary,
-                           deduplicator.filter(attributes, dedup: true, messagingState: owner) as NSDictionary)
+                           deduplicator.toSend(attributes, dedup: true, messagingState: owner) as NSDictionary)
         }
     }
 
@@ -198,7 +210,7 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         ]]
         deduplicator.commit(attributes)
         XCTAssertEqual(attributes as NSDictionary,
-                       deduplicator.filter(attributes,
+                       deduplicator.toSend(attributes,
                                            dedup: false,
                                            messagingState: owner,
                                            timezone: "Europe/London") as NSDictionary)
@@ -206,11 +218,11 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
 
     func testNullIsDroppedAndEmptyContainersAreValuesButAppIsNotAnAttribute() {
         let attributes: [String: Any] = ["null": NSNull(), "array": [], "object": [:], "app": ["id": "test"]]
-        let filtered = deduplicator.filter(attributes, dedup: true)
+        let filtered = deduplicator.toSend(attributes, dedup: true)
         XCTAssertEqual(["array": [], "object": [:]] as NSDictionary, filtered as NSDictionary)
-        deduplicator.commit(attributes)
+        deduplicator.commit(filtered)
         XCTAssertEqual(2, deduplicator.readSynced().count)
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true).isEmpty)
     }
 
     func testEmptyPushTokenIsPreservedAndComparedAsAString() {
@@ -218,18 +230,18 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         let previous: [String: Any] = ["tokens": ["pushNotification": "previous"]]
         deduplicator.commit(previous)
         XCTAssertEqual(attributes as NSDictionary,
-                       deduplicator.filter(attributes,
+                       deduplicator.toSend(attributes,
                                            dedup: true,
                                            messagingState: ["pushidentifier": "previous"]) as NSDictionary)
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true, messagingState: ["pushidentifier": ""]).isEmpty)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true, messagingState: ["pushidentifier": ""]).isEmpty)
         XCTAssertEqual(1, deduplicator.readSynced().count)
         deduplicator.commit(attributes)
-        XCTAssertTrue(deduplicator.filter(attributes, dedup: true).isEmpty)
-        XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: false) as NSDictionary)
+        XCTAssertTrue(deduplicator.toSend(attributes, dedup: true).isEmpty)
+        XCTAssertEqual(attributes as NSDictionary, deduplicator.toSend(attributes, dedup: false) as NSDictionary)
     }
 
     func testInvalidJSONLeavesAreDroppedWithoutWritingStorage() {
-        let filtered = deduplicator.filter(["nested": ["valid": "value", "invalid": Date()], "nan": Double.nan], dedup: false)
+        let filtered = deduplicator.toSend(["nested": ["valid": "value", "invalid": Date()], "nan": Double.nan], dedup: false)
         XCTAssertEqual(["nested": ["valid": "value"]] as NSDictionary, filtered as NSDictionary)
         XCTAssertTrue(deduplicator.readSynced().isEmpty)
     }
@@ -239,11 +251,72 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         store.set(collectionName: IdentityConstants.Store.PROFILE_ATTRIBUTES, key: TimeZoneAttributeHandler.key, value: "Asia/Kolkata")
         deduplicator.commit(attributes)
         let restored = DeviceAttributeDeduplicator(storeName: storeName)
-        XCTAssertTrue(restored.filter(attributes, dedup: true).isEmpty)
+        XCTAssertTrue(restored.toSend(attributes, dedup: true).isEmpty)
         restored.clear()
         XCTAssertNil(store.get(collectionName: storeName, key: "confirmedAttributes"))
-        XCTAssertEqual(attributes as NSDictionary, restored.filter(attributes, dedup: true) as NSDictionary)
+        XCTAssertEqual(attributes as NSDictionary, restored.toSend(attributes, dedup: true) as NSDictionary)
         XCTAssertEqual("Asia/Kolkata",
                        store.get(collectionName: IdentityConstants.Store.PROFILE_ATTRIBUTES, key: TimeZoneAttributeHandler.key) as? String)
+    }
+
+    func testArraysCompareAsSetsOfElements() {
+        deduplicator.commit(["list": ["a", "b", 1, true], "objects": [["id": "1", "token": "x"], ["id": "2", "token": "y"]]])
+
+        XCTAssertTrue(deduplicator.toSend(["list": [true, 1, "b", "a"],
+                                           "objects": [["token": "y", "id": "2"], ["token": "x", "id": "1"]]],
+                                          dedup: true).isEmpty)
+        XCTAssertEqual(["list": ["a", "b", 1, false]] as NSDictionary,
+                       deduplicator.toSend(["list": ["a", "b", 1, false]], dedup: true) as NSDictionary)
+        XCTAssertEqual(["list": ["a", "b"]] as NSDictionary,
+                       deduplicator.toSend(["list": ["a", "b"]], dedup: true) as NSDictionary)
+    }
+
+    func testOwnerMatchesAreReturnedSeparatelyFromValuesToSend() {
+        let result = deduplicator.filter(["timezone": "Europe/London", "tokens": ["pushNotification": "push"], "custom": 1],
+                                         dedup: true,
+                                         messagingState: ["pushidentifier": "push"],
+                                         timezone: "Europe/London")
+        XCTAssertEqual(["custom": 1] as NSDictionary, result.toSend as NSDictionary)
+        XCTAssertEqual(["timezone": "Europe/London", "tokens": ["pushNotification": "push"]] as NSDictionary,
+                       result.ownerMatches as NSDictionary)
+        XCTAssertTrue(deduplicator.readSynced().isEmpty)
+    }
+
+    func testStoreValueMatchTakesPrecedenceOverOwnerMatch() {
+        deduplicator.commit(["tokens": ["pushNotification": "push"]])
+        let result = deduplicator.filter(["tokens": ["pushNotification": "push"]],
+                                         dedup: true,
+                                         messagingState: ["pushidentifier": "push"])
+        XCTAssertTrue(result.toSend.isEmpty)
+        XCTAssertTrue(result.ownerMatches.isEmpty)
+    }
+
+    func testStoreIsPersistedAsJSONAndSupportsNullInsideArrays() {
+        deduplicator.commit(["list": ["a", NSNull()]])
+        XCTAssertNotNil(store.get(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES) as? String)
+        XCTAssertEqual(["list": ["a", NSNull()]] as NSDictionary,
+                       DeviceAttributeDeduplicator(storeName: storeName).readSynced() as NSDictionary)
+    }
+
+    func testRemovePathsDeletesValuesAndPrunesEmptyParents() {
+        deduplicator.commit(["tokens": ["liveActivityStart": ["a"], "liveActivityUpdate": ["b"]], "timezone": "Europe/London"])
+        deduplicator.remove(paths: [["tokens", "liveActivityStart"], ["tokens", "liveActivityUpdate"], ["missing", "path"]])
+        XCTAssertEqual(["timezone": "Europe/London"] as NSDictionary, deduplicator.readSynced() as NSDictionary)
+    }
+
+    func testNumbersCompareNumerically() {
+        deduplicator.commit(["count": 1, "list": [1, 2.5]])
+        XCTAssertTrue(deduplicator.toSend(["count": 1.0, "list": [2.5, 1.0]], dedup: true).isEmpty)
+        XCTAssertFalse(deduplicator.toSend(["count": 1.5], dedup: true).isEmpty)
+        XCTAssertFalse(DeviceAttributeDeduplicator.isEqual(1, true))
+    }
+}
+
+private extension DeviceAttributeDeduplicator {
+    func toSend(_ attributes: [String: Any],
+                dedup: Bool,
+                messagingState: [String: Any]? = nil,
+                timezone: String? = nil) -> [String: Any] {
+        return filter(attributes, dedup: dedup, messagingState: messagingState, timezone: timezone).toSend
     }
 }

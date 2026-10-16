@@ -33,7 +33,8 @@ import Foundation
 
     private let deviceAttributeDeduplicator = DeviceAttributeDeduplicator(storeName: IdentityConstants.Store.DEVICE_ATTRIBUTES)
     private var deviceAttributeQueue: [Event] = []
-    private var deviceAttributesForEdge: Event?
+    // The Edge bypass request awaiting its result; nil when no request is in flight.
+    private var activeDeviceAttributeRequest: Event?
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
@@ -52,6 +53,7 @@ import Foundation
         registerListener(type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
                          source: EventSource.responseContent,
                          listener: handleDeviceAttributeResult)
+        registerListener(type: EventType.messaging, source: EventSource.requestContent, listener: handleClearLiveActivities)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
@@ -65,11 +67,13 @@ import Foundation
         // The closure passed to bootupIfReady is wrapped so that when identity properties are first
         // published, hydrated profile attributes are merged in — preventing the bootup publish from
         // wiping the profile attributes section that `onRegistered` populated.
+        // On bootup, also publish the persisted profile attributes in the standard shared state.
         guard state.bootupIfReady(getSharedState: getSharedState(extensionName:event:),
                                   createXDMSharedState: { [weak self] data, sharedStateEvent in
                                       self?.createXDMSharedState(
                                           data: self?.enrichWithProfileAttributes(baseData: data) ?? data,
                                           event: sharedStateEvent)
+                                      self?.publishProfileAttributes(event: sharedStateEvent)
                                   }) else {
             return false
         }
@@ -102,6 +106,16 @@ import Foundation
             data[IdentityConstants.ProfileAttributes.STORE_NAME] = merged
         }
         return data
+    }
+
+    /// Publishes the standard shared state `{"profileAttributes": {...}}`: the synced device attributes
+    /// merged with the profile-path timezone.
+    private func publishProfileAttributes(event: Event?) {
+        var attributes = deviceAttributeDeduplicator.readSynced()
+        if let timezone = collectStoredAttributes()[TimeZoneAttributeHandler.key] {
+            attributes[IdentityConstants.DeviceAttributes.TIMEZONE] = timezone
+        }
+        createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: attributes], event: event)
     }
 
     // MARK: Event Listeners
@@ -147,6 +161,7 @@ import Foundation
 
     private func publishProfileAttributesSharedState(_ xdm: [String: String], event: Event, resolveSharedState: ([String: Any]) -> Void) {
         resolveSharedState(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
+        publishProfileAttributes(event: event)
         dispatchProfileAttributesEdgeEvent(xdmData: xdm)
     }
 
@@ -166,128 +181,6 @@ import Foundation
                           source: EventSource.requestContent,
                           data: eventData)
         dispatch(event: event)
-    }
-
-    // MARK: - Device attributes (consent-independent) -> operational-data event
-
-    /// Sends the public API's attributes to rules without checking or changing dedup state.
-    private func handleDeviceAttributes(event: Event) {
-        // The edgeIdentity/requestContent pair is shared; only the API's own request may be forwarded,
-        // so data from any other event on this pair never reaches the consent-independent path.
-        guard event.name == IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES else {
-            Log.trace(label: friendlyName, "\(#function) - Ignoring event '\(event.name)', not a device-attributes request.")
-            return
-        }
-        guard let eventData = event.data, !eventData.isEmpty else {
-            Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
-            return
-        }
-
-        let operationalEvent = event.createChainedEvent(
-            name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_TO_RULES_ENGINE,
-            type: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_TYPE,
-            source: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_SOURCE,
-            data: eventData)
-        dispatch(event: operationalEvent)
-    }
-
-    private func handleDeviceAttributeRuleResponse(event: Event) {
-        guard let data = event.data, !data.isEmpty else {
-            Log.debug(label: friendlyName, "Rule response contains no device attributes.")
-            return
-        }
-        deviceAttributeQueue.append(event)
-        sendNextDeviceAttributeRequest()
-    }
-
-    private func sendNextDeviceAttributeRequest() {
-        guard deviceAttributesForEdge == nil else { return }
-        while !deviceAttributeQueue.isEmpty {
-            let request = deviceAttributeQueue.removeFirst()
-            let attributes = request.data ?? [:]
-            let config = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
-                                        event: nil,
-                                        resolution: .lastSet)?.value
-            let dedup = config?[IdentityConstants.ConfigKeys.DEVICE_ATTRIBUTES_DEDUP] as? Bool ?? true
-            // Owner stores are optimistic, not acknowledgements. Trust them only with collect consent "y".
-            // The bypass store records Edge acknowledgements and is compared independently of consent.
-            let compareOwners = dedup && isCollectConsentGranted()
-            let messagingState = compareOwners
-                ? getSharedState(extensionName: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
-                                 event: nil,
-                                 resolution: .lastSet)?.value : nil
-            let timezone = compareOwners ? collectStoredAttributes()[TimeZoneAttributeHandler.key] : nil
-            var payload = deviceAttributeDeduplicator.filter(
-                attributes,
-                dedup: dedup,
-                messagingState: messagingState,
-                timezone: timezone)
-            guard !payload.isEmpty else {
-                Log.debug(label: friendlyName, "No device attributes remain after deduplication for rule event \(request.id). Skipping Edge dispatch.")
-                continue
-            }
-            guard let appId = Bundle.main.bundleIdentifier, !appId.isEmpty else {
-                Log.warning(label: friendlyName, "Cannot send device attributes without an app bundle identifier.")
-                continue
-            }
-            let useSandbox = config?[IdentityConstants.DeviceAttributes.MESSAGING_USE_SANDBOX] as? Bool ?? false
-            payload[IdentityConstants.DeviceAttributes.APP] = [
-                IdentityConstants.DeviceAttributes.APP_ID: appId,
-                IdentityConstants.DeviceAttributes.APP_PLATFORM: useSandbox
-                    ? IdentityConstants.DeviceAttributes.PLATFORM_APNS_SANDBOX : IdentityConstants.DeviceAttributes.PLATFORM_APNS
-            ]
-            let edgeEvent = request.createChainedEvent(name: "Edge bypass request",
-                                                       type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
-                                                       source: EventSource.requestContent,
-                                                       data: payload)
-            deviceAttributesForEdge = edgeEvent
-            dispatch(event: edgeEvent)
-            return
-        }
-    }
-
-    private func isCollectConsentGranted() -> Bool {
-        typealias Consent = IdentityConstants.XDMKeys.Consent
-        // Do not fall back to an older "y" when the latest consent state is pending.
-        guard let state = getXDMSharedState(extensionName: IdentityConstants.SharedState.Consent.SHARED_OWNER_NAME,
-                                            event: nil,
-                                            resolution: .any),
-              state.status == .set,
-              let consents = state.value?[Consent.CONSENTS] as? [String: Any],
-              let collect = consents[Consent.COLLECT] as? [String: Any] else { return false }
-        return collect[Consent.VAL] as? String == Consent.YES
-    }
-
-    private func handleDeviceAttributeResult(event: Event) {
-        guard let request = deviceAttributesForEdge, event.parentID == request.id else { return }
-        guard let status = event.data?["status"] as? String,
-              ["success", "failed", "dropped"].contains(status) else {
-            Log.warning(label: friendlyName, "Ignoring device attribute result with an invalid status.")
-            return
-        }
-        if status == "success" {
-            let attributes = request.data ?? [:]
-            deviceAttributeDeduplicator.commit(attributes)
-            if let timezone = attributes["timezone"] as? String {
-                ServiceProvider.shared.namedKeyValueService.set(
-                    collectionName: IdentityConstants.Store.PROFILE_ATTRIBUTES,
-                    key: TimeZoneAttributeHandler.key,
-                    value: timezone)
-                createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)
-            }
-            if let tokens = attributes["tokens"] as? [String: Any], !tokens.isEmpty {
-                dispatch(event: event.createChainedEvent(
-                    name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_CONFIRMED,
-                    type: EventType.messaging,
-                    source: EventSource.responseContent,
-                    data: ["tokens": tokens]))
-            }
-            Log.debug(label: friendlyName, "Device attributes confirmed by Edge for request \(request.id). Dedup store updated.")
-        } else {
-            Log.warning(label: friendlyName, "Device attribute sync \(status): \(event.data?["reason"] ?? "unknown"). Values remain unsynced.")
-        }
-        deviceAttributesForEdge = nil
-        sendNextDeviceAttributeRequest()
     }
 
     /// Handles events requesting for identifiers. Dispatches response event containing the identifiers. Called by listener registered with event hub.
@@ -379,14 +272,16 @@ import Foundation
             ServiceProvider.shared.namedKeyValueService.remove(
                 collectionName: handler.storeName, key: handler.attributeKey)
         }
-        // Clear stored device attributes and pending requests for the new identity.
+        // Clear stored device attributes and pending requests for the new identity. A late Edge result is ignored.
+        // TODO: Publish a sync result event for requests dropped by reset.
         deviceAttributeDeduplicator.clear()
         deviceAttributeQueue.removeAll()
-        deviceAttributesForEdge = nil
+        activeDeviceAttributeRequest = nil
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,
                                eventDispatcher: dispatch(event:))
+        publishProfileAttributes(event: event)
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.
@@ -409,5 +304,173 @@ import Foundation
         if state.updateLegacyExperienceCloudId(legacyEcid) {
             createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)
         }
+    }
+}
+
+// MARK: - Device attributes (consent-independent) -> operational-data event
+
+extension Identity {
+    /// Sends the public API's attributes to rules without checking or changing dedup state.
+    private func handleDeviceAttributes(event: Event) {
+        // The edgeIdentity/requestContent pair is shared; only the API's own request may be forwarded,
+        // so data from any other event on this pair never reaches the consent-independent path.
+        guard event.name == IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES else {
+            Log.trace(label: friendlyName, "\(#function) - Ignoring event '\(event.name)', not a device-attributes request.")
+            return
+        }
+        guard let eventData = event.data, !eventData.isEmpty else {
+            Log.warning(label: friendlyName, "\(#function) - Device attributes request has no data, dropping it.")
+            return
+        }
+
+        Log.debug(label: friendlyName, "\(#function) - Forwarding device attributes to the rules engine. " +
+                    "Nothing is sent unless a forward operational data rule matches.")
+        let operationalEvent = event.createChainedEvent(
+            name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_TO_RULES_ENGINE,
+            type: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_TYPE,
+            source: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_SOURCE,
+            data: eventData)
+        dispatch(event: operationalEvent)
+    }
+
+    /// Queues a forward operational data rule consequence and sends it when no other request is active.
+    private func handleDeviceAttributeRuleResponse(event: Event) {
+        guard let data = event.data, !data.isEmpty else {
+            Log.debug(label: friendlyName, "Rule response contains no device attributes.")
+            return
+        }
+        deviceAttributeQueue.append(event)
+        processDeviceAttributeQueue()
+    }
+
+    /// Sends queued requests to Edge one at a time. Requests with nothing left to send are skipped.
+    private func processDeviceAttributeQueue() {
+        while activeDeviceAttributeRequest == nil, !deviceAttributeQueue.isEmpty {
+            let request = deviceAttributeQueue.removeFirst()
+            guard let edgeEvent = makeDeviceAttributeEdgeEvent(for: request) else { continue }
+            activeDeviceAttributeRequest = edgeEvent
+            dispatch(event: edgeEvent)
+        }
+    }
+
+    /// Builds the Edge bypass event for a rule consequence, or returns nil when nothing needs to be sent.
+    private func makeDeviceAttributeEdgeEvent(for request: Event) -> Event? {
+        let config = getSharedState(extensionName: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
+                                    event: nil,
+                                    resolution: .lastSet)?.value
+        let dedup = config?[IdentityConstants.ConfigKeys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC] as? Bool ?? true
+        // Owner values are trusted only with collect consent "y"; otherwise only the device attributes store is compared.
+        let compareOwners = dedup && isCollectConsentGranted()
+        let messagingState = compareOwners
+            ? getSharedState(extensionName: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
+                             event: nil,
+                             resolution: .lastSet)?.value : nil
+        let timezone = compareOwners ? collectStoredAttributes()[TimeZoneAttributeHandler.key] : nil
+        let result = deviceAttributeDeduplicator.filter(request.data ?? [:],
+                                                        dedup: dedup,
+                                                        messagingState: messagingState,
+                                                        timezone: timezone)
+        if !result.ownerMatches.isEmpty {
+            // The owner already holds these values; store them so later requests dedup without the owner.
+            deviceAttributeDeduplicator.commit(result.ownerMatches)
+        }
+
+        var payload = result.toSend
+        guard !payload.isEmpty else {
+            // TODO: Publish a sync result event when every value is deduplicated.
+            Log.debug(label: friendlyName, "No device attributes remain after deduplication for rule event \(request.id). Skipping Edge dispatch.")
+            return nil
+        }
+        guard let appId = Bundle.main.bundleIdentifier, !appId.isEmpty else {
+            Log.warning(label: friendlyName, "Cannot send device attributes without an app bundle identifier. Dropping rule event \(request.id).")
+            return nil
+        }
+        let useSandbox = config?[IdentityConstants.DeviceAttributes.MESSAGING_USE_SANDBOX] as? Bool ?? false
+        payload[IdentityConstants.DeviceAttributes.APP] = [
+            IdentityConstants.DeviceAttributes.APP_ID: appId,
+            IdentityConstants.DeviceAttributes.APP_PLATFORM: useSandbox
+                ? IdentityConstants.DeviceAttributes.PLATFORM_APNS_SANDBOX : IdentityConstants.DeviceAttributes.PLATFORM_APNS
+        ]
+        return request.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_BYPASS_REQUEST,
+                                          type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
+                                          source: EventSource.requestContent,
+                                          data: payload)
+    }
+
+    /// Returns true when collect consent is "y". Like the Edge extension, consent is "y" when the Consent extension is not registered.
+    /// Before the Event Hub publishes its registered extensions, consent is treated as not "y".
+    private func isCollectConsentGranted() -> Bool {
+        typealias Consent = IdentityConstants.XDMKeys.Consent
+        guard let hubState = getSharedState(extensionName: IdentityConstants.SharedState.Hub.SHARED_OWNER_NAME, event: nil)?.value else {
+            return false
+        }
+        let extensions = hubState[IdentityConstants.SharedState.Hub.EXTENSIONS] as? [String: Any]
+        let consentExtension = extensions?[IdentityConstants.SharedState.Consent.SHARED_OWNER_NAME] as? [String: Any]
+        guard let consentExtension = consentExtension, !consentExtension.isEmpty else { return true }
+        // Do not fall back to an older "y" when the latest consent state is pending.
+        guard let state = getXDMSharedState(extensionName: IdentityConstants.SharedState.Consent.SHARED_OWNER_NAME,
+                                            event: nil,
+                                            resolution: .any),
+              state.status == .set,
+              let consents = state.value?[Consent.CONSENTS] as? [String: Any],
+              let collect = consents[Consent.COLLECT] as? [String: Any] else { return false }
+        return collect[Consent.VAL] as? String == Consent.YES
+    }
+
+    /// Handles the Edge result for a device attributes request. A result for the active request always
+    /// releases it and advances the queue. Any status other than success is treated as failed.
+    private func handleDeviceAttributeResult(event: Event) {
+        typealias Keys = IdentityConstants.DeviceAttributes
+        guard let request = activeDeviceAttributeRequest, isResult(event, for: request) else {
+            Log.debug(label: friendlyName, "Ignoring device attribute result \(event.id), it does not match the active request.")
+            return
+        }
+        activeDeviceAttributeRequest = nil
+
+        if event.data?[Keys.STATUS] as? String == Keys.STATUS_SUCCESS {
+            var attributes = request.data ?? [:]
+            attributes.removeValue(forKey: Keys.APP)
+            deviceAttributeDeduplicator.commit(attributes)
+            if let timezone = attributes[Keys.TIMEZONE] as? String {
+                ServiceProvider.shared.namedKeyValueService.set(collectionName: IdentityConstants.Store.PROFILE_ATTRIBUTES,
+                                                                key: TimeZoneAttributeHandler.key,
+                                                                value: timezone)
+            }
+            publishProfileAttributes(event: event)
+            dispatchDeviceAttributeSyncResult([Keys.STATUS: Keys.STATUS_SUCCESS, Keys.ATTRIBUTES: attributes], for: event)
+            Log.debug(label: friendlyName, "Device attributes confirmed by Edge for request \(request.id).")
+        } else {
+            var data: [String: Any] = [Keys.STATUS: Keys.STATUS_FAILED]
+            if let reason = event.data?[Keys.REASON] {
+                data[Keys.REASON] = reason
+            }
+            dispatchDeviceAttributeSyncResult(data, for: event)
+            Log.warning(label: friendlyName, "Device attribute sync failed with status '\(event.data?[Keys.STATUS] ?? "missing")', " +
+                            "reason: \(event.data?[Keys.REASON] ?? "unknown"). Values remain unsynced.")
+        }
+        processDeviceAttributeQueue()
+    }
+
+    /// An Edge result belongs to a request when it is chained to it, or names it in `requestEventId` (unchained results).
+    private func isResult(_ event: Event, for request: Event) -> Bool {
+        if event.parentID == request.id { return true }
+        guard let requestEventId = event.data?[IdentityConstants.DeviceAttributes.REQUEST_EVENT_ID] as? String else { return false }
+        return UUID(uuidString: requestEventId) == request.id
+    }
+
+    private func dispatchDeviceAttributeSyncResult(_ data: [String: Any], for event: Event) {
+        dispatch(event: event.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_SYNC_RESULT,
+                                                 type: EventType.edgeIdentity,
+                                                 source: EventSource.responseContent,
+                                                 data: data))
+    }
+
+    /// Removes the Live Activity tokens when Messaging clears its Live Activities.
+    private func handleClearLiveActivities(event: Event) {
+        typealias Keys = IdentityConstants.DeviceAttributes
+        guard event.data?[Keys.CLEAR_LIVE_ACTIVITIES] as? Bool == true else { return }
+        deviceAttributeDeduplicator.remove(paths: [[Keys.TOKENS, Keys.LIVE_ACTIVITY_START],
+                                                   [Keys.TOKENS, Keys.LIVE_ACTIVITY_UPDATE]])
+        publishProfileAttributes(event: event)
     }
 }

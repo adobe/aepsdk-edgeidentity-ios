@@ -273,4 +273,45 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         XCTAssertEqual("Asia/Kolkata",
                        attrs?[TimeZoneAttributeHandler.key] as? String)
     }
+
+    // MARK: - Standard shared state
+
+    private func lastStandardProfileAttributes(_ runtime: TestableExtensionRuntime) -> [String: Any]? {
+        let lastState = runtime.createdSharedStates.last ?? nil
+        return lastState?[IdentityConstants.ProfileAttributes.SHARED_STATE_KEY] as? [String: Any]
+    }
+
+    func testTimezoneSync_createsStandardSharedStateWithTimezone() {
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
+
+        XCTAssertEqual(["timezone": "Europe/London"] as NSDictionary,
+                       lastStandardProfileAttributes(mockRuntime) as NSDictionary?)
+    }
+
+    func testTimezoneSync_dedup_doesNotChangeStandardSharedState() {
+        storeTimezone("Europe/London")
+
+        mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
+
+        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
+    }
+
+    func testColdStartHydration_storedTimezoneSurfacesInStandardSharedState() {
+        let store = MockDataStore()
+        ServiceProvider.shared.namedKeyValueService = store
+        store.set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
+                  key: TimeZoneAttributeHandler.key,
+                  value: "Asia/Kolkata")
+
+        let runtime = TestableExtensionRuntime()
+        guard let freshIdentity = Identity(runtime: runtime) else {
+            XCTFail("Failed to initialize Identity")
+            return
+        }
+        freshIdentity.onRegistered()
+        XCTAssertTrue(freshIdentity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
+
+        XCTAssertEqual(["timezone": "Asia/Kolkata"] as NSDictionary,
+                       lastStandardProfileAttributes(runtime) as NSDictionary?)
+    }
 }
