@@ -94,11 +94,14 @@ class IdentityDeviceAttributesTests: XCTestCase {
         return mockRuntime.dispatchedEvents.filter { $0.type == IdentityConstants.DeviceAttributes.BYPASS_TYPE }
     }
 
-    private func complete(_ event: Event, status: String = "success") {
-        mockRuntime.simulateComingEvents(event.createChainedEvent(name: "Edge bypass result",
-                                                                  type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
-                                                                  source: EventSource.responseContent,
-                                                                  data: ["status": status, "reason": "network"]))
+    @discardableResult
+    private func complete(_ event: Event, status: String = "success") -> Event {
+        let response = event.createChainedEvent(name: "Edge bypass result",
+                                                type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
+                                                source: EventSource.responseContent,
+                                                data: ["status": status, "reason": "network"])
+        mockRuntime.simulateComingEvents(response)
+        return response
     }
 
     @discardableResult
@@ -158,6 +161,10 @@ class IdentityDeviceAttributesTests: XCTestCase {
 
     private func syncResultEvents() -> [Event] {
         return mockRuntime.dispatchedEvents.filter { $0.name == IdentityConstants.EventNames.DEVICE_ATTRIBUTES_SYNC_RESULT }
+    }
+
+    private func tokensConfirmedEvents() -> [Event] {
+        return mockRuntime.dispatchedEvents.filter { $0.name == IdentityConstants.EventNames.DEVICE_ATTRIBUTES_CONFIRMED }
     }
 
     private func lastProfileAttributesSharedState() -> [String: Any]? {
@@ -648,9 +655,12 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertEqual(result.id, syncResult.parentID)
         XCTAssertNil(syncResult.responseID)
         XCTAssertEqual(["status": "success", "reason": "", "attributes": attributes] as NSDictionary, syncResult.data as NSDictionary?)
-        XCTAssertFalse(mockRuntime.dispatchedEvents.contains { $0.type == EventType.messaging })
+        // Messaging gets the confirmed tokens as sent, including an empty push token.
+        XCTAssertEqual([["tokens": attributes["tokens"] ?? [:]]] as [NSDictionary],
+                       mockRuntime.dispatchedEvents.filter { $0.type == EventType.messaging }.map { ($0.data ?? [:]) as NSDictionary })
         mockRuntime.simulateComingEvents(result)
         XCTAssertEqual(1, syncResultEvents().count)
+        XCTAssertEqual(1, tokensConfirmedEvents().count)
     }
 
     func testFailedOrDroppedBypassDispatchesFailedSyncResult() throws {
@@ -1307,6 +1317,89 @@ extension IdentityDeviceAttributesTests {
         XCTAssertEqual("com.adobe.test", (edge.data?["app"] as? [String: Any])?["id"] as? String)
     }
 
+    // MARK: - Device attributes confirmed event for Messaging
+
+    func testSuccessWithTokensDispatchesTokensConfirmedAfterPublishAndBeforeSyncResult() throws {
+        let recorder = startRecordingIdentity()
+        let edge = try XCTUnwrap(consequence(["timezone": "Europe/London", "tokens": ["pushNotification": "token"]],
+                                             completeImmediately: false))
+
+        let response = complete(edge)
+
+        let confirmed = try XCTUnwrap(tokensConfirmedEvents().last)
+        XCTAssertEqual(1, tokensConfirmedEvents().count)
+        XCTAssertEqual("Device attributes confirmed", confirmed.name)
+        XCTAssertEqual(EventType.messaging, confirmed.type)
+        XCTAssertEqual(EventSource.responseContent, confirmed.source)
+        XCTAssertEqual(response.id, confirmed.parentID)
+        XCTAssertEqual(["tokens": ["pushNotification": "token"]] as NSDictionary, confirmed.data as NSDictionary?)
+        XCTAssertEqual(["sharedState", "Device attributes confirmed", "Device Attributes Sync Result"],
+                       recorder.trace.suffix(3))
+    }
+
+    func testSuccessWithoutTokensDoesNotDispatchTokensConfirmed() {
+        XCTAssertNotNil(consequence(["timezone": "Europe/London"]))
+
+        XCTAssertEqual(1, syncResultEvents().count)
+        XCTAssertTrue(tokensConfirmedEvents().isEmpty)
+    }
+
+    func testFailureWithTokensDoesNotDispatchTokensConfirmed() throws {
+        let edge = try XCTUnwrap(consequence(["tokens": ["pushNotification": "token"]], completeImmediately: false))
+
+        complete(edge, status: "failed")
+
+        XCTAssertEqual("failed", syncResultEvents().last?.data?["status"] as? String)
+        XCTAssertTrue(tokensConfirmedEvents().isEmpty)
+    }
+
+    func testOwnerMatchedTokenWithEverythingDeduplicatedDoesNotDispatchTokensConfirmed() {
+        simulateCollectConsent("y")
+        mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
+                                        data: (["pushidentifier": "token"], .set))
+        startIdentity()
+
+        mockRuntime.simulateComingEvents(ruleResponse(["tokens": ["pushNotification": "token"]]))
+
+        XCTAssertTrue(bypassEvents().isEmpty)
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual("unchanged", syncResultEvents().last?.data?["reason"] as? String)
+        XCTAssertTrue(tokensConfirmedEvents().isEmpty)
+    }
+
+    func testResetWithPendingTokenRequestDoesNotDispatchTokensConfirmed() throws {
+        let edge = try XCTUnwrap(consequence(["tokens": ["pushNotification": "token"]], completeImmediately: false))
+
+        mockRuntime.simulateComingEvents(resetEvent())
+        complete(edge)
+
+        XCTAssertEqual("identityReset", syncResultEvents().last?.data?["reason"] as? String)
+        XCTAssertTrue(tokensConfirmedEvents().isEmpty)
+    }
+
+    func testPartialDedupDispatchesOnlyTheSentTokens() throws {
+        DeviceAttributeDeduplicator(storeName: deviceStore).commit(["tokens": ["pushNotification": "token"]])
+        startIdentity()
+
+        XCTAssertNotNil(consequence(["timezone": "Europe/London",
+                                     "tokens": ["pushNotification": "token", "otherToken": "new"]]))
+
+        XCTAssertEqual(["tokens": ["otherToken": "new"]] as NSDictionary,
+                       tokensConfirmedEvents().last?.data as NSDictionary?)
+    }
+
+    func testLiveActivityTokensAreIncludedInTokensConfirmed() {
+        let tokens: [String: Any] = [
+            "liveActivityStart": [["attributeType": "A", "value": "start"]],
+            "liveActivityUpdate": [["liveActivityID": "1", "token": "update"]]
+        ]
+
+        XCTAssertNotNil(consequence(["tokens": tokens]))
+
+        XCTAssertEqual(1, tokensConfirmedEvents().count)
+        XCTAssertEqual(["tokens": tokens] as NSDictionary, tokensConfirmedEvents().last?.data as NSDictionary?)
+    }
+
     // MARK: - Shared state
 
     func testDeviceAttributesArePublishedInStandardSharedStateOnly() throws {
@@ -1399,6 +1492,8 @@ extension IdentityDeviceAttributesTests {
 private final class SharedStateEventRecorder: ExtensionRuntime {
     private let runtime: TestableExtensionRuntime
     var sharedStateEvents: [Event?] = []
+    /// Dispatched event names and "sharedState" for each standard shared state, in call order.
+    var trace: [String] = []
 
     init(_ runtime: TestableExtensionRuntime) {
         self.runtime = runtime
@@ -1410,9 +1505,13 @@ private final class SharedStateEventRecorder: ExtensionRuntime {
     }
     func startEvents() { runtime.startEvents() }
     func stopEvents() { runtime.stopEvents() }
-    func dispatch(event: Event) { runtime.dispatch(event: event) }
+    func dispatch(event: Event) {
+        trace.append(event.name)
+        runtime.dispatch(event: event)
+    }
     func createSharedState(data: [String: Any], event: Event?) {
         sharedStateEvents.append(event)
+        trace.append("sharedState")
         runtime.createSharedState(data: data, event: event)
     }
     func createPendingSharedState(event: Event?) -> SharedStateResolver {
