@@ -264,4 +264,63 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         deduplicator.remove(paths: [["tokens", "liveActivityStart"], ["tokens", "liveActivityUpdate"]])
         XCTAssertEqual(["timezone": "UTC"] as NSDictionary, reloaded().readSynced() as NSDictionary)
     }
+
+    // MARK: - Nesting depth
+
+    /// Returns a value made of `levels` nested maps, so its innermost map is at depth `levels` when the value is
+    /// placed directly in the attributes map.
+    private func nestedMaps(_ levels: Int) -> Any {
+        var value: Any = "leaf"
+        for _ in 0..<levels { value = ["k": value] }
+        return value
+    }
+
+    /// Returns a value made of `levels` nested arrays.
+    private func nestedArrays(_ levels: Int) -> Any {
+        var value: Any = "leaf"
+        for _ in 0..<levels { value = [value] }
+        return value
+    }
+
+    func testFilter_containersAtMaxDepthAreKept() {
+        let attributes: [String: Any] = ["maps": nestedMaps(DeviceAttributeDeduplicator.MAX_DEPTH),
+                                         "arrays": nestedArrays(DeviceAttributeDeduplicator.MAX_DEPTH),
+                                         "sibling": "kept"]
+        XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
+    }
+
+    func testFilter_containersDeeperThanMaxDepthAreDropped() {
+        let attributes: [String: Any] = ["maps": nestedMaps(DeviceAttributeDeduplicator.MAX_DEPTH + 1),
+                                         "arrays": nestedArrays(DeviceAttributeDeduplicator.MAX_DEPTH + 1),
+                                         "sibling": "kept"]
+        XCTAssertEqual(["sibling": "kept"] as NSDictionary,
+                       deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
+    }
+
+    /// iOS only: an Objective-C app can pass a collection that contains itself.
+    func testFilter_cyclicCollectionsAreDropped() {
+        let cyclicMap = NSMutableDictionary()
+        cyclicMap["self"] = cyclicMap
+        let cyclicArray = NSMutableArray()
+        cyclicArray.add(cyclicArray)
+        defer {
+            cyclicMap.removeAllObjects()
+            cyclicArray.removeAllObjects()
+        }
+        let attributes: [String: Any] = ["tokens": cyclicMap, "custom": cyclicArray, "timezone": "UTC"]
+
+        XCTAssertEqual(["timezone": "UTC"] as NSDictionary,
+                       deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
+    }
+
+    /// iOS only: an invalid JSON object is never passed to `JSONSerialization`, which would raise an exception.
+    func testCommit_invalidJSONObjectIsNotPersisted() {
+        deduplicator.commit(["timezone": "UTC"])
+        let persistedBefore = persisted() as? String
+
+        deduplicator.commit(["nan": Double.nan, "date": Date()])
+
+        XCTAssertEqual(persistedBefore, persisted() as? String)
+        XCTAssertEqual(["timezone": "UTC"] as NSDictionary, reloaded().readSynced() as NSDictionary)
+    }
 }

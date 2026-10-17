@@ -357,4 +357,42 @@ class IdentityAPITests: XCTestCase {
         Identity.updateDeviceAttributesBypassConsent([:])
         wait(for: [expectation], timeout: 0.1)
     }
+
+    /// Calls the API through its Objective-C selector, as an Objective-C app does.
+    private func updateDeviceAttributesFromObjC(_ attributes: NSDictionary) {
+        _ = (Identity.self as AnyObject).perform(NSSelectorFromString("updateDeviceAttributesBypassConsent:"), with: attributes)
+    }
+
+    /// Tests that the Objective-C entry point drops non-string keys and forwards the rest.
+    func testUpdateDeviceAttributes_objC_dropsNonStringKeys() {
+        // setup
+        let expectation = XCTestExpectation(description: "updateDeviceAttributesBypassConsent should dispatch an event")
+        expectation.assertForOverFulfill = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { event in
+            XCTAssertEqual(["timezone": "UTC", "tokens": ["pushNotification": "push"]] as NSDictionary, event.data as NSDictionary?)
+            expectation.fulfill()
+        }
+
+        // test
+        updateDeviceAttributesFromObjC(NSDictionary(dictionary: [AnyHashable(1): "dropped",
+                                                                 AnyHashable("timezone"): "UTC",
+                                                                 AnyHashable("tokens"): ["pushNotification": "push"]]))
+
+        // verify
+        wait(for: [expectation], timeout: 1)
+    }
+
+    /// Tests that the Objective-C entry point treats a map without string keys as empty.
+    func testUpdateDeviceAttributes_objC_onlyNonStringKeys_doesNotDispatch() {
+        // setup
+        let expectation = XCTestExpectation(description: "Attributes without string keys must not dispatch")
+        expectation.isInverted = true
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { _ in
+            expectation.fulfill()
+        }
+
+        // test
+        updateDeviceAttributesFromObjC(NSDictionary(dictionary: [AnyHashable(1): "dropped", AnyHashable(2.5): "dropped"]))
+        wait(for: [expectation], timeout: 0.1)
+    }
 }

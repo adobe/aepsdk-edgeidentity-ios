@@ -141,7 +141,7 @@ import Foundation
     /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
     ///   or arrays/dictionaries of those). Null attribute values and entries with other value types are dropped.
     ///   Empty strings, including empty tokens, are preserved. An empty map is a no-op.
-    @objc(updateDeviceAttributesBypassConsent:)
+    @nonobjc
     static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
         guard !attributes.isEmpty else {
             Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Unable to update device attributes, attributes are null or empty.")
@@ -152,6 +152,23 @@ import Foundation
                           source: EventSource.requestContent,
                           data: attributes)
         MobileCore.dispatch(event: event)
+    }
+
+    /// Objective-C entry point for `updateDeviceAttributesBypassConsent(_:)`. An `NSDictionary` may hold keys that are
+    /// not strings, which would abort when bridged to `[String: Any]`, so those entries are dropped here.
+    @available(swift, obsoleted: 1)
+    @objc(updateDeviceAttributesBypassConsent:)
+    static func updateDeviceAttributesBypassConsentObjC(_ attributes: [AnyHashable: Any]) {
+        var stringKeyed: [String: Any] = [:]
+        for (key, value) in attributes {
+            if let key = key as? String {
+                stringKeyed[key] = value
+            }
+        }
+        if stringKeyed.count < attributes.count {
+            Log.debug(label: IdentityConstants.LOG_TAG, "Identity - Dropped device attributes with non-string keys.")
+        }
+        updateDeviceAttributesBypassConsent(stringKeyed)
     }
 
     /// Removes the identity from the stored client-side `IdentityMap`. The Identity extension will stop sending this identifier.
