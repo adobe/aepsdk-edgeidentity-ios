@@ -75,7 +75,10 @@ struct GetIdentitiesView: View {
     @State var timezoneInput: String = ""
     @State var lastTimezoneStatus: String = ""
     // Exact input passed to updateDeviceAttributesBypassConsent (backend shape). Edit any value to send it again.
-    @State var deviceAttrJSON: String = #"{"timezone": "America/Los_Angeles", "tokens": {"pushNotification": "804EB6EDB22D-push-token-TEST", "liveActivityStart": [{"attributeType": "GameScoreLiveActivityAttributes", "value": "la-push-to-start-token-TEST"}], "liveActivityUpdate": [{"liveActivityID": "Test2", "token": "la-update-token-TEST"}]}}"#
+    @State var deviceAttrJSON: String =
+        #"{"timezone": "America/Los_Angeles", "tokens": {"pushNotification": "804EB6EDB22D-push-token-TEST", "# +
+        #""liveActivityStart": [{"attributeType": "GameScoreLiveActivityAttributes", "value": "la-push-to-start-token-TEST"}], "# +
+        #""liveActivityUpdate": [{"liveActivityID": "Test2", "token": "la-update-token-TEST"}]}}"#
     @State var lastDeviceAttrStatus: String = ""
 
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]

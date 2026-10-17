@@ -94,6 +94,9 @@ enum IdentityConstants {
         static let REQUEST_EVENT_ID = "requestEventId"
         static let ATTRIBUTES = "attributes"
         static let UNKNOWN_REASON = "unknown"
+        static let REASON_UNCHANGED = "unchanged"
+        static let REASON_IDENTITY_RESET = "identityReset"
+        static let REASON_MISSING_APP_IDENTIFIER = "missingAppIdentifier"
 
         // iOS only: Live Activity tokens and the Messaging clear Live Activities event.
         static let LIVE_ACTIVITY_START = "liveActivityStart"

@@ -20,12 +20,14 @@ final class DeviceAttributeSync {
     private static let LOG_SOURCE = "DeviceAttributeSync"
 
     private let runtime: ExtensionRuntime
+    private let appIdentifier: () -> String?
     private let deduplicator = DeviceAttributeDeduplicator(storeName: IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME)
     private var pendingRequests: [Event] = []
     private var activeRequest: Event?
 
-    init(runtime: ExtensionRuntime) {
+    init(runtime: ExtensionRuntime, appIdentifier: @escaping () -> String? = { Bundle.main.bundleIdentifier }) {
         self.runtime = runtime
+        self.appIdentifier = appIdentifier
     }
 
     /// Forwards public API data to the rules engine, which decides which attributes may be sent.
@@ -80,16 +82,17 @@ final class DeviceAttributeSync {
         }
         var changed = result.changed
         guard !changed.isEmpty else {
-            // TODO: Publish a result event when all values are deduplicated.
             Log.debug(label: IdentityConstants.LOG_TAG,
                       "\(Self.LOG_SOURCE) - Device attributes unchanged, not sending to Edge (rule event '\(ruleResponse.id.uuidString)').")
+            dispatchSyncResult(status: Keys.STATUS_SUCCESS, reason: Keys.REASON_UNCHANGED, attributes: attributes, parent: ruleResponse)
             return nil
         }
 
-        guard let appId = Bundle.main.bundleIdentifier, !appId.isEmpty else {
+        guard let appId = appIdentifier(), !appId.isEmpty else {
             Log.warning(label: IdentityConstants.LOG_TAG,
                         "\(Self.LOG_SOURCE) - Cannot send device attributes without an app identifier. " +
                             "Dropping rule event '\(ruleResponse.id.uuidString)'.")
+            dispatchSyncResult(status: Keys.STATUS_FAILED, reason: Keys.REASON_MISSING_APP_IDENTIFIER, attributes: changed, parent: ruleResponse)
             return nil
         }
         let useSandbox = config[Keys.MESSAGING_USE_SANDBOX] as? Bool ?? false
@@ -117,7 +120,6 @@ final class DeviceAttributeSync {
         activeRequest = nil
 
         let status = event.data?[Keys.STATUS] as? String
-        var result: [String: Any] = [:]
         if status == Keys.STATUS_SUCCESS {
             deduplicator.commit(attributes)
             if let timezone = attributes[Keys.TIMEZONE] as? String {
@@ -126,22 +128,25 @@ final class DeviceAttributeSync {
             }
             publishProfileAttributes(event: event)
             Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Device attributes synced (request '\(requestId)').")
-            result[Keys.STATUS] = Keys.STATUS_SUCCESS
-            result[Keys.REASON] = ""
+            dispatchSyncResult(status: Keys.STATUS_SUCCESS, reason: "", attributes: attributes, parent: event)
         } else {
             let reason = event.data?[Keys.REASON] as? String ?? Keys.UNKNOWN_REASON
             Log.warning(label: IdentityConstants.LOG_TAG,
                         "\(Self.LOG_SOURCE) - Device attribute sync failed (request '\(requestId)') with status '\(status ?? "missing")' " +
                             "and reason '\(reason)'. Values remain unsynced.")
-            result[Keys.STATUS] = Keys.STATUS_FAILED
-            result[Keys.REASON] = reason
+            dispatchSyncResult(status: Keys.STATUS_FAILED, reason: reason, attributes: attributes, parent: event)
         }
-        result[Keys.ATTRIBUTES] = attributes
-        runtime.dispatch(event: event.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_SYNC_RESULT,
-                                                         type: EventType.edgeIdentity,
-                                                         source: EventSource.responseContent,
-                                                         data: result))
         processQueue()
+    }
+
+    /// Dispatches the sync result for a request, chained to `parent`. `attributes` must not contain `app`.
+    private func dispatchSyncResult(status: String, reason: String, attributes: [String: Any], parent: Event) {
+        typealias Keys = IdentityConstants.DeviceAttributes
+        let data: [String: Any] = [Keys.STATUS: status, Keys.REASON: reason, Keys.ATTRIBUTES: attributes]
+        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_SYNC_RESULT,
+                                                          type: EventType.edgeIdentity,
+                                                          source: EventSource.responseContent,
+                                                          data: data))
     }
 
     /// A response matches when it is chained to the active request or names it in `requestEventId`.
@@ -221,10 +226,23 @@ final class DeviceAttributeSync {
         return collect?[Consent.VAL] as? String == Consent.YES
     }
 
-    /// Clears queued requests and all synced values, then republishes the profile attributes. The profile
-    /// attribute store itself is cleared by `Identity.handleRequestReset`.
+    /// Dispatches a failed result for the active request and each queued request, then clears them and all synced
+    /// values and republishes the profile attributes. The profile attribute store itself is cleared by
+    /// `Identity.handleRequestReset`.
     func reset(event: Event) {
-        // TODO: Publish a result event for requests dropped by a reset.
+        typealias Keys = IdentityConstants.DeviceAttributes
+        if let request = activeRequest {
+            dispatchSyncResult(status: Keys.STATUS_FAILED,
+                               reason: Keys.REASON_IDENTITY_RESET,
+                               attributes: (request.data ?? [:]).filter { $0.key != Keys.APP },
+                               parent: request)
+        }
+        for ruleResponse in pendingRequests {
+            dispatchSyncResult(status: Keys.STATUS_FAILED,
+                               reason: Keys.REASON_IDENTITY_RESET,
+                               attributes: (ruleResponse.data ?? [:]).filter { $0.key != Keys.APP },
+                               parent: ruleResponse)
+        }
         pendingRequests.removeAll()
         activeRequest = nil
         deduplicator.clear()
