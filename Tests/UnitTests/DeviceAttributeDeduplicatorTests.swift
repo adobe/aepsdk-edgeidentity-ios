@@ -47,18 +47,24 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         XCTAssertEqual(attributes as NSDictionary, reloaded().readSynced() as NSDictionary)
     }
 
+    /// Returns `value` at the `tokens.liveActivityStart` path, a deduplicated path that holds an array.
+    private func liveActivityStart(_ value: Any) -> [String: Any] {
+        return ["tokens": ["liveActivityStart": value]]
+    }
+
     func testNestedAttributesAreDeduplicatedIndependently() {
-        deduplicator.commit(["custom": ["a": "old", "b": "same"]])
-        XCTAssertEqual(["custom": ["a": "new"]] as NSDictionary,
-                       deduplicator.filter(["custom": ["a": "new", "b": "same"]], dedup: true, owners: nil).changed as NSDictionary)
+        deduplicator.commit(["tokens": ["pushNotification": "same", "liveActivityStart": ["old"]]])
+        XCTAssertEqual(liveActivityStart(["new"]) as NSDictionary,
+                       deduplicator.filter(["tokens": ["pushNotification": "same", "liveActivityStart": ["new"]]],
+                                           dedup: true, owners: nil).changed as NSDictionary)
     }
 
     func testFilteredPayloadDoesNotRetainMutableValues() {
         let values = NSMutableArray(array: [NSMutableDictionary(dictionary: ["value": "original"])])
-        let attributes: [String: Any] = ["custom": values]
+        let attributes = liveActivityStart(values)
         let payload = deduplicator.filter(attributes, dedup: true, owners: nil).changed
         values.removeAllObjects()
-        XCTAssertEqual(["custom": [["value": "original"]]] as NSDictionary, payload as NSDictionary)
+        XCTAssertEqual(liveActivityStart([["value": "original"]]) as NSDictionary, payload as NSDictionary)
         deduplicator.commit(payload)
         XCTAssertTrue(deduplicator.filter(payload, dedup: true, owners: nil).changed.isEmpty)
         XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
@@ -66,9 +72,9 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
 
     func testCommitDoesNotRetainMutableValues() {
         let values = NSMutableArray(array: ["original"])
-        deduplicator.commit(["custom": values])
+        deduplicator.commit(liveActivityStart(values))
         values.removeAllObjects()
-        XCTAssertEqual(["custom": ["original"]] as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(liveActivityStart(["original"]) as NSDictionary, deduplicator.readSynced() as NSDictionary)
     }
 
     func testOwnerMatchesAreReturnedSeparatelyAndNotCommitted() {
@@ -105,8 +111,8 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
     }
 
     func testNullIsDroppedButEmptyContainersAreValues() {
-        let attributes: [String: Any] = ["null": NSNull(), "array": [Any](), "object": [String: Any]()]
-        let expected: [String: Any] = ["array": [Any](), "object": [String: Any]()]
+        let attributes: [String: Any] = ["null": NSNull(), "tokens": ["liveActivityStart": [Any](), "pushNotification": [String: Any]()]]
+        let expected: [String: Any] = ["tokens": ["liveActivityStart": [Any](), "pushNotification": [String: Any]()]]
         let changed = deduplicator.filter(attributes, dedup: false, owners: nil).changed
         XCTAssertEqual(expected as NSDictionary, changed as NSDictionary)
         deduplicator.commit(changed)
@@ -122,34 +128,36 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
     }
 
     func testArraysAreComparedAsSets() {
-        deduplicator.commit(["array": ["first", "second"]])
-        XCTAssertTrue(deduplicator.filter(["array": ["second", "first"]], dedup: true, owners: nil).changed.isEmpty)
-        XCTAssertTrue(deduplicator.filter(["array": NSArray(array: ["second", "first"])], dedup: true, owners: nil).changed.isEmpty)
-        XCTAssertEqual(["array": ["first"]] as NSDictionary,
-                       deduplicator.filter(["array": ["first"]], dedup: true, owners: nil).changed as NSDictionary)
-        XCTAssertEqual(["array": ["first", NSNull()]] as NSDictionary,
-                       deduplicator.filter(["array": ["first", NSNull()]], dedup: true, owners: nil).changed as NSDictionary)
-        deduplicator.commit(["nested": [["x", "y"], ["z"]]])
-        XCTAssertTrue(deduplicator.filter(["nested": [["z", "z"], ["y", "x", "x"]]], dedup: true, owners: nil).changed.isEmpty)
+        deduplicator.commit(liveActivityStart(["first", "second"]))
+        XCTAssertTrue(deduplicator.filter(liveActivityStart(["second", "first"]), dedup: true, owners: nil).changed.isEmpty)
+        XCTAssertTrue(deduplicator.filter(liveActivityStart(NSArray(array: ["second", "first"])), dedup: true, owners: nil).changed.isEmpty)
+        XCTAssertEqual(liveActivityStart(["first"]) as NSDictionary,
+                       deduplicator.filter(liveActivityStart(["first"]), dedup: true, owners: nil).changed as NSDictionary)
+        XCTAssertEqual(liveActivityStart(["first", NSNull()]) as NSDictionary,
+                       deduplicator.filter(liveActivityStart(["first", NSNull()]), dedup: true, owners: nil).changed as NSDictionary)
+        deduplicator.commit(liveActivityStart([["x", "y"], ["z"]]))
+        XCTAssertTrue(deduplicator.filter(liveActivityStart([["z", "z"], ["y", "x", "x"]]), dedup: true, owners: nil).changed.isEmpty)
     }
 
     func testCommitDeepMergesMapsAndReplacesOtherValues() {
-        deduplicator.commit(["prefs": ["lang": "en", "theme": "dark"], "tags": ["a"]])
-        deduplicator.commit(["prefs": ["lang": "fr"]])
-        XCTAssertEqual(["prefs": ["lang": "fr", "theme": "dark"], "tags": ["a"]] as NSDictionary,
+        deduplicator.commit(["tokens": ["pushNotification": "push", "liveActivityStart": ["a"]], "timezone": "UTC"])
+        deduplicator.commit(["tokens": ["pushNotification": "new"]])
+        XCTAssertEqual(["tokens": ["pushNotification": "new", "liveActivityStart": ["a"]], "timezone": "UTC"] as NSDictionary,
                        deduplicator.readSynced() as NSDictionary)
-        deduplicator.commit(["prefs": [String: Any](), "tags": ["x": 1]])
-        XCTAssertEqual(["prefs": [String: Any](), "tags": ["x": 1]] as NSDictionary, deduplicator.readSynced() as NSDictionary)
-        deduplicator.commit(["prefs": "off"])
-        XCTAssertEqual(["prefs": "off", "tags": ["x": 1]] as NSDictionary, reloaded().readSynced() as NSDictionary)
+        deduplicator.commit(["tokens": ["pushNotification": [String: Any]()], "timezone": ["x": 1]])
+        XCTAssertEqual(["tokens": ["pushNotification": [String: Any](), "liveActivityStart": ["a"]], "timezone": ["x": 1]] as NSDictionary,
+                       deduplicator.readSynced() as NSDictionary)
+        deduplicator.commit(["timezone": "off"])
+        XCTAssertEqual(["tokens": ["pushNotification": [String: Any](), "liveActivityStart": ["a"]], "timezone": "off"] as NSDictionary,
+                       reloaded().readSynced() as NSDictionary)
     }
 
     func testBooleansRemainDistinctFromNumbersAndNumbersSurviveSnapshots() {
-        deduplicator.commit(["value": true])
-        XCTAssertEqual(["value": 1] as NSDictionary, deduplicator.filter(["value": 1], dedup: true, owners: nil).changed as NSDictionary)
-        deduplicator.commit(deduplicator.filter(["value": 1.0], dedup: true, owners: nil).changed)
-        XCTAssertTrue(deduplicator.filter(["value": 1.0], dedup: true, owners: nil).changed.isEmpty)
-        XCTAssertTrue(reloaded().filter(["value": 1.0], dedup: true, owners: nil).changed.isEmpty)
+        deduplicator.commit(["timezone": true])
+        XCTAssertEqual(["timezone": 1] as NSDictionary, deduplicator.filter(["timezone": 1], dedup: true, owners: nil).changed as NSDictionary)
+        deduplicator.commit(deduplicator.filter(["timezone": 1.0], dedup: true, owners: nil).changed)
+        XCTAssertTrue(deduplicator.filter(["timezone": 1.0], dedup: true, owners: nil).changed.isEmpty)
+        XCTAssertTrue(reloaded().filter(["timezone": 1.0], dedup: true, owners: nil).changed.isEmpty)
     }
 
     func testClearRemovesOnlyConfirmedDeviceValues() {
@@ -265,36 +273,104 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         XCTAssertEqual(["timezone": "UTC"] as NSDictionary, reloaded().readSynced() as NSDictionary)
     }
 
-    // MARK: - Nesting depth
+    // MARK: - Deduplicated paths
 
-    /// Returns a value made of `levels` nested maps, so its innermost map is at depth `levels` when the value is
-    /// placed directly in the attributes map.
-    private func nestedMaps(_ levels: Int) -> Any {
-        var value: Any = "leaf"
-        for _ in 0..<levels { value = ["k": value] }
-        return value
+    func testFilter_valuesOutsideDeduplicatedPathsAreAlwaysChangedAndNeverOwnerMatched() {
+        let attributes: [String: Any] = ["custom": "value", "tokens": [
+            "liveActivityUpdate": [["liveActivityID": "1", "token": "update"]],
+            "foo": "bar"
+        ]]
+        deduplicator.commit(attributes)
+        let result = deduplicator.filter(attributes, dedup: true, owners: attributes)
+        XCTAssertEqual(attributes as NSDictionary, result.changed as NSDictionary)
+        XCTAssertTrue(result.ownerMatches.isEmpty)
     }
 
-    /// Returns a value made of `levels` nested arrays.
-    private func nestedArrays(_ levels: Int) -> Any {
-        var value: Any = "leaf"
-        for _ in 0..<levels { value = [value] }
-        return value
+    func testFilter_unknownTokenIsChangedWhileSyncedPushTokenIsDeduplicated() {
+        deduplicator.commit(["tokens": ["pushNotification": "push"]])
+        XCTAssertEqual(["tokens": ["foo": "bar"]] as NSDictionary,
+                       deduplicator.filter(["tokens": ["pushNotification": "push", "foo": "bar"]], dedup: true, owners: nil).changed as NSDictionary)
     }
 
-    func testFilter_containersAtMaxDepthAreKept() {
-        let attributes: [String: Any] = ["maps": nestedMaps(DeviceAttributeDeduplicator.MAX_DEPTH),
-                                         "arrays": nestedArrays(DeviceAttributeDeduplicator.MAX_DEPTH),
-                                         "sibling": "kept"]
+    func testCommit_storesOnlyDeduplicatedPaths() {
+        deduplicator.commit(["timezone": "UTC", "custom": 1, "tokens": [
+            "pushNotification": "push",
+            "liveActivityStart": ["start"],
+            "liveActivityUpdate": ["update"],
+            "foo": "bar"
+        ]])
+        let expected: [String: Any] = ["timezone": "UTC", "tokens": ["pushNotification": "push", "liveActivityStart": ["start"]]]
+        XCTAssertEqual(expected as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(expected as NSDictionary, reloaded().readSynced() as NSDictionary)
+    }
+
+    func testPersistedValuesOutsideDeduplicatedPathsArePrunedOnLoad() {
+        store.set(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES,
+                  value: #"{"timezone":"UTC","custom":1,"tokens":{"pushNotification":"push","liveActivityUpdate":["update"]}}"#)
+        XCTAssertEqual(["timezone": "UTC", "tokens": ["pushNotification": "push"]] as NSDictionary,
+                       reloaded().readSynced() as NSDictionary)
+    }
+
+    func testLiteralDottedKey_isNotTreatedAsKnownPath() {
+        let attributes: [String: Any] = ["tokens.pushNotification": "push"]
+        deduplicator.commit(attributes)
+        XCTAssertNil(persisted())
+        XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true, owners: attributes).changed as NSDictionary)
+    }
+
+    func testMapAtDeduplicatedPathIsComparedAndStoredWhole() {
+        deduplicator.commit(["timezone": ["a": 1, "b": 2]])
+        XCTAssertEqual(["timezone": ["a": 1]] as NSDictionary,
+                       deduplicator.filter(["timezone": ["a": 1]], dedup: true, owners: nil).changed as NSDictionary)
+        XCTAssertTrue(deduplicator.filter(["timezone": ["b": 2, "a": 1]], dedup: true, owners: nil).changed.isEmpty)
+        deduplicator.commit(["timezone": ["a": 1]])
+        XCTAssertEqual(["timezone": ["a": 1]] as NSDictionary, reloaded().readSynced() as NSDictionary)
+    }
+
+    func testCommitWithoutDeduplicatedValuesDoesNotWrite() {
+        deduplicator.commit(["custom": 1, "tokens": ["foo": "bar"]])
+        XCTAssertNil(persisted())
+        XCTAssertTrue(deduplicator.readSynced().isEmpty)
+    }
+
+    func testChildThenEmptyParent_keepsConfirmedChildBeforeAndAfterRestart() {
+        deduplicator.commit(["tokens": ["pushNotification": "push"]])
+        let emptyParent: [String: Any] = ["tokens": [String: Any]()]
+        let changed = deduplicator.filter(emptyParent, dedup: true, owners: nil).changed
+        XCTAssertEqual(emptyParent as NSDictionary, changed as NSDictionary)
+        deduplicator.commit(changed)
+        XCTAssertEqual(["tokens": ["pushNotification": "push"]] as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(["tokens": ["pushNotification": "push"]] as NSDictionary, reloaded().readSynced() as NSDictionary)
+    }
+
+    func testLoadWritesBackOnlyWhenValuesArePruned() {
+        let pruned = #"{"timezone":"UTC"}"#
+        store.set(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES, value: #"{"timezone":"UTC","custom":1}"#)
+        _ = reloaded()
+        XCTAssertEqual(pruned, persisted() as? String)
+        // An already pruned store is not rewritten.
+        let unformatted = #"{ "timezone" : "UTC" }"#
+        store.set(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES, value: unformatted)
+        _ = reloaded()
+        XCTAssertEqual(unformatted, persisted() as? String)
+    }
+
+    // MARK: - Nesting
+
+    func testFilter_deeplyNestedCustomValuesAreSentInFull() {
+        var maps: Any = "leaf"
+        var arrays: Any = "leaf"
+        for _ in 0..<40 {
+            maps = ["k": maps]
+            arrays = [arrays]
+        }
+        let custom: [String: Any] = ["custom": ["maps": maps, "arrays": arrays]]
+        let attributes = custom.merging(["timezone": "UTC"]) { first, _ in first }
         XCTAssertEqual(attributes as NSDictionary, deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
-    }
 
-    func testFilter_containersDeeperThanMaxDepthAreDropped() {
-        let attributes: [String: Any] = ["maps": nestedMaps(DeviceAttributeDeduplicator.MAX_DEPTH + 1),
-                                         "arrays": nestedArrays(DeviceAttributeDeduplicator.MAX_DEPTH + 1),
-                                         "sibling": "kept"]
-        XCTAssertEqual(["sibling": "kept"] as NSDictionary,
-                       deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
+        deduplicator.commit(attributes)
+        XCTAssertEqual(["timezone": "UTC"] as NSDictionary, deduplicator.readSynced() as NSDictionary)
+        XCTAssertEqual(custom as NSDictionary, deduplicator.filter(attributes, dedup: true, owners: nil).changed as NSDictionary)
     }
 
     /// iOS only: an Objective-C app can pass a collection that contains itself.
