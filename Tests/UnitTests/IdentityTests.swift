@@ -26,12 +26,13 @@ class IdentityTests: XCTestCase {
         mockRuntime = TestableExtensionRuntime()
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
+        // Registration publishes the persisted profile attributes in the standard shared state.
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
         // simulate bootup as mockRuntime bypasses call to readyForEvent
         let event = Event(name: "test-event", type: "test-type", source: "test-source", data: nil)
         XCTAssertTrue(identity.readyForEvent(event))
 
         XCTAssertEqual(1, mockRuntime.createdXdmSharedStates.count)
-        // Bootup also publishes the persisted profile attributes in the standard shared state.
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
     }
 

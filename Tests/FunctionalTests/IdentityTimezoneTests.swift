@@ -198,7 +198,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
     private func lastSharedStateProfileAttributes() -> [String: Any]? {
         let lastState = mockRuntime.createdXdmSharedStates.last ?? nil
-        return lastState?[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]
+        return lastState?[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] as? [String: Any]
     }
 
     func testTimezoneSync_createsXdmSharedStateWithTimezone() {
@@ -216,14 +216,25 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
         XCTAssertNotNil(lastState?[IdentityConstants.XDMKeys.IDENTITY_MAP])
     }
 
-    func testTimezoneSync_dedup_stillResolvesSharedState() {
+    func testTimezoneSync_dedup_doesNotCreateXdmSharedState() {
         storeTimezone("Europe/London")
 
         mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
 
-        // Deduped: no Edge event, but the pending shared state must still be resolved (never left hanging).
+        // Deduped: no Edge event and no shared state, as on Android.
         XCTAssertTrue(edgeEvents().isEmpty)
-        XCTAssertFalse(mockRuntime.createdXdmSharedStates.isEmpty)
+        XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
+    }
+
+    func testTimezoneSync_emptyEventData_doesNotCreateSharedStates() {
+        mockRuntime.simulateComingEvents(Event(name: IdentityConstants.EventNames.UPDATE_PROFILE_ATTRIBUTES,
+                                               type: EventType.genericProfileAttributes,
+                                               source: EventSource.requestContent,
+                                               data: nil))
+
+        XCTAssertTrue(edgeEvents().isEmpty)
+        XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
+        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
     }
 
     // MARK: - Invalid / missing input
@@ -233,6 +244,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         XCTAssertTrue(edgeEvents().isEmpty)
         XCTAssertNil(storedTimezone())
+        XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
     }
 
     func testTimezoneSync_missingTimezoneData_noEdgeEventAndNotStored() {
@@ -245,6 +257,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         XCTAssertTrue(edgeEvents().isEmpty)
         XCTAssertNil(storedTimezone())
+        XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
     }
 
     // MARK: - Cold-start hydration
@@ -267,9 +280,9 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         // The bootup XDM shared state should carry the hydrated timezone.
         let hydrated = runtime.createdXdmSharedStates.compactMap { $0 }.first {
-            ($0[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]) != nil
+            ($0[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] as? [String: Any]) != nil
         }
-        let attrs = hydrated?[IdentityConstants.ProfileAttributes.STORE_NAME] as? [String: Any]
+        let attrs = hydrated?[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] as? [String: Any]
         XCTAssertEqual("Asia/Kolkata",
                        attrs?[TimeZoneAttributeHandler.key] as? String)
     }
@@ -308,8 +321,8 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
             XCTFail("Failed to initialize Identity")
             return
         }
+        // The standard shared state is published at registration, before bootup.
         freshIdentity.onRegistered()
-        XCTAssertTrue(freshIdentity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
 
         XCTAssertEqual(["timezone": "Asia/Kolkata"] as NSDictionary,
                        lastStandardProfileAttributes(runtime) as NSDictionary?)

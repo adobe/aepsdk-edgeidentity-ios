@@ -12,10 +12,10 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// `AttributeHandler` for the device timezone. Reads the IANA identifier from the incoming event under
-/// `"timeZone"`, persists it against the injected `storeName`, and contributes to the outgoing payload
+/// `ProfileAttributeHandler` for the device timezone. Reads the IANA identifier from the
+/// incoming event under `"timeZone"`, persists it, and contributes to the outgoing payload
 /// under the same `"timeZone"` key.
-struct TimeZoneAttributeHandler: AttributeHandler {
+struct TimeZoneAttributeHandler: ProfileAttributeHandler {
 
     // NOTE: IANA timezone validation (TimeZone(identifier:)) is present here but absent in the
     // Android implementation. Android should add equivalent validation to reject non-IANA strings.
@@ -28,14 +28,7 @@ struct TimeZoneAttributeHandler: AttributeHandler {
 
     var attributeKey: String { TimeZoneAttributeHandler.key }
 
-    // Injected dedup namespace (the profile-attributes store).
-    let storeName: String
-
-    init(storeName: String) {
-        self.storeName = storeName
-    }
-
-    func collectFromEvent(_ event: Event, dedup: Bool) -> [String: String]? {
+    func collectFromEvent(_ event: Event) -> [String: String]? {
         guard let timezone = event.data?[attributeKey] as? String, !timezone.isEmpty else {
             Log.debug(label: Self.LOG_TAG, "TimeZoneAttributeHandler - Timezone missing or empty in event data, ignoring.")
             return nil
@@ -44,7 +37,7 @@ struct TimeZoneAttributeHandler: AttributeHandler {
             Log.warning(label: Self.LOG_TAG, "TimeZoneAttributeHandler - '\(timezone)' is not a valid IANA timezone identifier, ignoring.")
             return nil
         }
-        if dedup, readStored() == timezone {
+        guard readStored() != timezone else {
             Log.debug(label: Self.LOG_TAG, "TimeZoneAttributeHandler - Timezone unchanged, skipping.")
             return nil
         }
@@ -59,11 +52,11 @@ struct TimeZoneAttributeHandler: AttributeHandler {
 
     private func readStored() -> String? {
         return ServiceProvider.shared.namedKeyValueService
-            .get(collectionName: storeName, key: attributeKey) as? String
+            .get(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: attributeKey) as? String
     }
 
     private func writeStored(_ value: String) {
         ServiceProvider.shared.namedKeyValueService
-            .set(collectionName: storeName, key: attributeKey, value: value)
+            .set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: attributeKey, value: value)
     }
 }

@@ -52,18 +52,12 @@ enum IdentityConstants {
         }
     }
 
-    /// Existing profile values and Edge-confirmed bypass values remain in separate stores.
-    enum Store {
-        static let PROFILE_ATTRIBUTES = "com.adobe.mobilecore.profileAttributes"
-        static let DEVICE_ATTRIBUTES = "com.adobe.mobilecore.deviceAttributes"
-    }
-
     enum ProfileAttributes {
         // Per-attribute keys (event data, persistence, and XDM payload) are owned by each
-        // AttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
-        // Add a new attribute by creating a new AttributeHandler conforming type.
+        // ProfileAttributeHandler — e.g. TimeZoneAttributeHandler.key = "timeZone".
+        // Add a new attribute by creating a new ProfileAttributeHandler conforming type.
 
-        static let STORE_NAME = Store.PROFILE_ATTRIBUTES
+        static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
 
         // Standard shared state key holding the synced device attributes merged with the profile timezone.
         static let SHARED_STATE_KEY = "profileAttributes"
@@ -77,44 +71,36 @@ enum IdentityConstants {
 
     }
 
-    /// Constants for the consent-independent device-attribute sync (`updateDeviceAttributesBypassConsent` API).
-    /// Rules return allow-listed values to Identity, which deduplicates them before sending to Edge.
+    /// Constants for the consent-independent device attribute sync (`updateDeviceAttributesBypassConsent` API).
     enum DeviceAttributes {
         static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
         static let BYPASS_TYPE = "com.adobe.eventType.edgeBypassConsent"
-        // The operational-data event the Launch Rules Engine matches. Must equal the rule condition
-        // (`~type == generic.operationalData`, `~source == requestContent`).
         static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
-        static let OPERATIONAL_DATA_SOURCE = "com.adobe.eventSource.requestContent"
+        static let OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC = "edgeidentity.optimizeOperationalProfileDataSync"
 
-        // Persistence key holding the confirmed attributes as a JSON-encoded nested map.
-        static let SYNCED_VALUES = "confirmedAttributes"
-
-        // Attribute keys with owner-specific handling.
+        static let TIME_ZONE = "timeZone"
         static let TIMEZONE = "timezone"
         static let TOKENS = "tokens"
         static let PUSH_NOTIFICATION = "pushNotification"
-        static let LIVE_ACTIVITY_START = "liveActivityStart"
-        static let LIVE_ACTIVITY_UPDATE = "liveActivityUpdate"
-
-        // Edge result (E4) and sync result event data keys and values.
-        static let REQUEST_EVENT_ID = "requestEventId"
-        static let STATUS = "status"
-        static let REASON = "reason"
-        static let ATTRIBUTES = "attributes"
-        static let STATUS_SUCCESS = "success"
-        static let STATUS_FAILED = "failed"
-        static let STATUS_DROPPED = "dropped"
-
-        // Messaging clear Live Activities event (Messaging.clearLiveActivities()).
-        static let CLEAR_LIVE_ACTIVITIES = "isClearLiveActivitiesEvent"
-
-        // SDK-owned app details added to every Edge update at send time.
         static let APP = "app"
         static let APP_ID = "id"
         static let APP_PLATFORM = "platform"
+        static let SYNCED_VALUES = "confirmedAttributes"
 
-        // Config key (owned by the Messaging extension) used to derive the APNs platform for push.
+        static let STATUS = "status"
+        static let STATUS_SUCCESS = "success"
+        static let STATUS_FAILED = "failed"
+        static let REASON = "reason"
+        static let REQUEST_EVENT_ID = "requestEventId"
+        static let ATTRIBUTES = "attributes"
+        static let UNKNOWN_REASON = "unknown"
+
+        // iOS only: Live Activity tokens and the Messaging clear Live Activities event.
+        static let LIVE_ACTIVITY_START = "liveActivityStart"
+        static let LIVE_ACTIVITY_UPDATE = "liveActivityUpdate"
+        static let CLEAR_LIVE_ACTIVITIES = "isClearLiveActivitiesEvent"
+
+        // iOS only: the APNs platform is derived from the Messaging `messaging.useSandbox` setting.
         static let MESSAGING_USE_SANDBOX = "messaging.useSandbox"
         static let PLATFORM_APNS = "apns"
         static let PLATFORM_APNS_SANDBOX = "apnsSandbox"
@@ -131,10 +117,9 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
         static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
-        // Internal request event dispatched by updateDeviceAttributesBypassConsent; and the outgoing operational-data event.
         static let UPDATE_DEVICE_ATTRIBUTES = "Update Device Attributes"
         static let DEVICE_ATTRIBUTES_TO_RULES_ENGINE = "Device attributes for rules engine"
-        static let DEVICE_ATTRIBUTES_BYPASS_REQUEST = "Edge bypass request"
+        static let DEVICE_ATTRIBUTES_EDGE_REQUEST = "Edge bypass request"
         static let DEVICE_ATTRIBUTES_SYNC_RESULT = "Device Attributes Sync Result"
     }
 
@@ -146,6 +131,7 @@ enum IdentityConstants {
 
     enum DataStoreKeys {
         static let IDENTITY_PROPERTIES = "identity.properties"
+        static let DEVICE_ATTRIBUTES_DATASTORE_NAME = "com.adobe.mobilecore.deviceAttributes"
     }
 
     enum Namespaces {
@@ -162,6 +148,7 @@ enum IdentityConstants {
 
     enum XDMKeys {
         static let IDENTITY_MAP = "identityMap"
+        static let PROFILE_ATTRIBUTES = "com.adobe.mobilecore.profileAttributes"
 
         enum Consent {
             static let CONSENTS = "consents"
@@ -176,12 +163,6 @@ enum IdentityConstants {
 
     enum ConfigurationKeys {
         static let EXPERIENCE_CLOUD_ORGID = "experienceCloud.org"
-    }
-
-    enum ConfigKeys {
-        // When true (default), the device-attribute path skips dispatching unchanged values (dedup).
-        // Set to false to always dispatch on every `updateDeviceAttributesBypassConsent` call.
-        static let OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC = "edgeidentity.optimizeOperationalProfileDataSync"
     }
 
     enum URLKeys {

@@ -13,201 +13,227 @@
 import AEPServices
 import Foundation
 
-/// Stores confirmed device attributes as a nested map and filters out values that are already synced.
-struct DeviceAttributeDeduplicator {
-    private static let LOG_TAG = IdentityConstants.FRIENDLY_NAME
+/// Keeps the device attributes confirmed by Edge as a nested map and filters out values that do not need to be
+/// sent again. A value is compared with the confirmed value at the same path and, when owner values are given
+/// (collect consent is "y"), with the owner value at that path. Arrays are compared as sets.
+final class DeviceAttributeDeduplicator {
+    private static let LOG_SOURCE = "DeviceAttributeDeduplicator"
+    private let storeName: String
+    private var synced: [String: Any]
 
-    let storeName: String
+    init(storeName: String) {
+        self.storeName = storeName
+        synced = Self.readPersisted(storeName: storeName)
+    }
 
-    /// Splits `attributes` into values to send and values that already match their owner.
-    /// A value equal to the stored value is dropped. Owner values (`messagingState`, `timezone`) are compared only
-    /// when supplied, which the caller does only when collect consent is "y". When `dedup` is false, every value is sent.
-    /// Filtering never writes storage.
-    func filter(_ attributes: [String: Any],
-                dedup: Bool,
-                messagingState: [String: Any]? = nil,
-                timezone: String? = nil) -> (toSend: [String: Any], ownerMatches: [String: Any]) {
-        let synced = readSynced()
-        var toSend: [String: Any] = [:]
+    /// The result of `filter`: the values to send to Edge, and the values that are not sent because their owner
+    /// already holds them.
+    struct FilterResult {
+        let changed: [String: Any]
+        let ownerMatches: [String: Any]
+    }
+
+    /// Splits `attributes` into the values that need to be sent to Edge and the values that match an owner value.
+    /// Owner matches are not committed here; the caller commits them.
+    /// - Parameters:
+    ///   - attributes: the attributes to filter
+    ///   - dedup: whether to filter out unchanged values; when false, every valid value is returned as changed
+    ///   - owners: owner values to compare with, in the same shape as `attributes`; may be nil
+    /// - Returns: the changed values (empty when nothing changed) and the owner matches
+    func filter(_ attributes: [String: Any], dedup: Bool, owners: [String: Any]?) -> FilterResult {
+        var changed: [String: Any] = [:]
         var ownerMatches: [String: Any] = [:]
-
-        for (path, value) in Self.paths(in: attributes) {
-            // Detach mutable Foundation inputs so the sent payload and later confirmation use the same values.
-            guard let snapshot = Self.snapshot(value) else {
-                Log.warning(label: Self.LOG_TAG, "DeviceAttributeDeduplicator - Dropping '\(path)': value is null or not JSON-representable.")
-                continue
-            }
-            if dedup, Self.isEqual(Self.value(at: path, in: synced), snapshot) {
-                continue
-            }
-            if dedup, Self.matchesOwner(path: path, value: snapshot, messagingState: messagingState, timezone: timezone) {
-                Self.set(snapshot, at: path, in: &ownerMatches)
-                continue
-            }
-            Self.set(snapshot, at: path, in: &toSend)
-        }
-        return (toSend, ownerMatches)
+        Self.collect(attributes,
+                     synced: dedup ? synced : nil,
+                     owners: dedup ? owners : nil,
+                     changed: &changed,
+                     ownerMatches: &ownerMatches)
+        return FilterResult(changed: changed, ownerMatches: ownerMatches)
     }
 
-    /// Deep-merges `attributes` into the store. A map merges into a map; any other value, or an empty map,
-    /// replaces the whole subtree at its key. The SDK-owned root `app` entry is never stored.
+    /// Deep-merges `attributes` into the confirmed values and persists them. A map merges into an existing
+    /// map; any other value, or an empty map, replaces the existing value at that key.
+    /// - Parameter attributes: the attributes confirmed by Edge
     func commit(_ attributes: [String: Any]) {
-        var incoming = attributes
-        incoming.removeValue(forKey: IdentityConstants.DeviceAttributes.APP)
-        writeSynced(Self.merge(incoming, into: readSynced()))
+        synced = Self.merge(synced, attributes)
+        persist()
     }
 
-    /// Removes the values at the given paths from the store.
-    func remove(paths: [[String]]) {
-        var synced = readSynced()
-        for path in paths {
-            Self.remove(at: path, in: &synced)
-        }
-        writeSynced(synced)
-    }
-
-    /// Returns the confirmed values as a nested map.
     func readSynced() -> [String: Any] {
-        guard let json = ServiceProvider.shared.namedKeyValueService
-                .get(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES) as? String,
-              let data = json.data(using: .utf8),
-              let synced = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
-            return [:]
-        }
         return synced
     }
 
-    /// Removes all confirmed device attribute values.
     func clear() {
-        ServiceProvider.shared.namedKeyValueService
-            .remove(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES)
+        synced = [:]
+        ServiceProvider.shared.namedKeyValueService.remove(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES)
     }
 
-    // Persisted as JSON so any JSON value (including null inside arrays) can be stored safely.
-    private func writeSynced(_ values: [String: Any]) {
-        guard let data = try? JSONSerialization.data(withJSONObject: values, options: [.sortedKeys]),
+    /// Removes the values at the given paths and any parent map left empty. iOS only (Live Activity tokens).
+    func remove(paths: [[String]]) {
+        for path in paths {
+            Self.remove(at: path, in: &synced)
+        }
+        persist()
+    }
+
+    private static func collect(_ attributes: [AnyHashable: Any],
+                                synced: [AnyHashable: Any]?,
+                                owners: [AnyHashable: Any]?,
+                                changed: inout [String: Any],
+                                ownerMatches: inout [String: Any]) {
+        for (rawKey, value) in attributes {
+            guard let key = rawKey as? String else {
+                Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping device attribute with a non-string key.")
+                continue
+            }
+            if let map = value as? [AnyHashable: Any], !map.isEmpty {
+                var changedChild: [String: Any] = [:]
+                var ownerMatchesChild: [String: Any] = [:]
+                collect(map,
+                        synced: child(synced, key),
+                        owners: child(owners, key),
+                        changed: &changedChild,
+                        ownerMatches: &ownerMatchesChild)
+                if !changedChild.isEmpty { changed[key] = changedChild }
+                if !ownerMatchesChild.isEmpty { ownerMatches[key] = ownerMatchesChild }
+                continue
+            }
+            guard let canonical = canonicalize(value) else {
+                Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping invalid device attribute '\(key)'.")
+                continue
+            }
+            if let synced = synced, canonical == canonicalize(synced[key]) { continue }
+            if let owners = owners, canonical == canonicalize(owners[key]) {
+                ownerMatches[key] = copy(value)
+                continue
+            }
+            changed[key] = copy(value)
+        }
+    }
+
+    private static func merge(_ base: [String: Any], _ attributes: [String: Any]) -> [String: Any] {
+        var result = base
+        for (key, value) in attributes {
+            if let map = value as? [String: Any], !map.isEmpty, let existing = result[key] as? [String: Any] {
+                result[key] = merge(existing, map)
+            } else {
+                result[key] = copy(value)
+            }
+        }
+        return result
+    }
+
+    private static func child(_ map: [AnyHashable: Any]?, _ key: String) -> [AnyHashable: Any]? {
+        return map?[key] as? [AnyHashable: Any]
+    }
+
+    /// Deep copies a valid attribute value so later changes to the caller's collections are not retained.
+    private static func copy(_ value: Any) -> Any {
+        if let map = value as? [String: Any] {
+            return map.mapValues(copy)
+        }
+        if let array = value as? [Any] {
+            return array.map(copy)
+        }
+        if let string = value as? String {
+            return string
+        }
+        return value
+    }
+
+    private static func remove(at path: [String], in map: inout [String: Any]) {
+        guard let key = path.first else { return }
+        if path.count == 1 {
+            map.removeValue(forKey: key)
+        } else if var child = map[key] as? [String: Any] {
+            remove(at: Array(path.dropFirst()), in: &child)
+            map[key] = child.isEmpty ? nil : child
+        }
+    }
+
+    /// Returns a stable string form of a value for comparison, or nil when the value is null or invalid.
+    static func canonicalize(_ value: Any?) -> String? {
+        guard let value = value, !(value is NSNull) else { return nil }
+        return canonicalValue(value)
+    }
+
+    private static func canonicalValue(_ value: Any) -> String? {
+        if value is NSNull {
+            return "null"
+        }
+        if let string = value as? String {
+            return quote(string)
+        }
+        if let number = value as? NSNumber {
+            if CFGetTypeID(number) == CFBooleanGetTypeID() {
+                return number.boolValue ? "true" : "false"
+            }
+            let double = number.doubleValue
+            guard double.isFinite else { return nil }
+            if double == 0 { return "0" }
+            if CFNumberIsFloatType(number) {
+                // Integral values compare equal across integer and floating point types (1 == 1.0).
+                return double.rounded() == double && abs(double) < 1e18 ? String(Int64(double)) : String(double)
+            }
+            return number.stringValue
+        }
+        if let map = value as? [AnyHashable: Any] {
+            var entries: [(String, String)] = []
+            for (rawKey, element) in map {
+                guard let key = rawKey as? String, let canonicalElement = canonicalValue(element) else { return nil }
+                entries.append((key, canonicalElement))
+            }
+            let sorted = entries.sorted { $0.0 < $1.0 }.map { "\(quote($0.0)):\($0.1)" }
+            return "{" + sorted.joined(separator: ",") + "}"
+        }
+        if let array = value as? [Any] {
+            // Arrays are compared as sets, so element order and duplicates do not matter.
+            var elements = Set<String>()
+            for element in array {
+                guard let canonicalElement = canonicalValue(element) else { return nil }
+                elements.insert(canonicalElement)
+            }
+            return "[" + elements.sorted().joined(separator: ",") + "]"
+        }
+        return nil
+    }
+
+    /// Quotes a string as Android's `JSONObject.quote` does, so canonical forms match across platforms.
+    private static func quote(_ string: String) -> String {
+        var result = "\""
+        for scalar in string.unicodeScalars {
+            switch scalar {
+            case "\"", "\\", "/": result += "\\" + String(scalar)
+            case "\t": result += "\\t"
+            case "\u{08}": result += "\\b"
+            case "\n": result += "\\n"
+            case "\r": result += "\\r"
+            case "\u{0C}": result += "\\f"
+            case _ where scalar.value < 0x20: result += String(format: "\\u%04x", scalar.value)
+            default: result.unicodeScalars.append(scalar)
+            }
+        }
+        return result + "\""
+    }
+
+    // Persisted as a JSON string so any JSON value, including null inside arrays, can be stored.
+    private func persist() {
+        guard let data = try? JSONSerialization.data(withJSONObject: synced),
               let json = String(data: data, encoding: .utf8) else {
-            Log.warning(label: Self.LOG_TAG, "DeviceAttributeDeduplicator - Cannot persist confirmed device attributes.")
+            Log.warning(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Cannot persist synced device attributes.")
             return
         }
         ServiceProvider.shared.namedKeyValueService
             .set(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES, value: json)
     }
 
-    /// Returns each leaf value keyed by its path. Non-empty maps are walked; the root `app` entry is skipped.
-    static func paths(in attributes: [String: Any], prefix: [String] = []) -> [[String]: Any] {
-        var result: [[String]: Any] = [:]
-        for (key, value) in attributes {
-            let path = prefix + [key]
-            if path.first == IdentityConstants.DeviceAttributes.APP { continue }
-            if let nested = value as? [String: Any], !nested.isEmpty {
-                result.merge(paths(in: nested, prefix: path)) { _, new in new }
-            } else {
-                result[path] = value
-            }
+    private static func readPersisted(storeName: String) -> [String: Any] {
+        guard let json = ServiceProvider.shared.namedKeyValueService
+                .get(collectionName: storeName, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES) as? String,
+              let data = json.data(using: .utf8),
+              let persisted = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return [:]
         }
-        return result
-    }
-
-    /// Arrays are compared as sets of elements, so reordering is not a change. Other values compare by canonical JSON.
-    static func isEqual(_ stored: Any?, _ value: Any) -> Bool {
-        guard let stored = stored else { return false }
-        if let storedArray = stored as? [Any], let array = value as? [Any] {
-            return elementSet(storedArray) == elementSet(array)
-        }
-        return canonicalize(stored) == canonicalize(value)
-    }
-
-    /// Stable string form of a value for comparison. Dictionary keys are sorted so key order never counts
-    /// as a change; booleans stay distinct from numbers (`true` vs `1`).
-    static func canonicalize(_ value: Any) -> String? {
-        guard !(value is NSNull) else { return nil }
-        let wrapper: [Any] = [value]
-        guard JSONSerialization.isValidJSONObject(wrapper),
-              let data = try? JSONSerialization.data(withJSONObject: wrapper, options: [.sortedKeys]) else {
-            return nil
-        }
-        return String(data: data, encoding: .utf8)
-    }
-
-    private static func elementSet(_ array: [Any]) -> Set<String> {
-        return Set(array.map { canonicalize($0) ?? "null" })
-    }
-
-    private static func snapshot(_ value: Any) -> Any? {
-        guard let canonical = canonicalize(value), let data = canonical.data(using: .utf8) else { return nil }
-        return ((try? JSONSerialization.jsonObject(with: data)) as? [Any])?.first
-    }
-
-    private static func matchesOwner(path: [String],
-                                     value: Any,
-                                     messagingState: [String: Any]?,
-                                     timezone: String?) -> Bool {
-        typealias Keys = IdentityConstants.DeviceAttributes
-        typealias Messaging = IdentityConstants.SharedState.Messaging
-        if path == [Keys.TIMEZONE] {
-            guard let timezone = timezone, let input = value as? String else { return false }
-            return input == timezone
-        }
-        if path == [Keys.TOKENS, Keys.PUSH_NOTIFICATION] {
-            guard let stored = messagingState?[Messaging.PUSH_IDENTIFIER] as? String,
-                  let input = value as? String else { return false }
-            return input == stored
-        }
-
-        let isStart = path == [Keys.TOKENS, Keys.LIVE_ACTIVITY_START]
-        guard isStart || path == [Keys.TOKENS, Keys.LIVE_ACTIVITY_UPDATE],
-              let input = value as? [[String: Any]],
-              let liveActivity = messagingState?[Messaging.LIVE_ACTIVITY] as? [String: Any],
-              let stored = liveActivity[isStart ? Messaging.PUSH_TO_START_TOKENS : Messaging.UPDATE_TOKENS]
-                as? [String: [String: Any]] else { return false }
-        if input.isEmpty { return stored.isEmpty }
-        let idKey = isStart ? "attributeType" : "liveActivityID"
-        let tokenKey = isStart ? "value" : "token"
-        return input.allSatisfy { entry in
-            guard let id = entry[idKey] as? String, let token = entry[tokenKey] as? String else { return false }
-            return stored[id]?["token"] as? String == token
-        }
-    }
-
-    private static func value(at path: [String], in map: [String: Any]) -> Any? {
-        var current: Any? = map
-        for key in path {
-            current = (current as? [String: Any])?[key]
-        }
-        return current
-    }
-
-    private static func merge(_ incoming: [String: Any], into stored: [String: Any]) -> [String: Any] {
-        var result = stored
-        for (key, value) in incoming {
-            if let map = value as? [String: Any], !map.isEmpty {
-                result[key] = merge(map, into: result[key] as? [String: Any] ?? [:])
-            } else {
-                result[key] = value
-            }
-        }
-        return result
-    }
-
-    private static func set(_ value: Any, at path: [String], in data: inout [String: Any]) {
-        guard let key = path.first else { return }
-        if path.count == 1 {
-            data[key] = value
-        } else {
-            var child = data[key] as? [String: Any] ?? [:]
-            set(value, at: Array(path.dropFirst()), in: &child)
-            data[key] = child
-        }
-    }
-
-    private static func remove(at path: [String], in data: inout [String: Any]) {
-        guard let key = path.first else { return }
-        if path.count == 1 {
-            data.removeValue(forKey: key)
-        } else if var child = data[key] as? [String: Any] {
-            remove(at: Array(path.dropFirst()), in: &child)
-            data[key] = child.isEmpty ? nil : child
-        }
+        return persisted
     }
 }
