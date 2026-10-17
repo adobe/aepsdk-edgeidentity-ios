@@ -18,6 +18,9 @@ import Foundation
 /// (collect consent is "y"), with the owner value at that path. Arrays are compared as sets.
 final class DeviceAttributeDeduplicator {
     private static let LOG_SOURCE = "DeviceAttributeDeduplicator"
+    /// The deepest allowed container. The top-level attributes map is depth 0, a map or array directly inside it is
+    /// depth 1, and so on. A deeper container, including a cyclic collection, is an invalid value and is dropped.
+    static let MAX_DEPTH = 32
     private let storeName: String
     private var synced: [String: Any]
 
@@ -47,7 +50,8 @@ final class DeviceAttributeDeduplicator {
                      synced: dedup ? synced : nil,
                      owners: dedup ? owners : nil,
                      changed: &changed,
-                     ownerMatches: &ownerMatches)
+                     ownerMatches: &ownerMatches,
+                     depth: 0)
         return FilterResult(changed: changed, ownerMatches: ownerMatches)
     }
 
@@ -80,30 +84,32 @@ final class DeviceAttributeDeduplicator {
                                 synced: [AnyHashable: Any]?,
                                 owners: [AnyHashable: Any]?,
                                 changed: inout [String: Any],
-                                ownerMatches: inout [String: Any]) {
+                                ownerMatches: inout [String: Any],
+                                depth: Int) {
         for (rawKey, value) in attributes {
             guard let key = rawKey as? String else {
                 Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping device attribute with a non-string key.")
                 continue
             }
-            if let map = value as? [AnyHashable: Any], !map.isEmpty {
+            if let map = value as? [AnyHashable: Any], !map.isEmpty, depth < MAX_DEPTH {
                 var changedChild: [String: Any] = [:]
                 var ownerMatchesChild: [String: Any] = [:]
                 collect(map,
                         synced: child(synced, key),
                         owners: child(owners, key),
                         changed: &changedChild,
-                        ownerMatches: &ownerMatchesChild)
+                        ownerMatches: &ownerMatchesChild,
+                        depth: depth + 1)
                 if !changedChild.isEmpty { changed[key] = changedChild }
                 if !ownerMatchesChild.isEmpty { ownerMatches[key] = ownerMatchesChild }
                 continue
             }
-            guard let canonical = canonicalize(value) else {
+            guard let canonical = canonicalize(value, depth: depth + 1) else {
                 Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping invalid device attribute '\(key)'.")
                 continue
             }
-            if let synced = synced, canonical == canonicalize(synced[key]) { continue }
-            if let owners = owners, canonical == canonicalize(owners[key]) {
+            if let synced = synced, canonical == canonicalize(synced[key], depth: depth + 1) { continue }
+            if let owners = owners, canonical == canonicalize(owners[key], depth: depth + 1) {
                 ownerMatches[key] = copy(value)
                 continue
             }
@@ -151,13 +157,18 @@ final class DeviceAttributeDeduplicator {
         }
     }
 
-    /// Returns a stable string form of a value for comparison, or nil when the value is null or invalid.
+    /// Returns a stable string form of a value directly inside the attributes map for comparison, or nil when the
+    /// value is null or invalid.
     static func canonicalize(_ value: Any?) -> String? {
-        guard let value = value, !(value is NSNull) else { return nil }
-        return canonicalValue(value)
+        return canonicalize(value, depth: 1)
     }
 
-    private static func canonicalValue(_ value: Any) -> String? {
+    private static func canonicalize(_ value: Any?, depth: Int) -> String? {
+        guard let value = value, !(value is NSNull) else { return nil }
+        return canonicalValue(value, depth: depth)
+    }
+
+    private static func canonicalValue(_ value: Any, depth: Int) -> String? {
         if value is NSNull {
             return "null"
         }
@@ -177,10 +188,14 @@ final class DeviceAttributeDeduplicator {
             }
             return number.stringValue
         }
+        let isContainer = value is [AnyHashable: Any] || value is [Any]
+        if isContainer && depth > MAX_DEPTH {
+            return nil
+        }
         if let map = value as? [AnyHashable: Any] {
             var entries: [(String, String)] = []
             for (rawKey, element) in map {
-                guard let key = rawKey as? String, let canonicalElement = canonicalValue(element) else { return nil }
+                guard let key = rawKey as? String, let canonicalElement = canonicalValue(element, depth: depth + 1) else { return nil }
                 entries.append((key, canonicalElement))
             }
             let sorted = entries.sorted { $0.0 < $1.0 }.map { "\(quote($0.0)):\($0.1)" }
@@ -190,7 +205,7 @@ final class DeviceAttributeDeduplicator {
             // Arrays are compared as sets, so element order and duplicates do not matter.
             var elements = Set<String>()
             for element in array {
-                guard let canonicalElement = canonicalValue(element) else { return nil }
+                guard let canonicalElement = canonicalValue(element, depth: depth + 1) else { return nil }
                 elements.insert(canonicalElement)
             }
             return "[" + elements.sorted().joined(separator: ",") + "]"
@@ -218,7 +233,9 @@ final class DeviceAttributeDeduplicator {
 
     // Persisted as a JSON string so any JSON value, including null inside arrays, can be stored.
     private func persist() {
-        guard let data = try? JSONSerialization.data(withJSONObject: synced),
+        // JSONSerialization raises an Objective-C exception, which `try?` cannot catch, for an invalid object.
+        guard JSONSerialization.isValidJSONObject(synced),
+              let data = try? JSONSerialization.data(withJSONObject: synced),
               let json = String(data: data, encoding: .utf8) else {
             Log.warning(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Cannot persist synced device attributes.")
             return

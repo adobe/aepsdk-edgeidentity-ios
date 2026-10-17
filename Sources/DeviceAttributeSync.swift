@@ -114,10 +114,10 @@ final class DeviceAttributeSync {
                       "\(Self.LOG_SOURCE) - Ignoring device attribute response '\(event.id.uuidString)', it does not match the active request.")
             return
         }
+        activeRequest = nil
         let requestId = request.id.uuidString
         var attributes = request.data ?? [:]
         attributes.removeValue(forKey: Keys.APP)
-        activeRequest = nil
 
         let status = event.data?[Keys.STATUS] as? String
         if status == Keys.STATUS_SUCCESS {
