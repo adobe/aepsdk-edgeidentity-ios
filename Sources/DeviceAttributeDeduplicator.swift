@@ -13,20 +13,23 @@
 import AEPServices
 import Foundation
 
-/// Keeps the device attributes confirmed by Edge as a nested map and filters out values that do not need to be
-/// sent again. A value is compared with the confirmed value at the same path and, when owner values are given
-/// (collect consent is "y"), with the owner value at that path. Arrays are compared as sets.
+/// Keeps the confirmed values of the deduplicated paths (`DEDUPLICATED_PATHS`: the timezone, push token and
+/// push-to-start tokens) as a nested map and filters out values that do not need to be sent again. A value at a
+/// deduplicated path is compared as a whole, even when it is a map, with the confirmed value at the same path and,
+/// when owner values are given (collect consent is "y"), with the owner value at that path. Arrays are compared as
+/// sets. Values at any other path are always sent and never stored.
 final class DeviceAttributeDeduplicator {
     private static let LOG_SOURCE = "DeviceAttributeDeduplicator"
-    /// The deepest allowed container. The top-level attributes map is depth 0, a map or array directly inside it is
-    /// depth 1, and so on. A deeper container, including a cyclic collection, is an invalid value and is dropped.
-    static let MAX_DEPTH = 32
     private let storeName: String
     private var synced: [String: Any]
 
     init(storeName: String) {
         self.storeName = storeName
-        synced = Self.readPersisted(storeName: storeName)
+        let persisted = Self.readPersisted(storeName: storeName)
+        synced = Self.deduplicated(persisted)
+        if !(synced as NSDictionary).isEqual(to: persisted) {
+            persist()
+        }
     }
 
     /// The result of `filter`: the values to send to Edge, and the values that are not sent because their owner
@@ -37,6 +40,7 @@ final class DeviceAttributeDeduplicator {
     }
 
     /// Splits `attributes` into the values that need to be sent to Edge and the values that match an owner value.
+    /// Only values at the deduplicated paths can be unchanged or match an owner; every other valid value is changed.
     /// Owner matches are not committed here; the caller commits them.
     /// - Parameters:
     ///   - attributes: the attributes to filter
@@ -44,22 +48,19 @@ final class DeviceAttributeDeduplicator {
     ///   - owners: owner values to compare with, in the same shape as `attributes`; may be nil
     /// - Returns: the changed values (empty when nothing changed) and the owner matches
     func filter(_ attributes: [String: Any], dedup: Bool, owners: [String: Any]?) -> FilterResult {
-        var changed: [String: Any] = [:]
-        var ownerMatches: [String: Any] = [:]
-        Self.collect(attributes,
-                     synced: dedup ? synced : nil,
-                     owners: dedup ? owners : nil,
-                     changed: &changed,
-                     ownerMatches: &ownerMatches,
-                     depth: 0)
-        return FilterResult(changed: changed, ownerMatches: ownerMatches)
+        return Self.collect(attributes, synced: dedup ? synced : nil, owners: dedup ? owners : nil, path: [], ancestors: [])
     }
 
-    /// Deep-merges `attributes` into the confirmed values and persists them. A map merges into an existing
-    /// map; any other value, or an empty map, replaces the existing value at that key.
+    /// Stores each value of `attributes` at a deduplicated path, replacing the whole confirmed value at that path and
+    /// keeping the other confirmed values, then persists them. Values at any other path are not stored; when there
+    /// are none at a deduplicated path, nothing is written.
     /// - Parameter attributes: the attributes confirmed by Edge
     func commit(_ attributes: [String: Any]) {
-        synced = Self.merge(synced, attributes)
+        let values = Self.deduplicatedValues(attributes)
+        guard !values.isEmpty else { return }
+        for (path, value) in values {
+            Self.set(Self.copy(value), at: path, in: &synced)
+        }
         persist()
     }
 
@@ -83,50 +84,72 @@ final class DeviceAttributeDeduplicator {
     private static func collect(_ attributes: [AnyHashable: Any],
                                 synced: [AnyHashable: Any]?,
                                 owners: [AnyHashable: Any]?,
-                                changed: inout [String: Any],
-                                ownerMatches: inout [String: Any],
-                                depth: Int) {
+                                path: [String],
+                                ancestors: [ObjectIdentifier]) -> FilterResult {
+        var changed: [String: Any] = [:]
+        var ownerMatches: [String: Any] = [:]
         for (rawKey, value) in attributes {
             guard let key = rawKey as? String else {
                 Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping device attribute with a non-string key.")
                 continue
             }
-            if let map = value as? [AnyHashable: Any], !map.isEmpty, depth < MAX_DEPTH {
-                var changedChild: [String: Any] = [:]
-                var ownerMatchesChild: [String: Any] = [:]
-                collect(map,
-                        synced: child(synced, key),
-                        owners: child(owners, key),
-                        changed: &changedChild,
-                        ownerMatches: &ownerMatchesChild,
-                        depth: depth + 1)
-                if !changedChild.isEmpty { changed[key] = changedChild }
-                if !ownerMatchesChild.isEmpty { ownerMatches[key] = ownerMatchesChild }
+            let isDeduplicated = IdentityConstants.DeviceAttributes.DEDUPLICATED_PATHS.contains(path + [key])
+            let identity = referenceIdentity(value)
+            if !isDeduplicated, let map = value as? [AnyHashable: Any], !map.isEmpty,
+               !(identity.map(ancestors.contains) ?? false) {
+                let childResult = collect(map,
+                                          synced: child(synced, key),
+                                          owners: child(owners, key),
+                                          path: path + [key],
+                                          ancestors: ancestors + [identity].compactMap { $0 })
+                if !childResult.changed.isEmpty { changed[key] = childResult.changed }
+                if !childResult.ownerMatches.isEmpty { ownerMatches[key] = childResult.ownerMatches }
                 continue
             }
-            guard let canonical = canonicalize(value, depth: depth + 1) else {
+            guard let canonical = canonicalize(value, ancestors: ancestors) else {
                 Log.warning(label: IdentityConstants.LOG_TAG, "\(LOG_SOURCE) - Dropping invalid device attribute '\(key)'.")
                 continue
             }
-            if let synced = synced, canonical == canonicalize(synced[key], depth: depth + 1) { continue }
-            if let owners = owners, canonical == canonicalize(owners[key], depth: depth + 1) {
+            if isDeduplicated, let synced = synced, canonical == canonicalize(synced[key]) { continue }
+            if isDeduplicated, let owners = owners, canonical == canonicalize(owners[key]) {
                 ownerMatches[key] = copy(value)
                 continue
             }
             changed[key] = copy(value)
         }
+        return FilterResult(changed: changed, ownerMatches: ownerMatches)
     }
 
-    private static func merge(_ base: [String: Any], _ attributes: [String: Any]) -> [String: Any] {
-        var result = base
-        for (key, value) in attributes {
-            if let map = value as? [String: Any], !map.isEmpty, let existing = result[key] as? [String: Any] {
-                result[key] = merge(existing, map)
-            } else {
-                result[key] = copy(value)
+    /// Returns the values of `attributes` at the deduplicated paths, keyed by path.
+    private static func deduplicatedValues(_ attributes: [String: Any]) -> [([String], Any)] {
+        return IdentityConstants.DeviceAttributes.DEDUPLICATED_PATHS.compactMap { path in
+            var value: Any? = attributes
+            for key in path {
+                value = (value as? [String: Any])?[key]
             }
+            return value.map { (path, $0) }
+        }
+    }
+
+    /// Returns only the values of `attributes` at the deduplicated paths, in the same nested shape.
+    private static func deduplicated(_ attributes: [String: Any]) -> [String: Any] {
+        var result: [String: Any] = [:]
+        for (path, value) in deduplicatedValues(attributes) {
+            set(value, at: path, in: &result)
         }
         return result
+    }
+
+    /// Sets `value` at `path`, creating or replacing the parent maps on the way.
+    private static func set(_ value: Any, at path: [String], in map: inout [String: Any]) {
+        guard let key = path.first else { return }
+        if path.count == 1 {
+            map[key] = value
+            return
+        }
+        var child = map[key] as? [String: Any] ?? [:]
+        set(value, at: Array(path.dropFirst()), in: &child)
+        map[key] = child
     }
 
     private static func child(_ map: [AnyHashable: Any]?, _ key: String) -> [AnyHashable: Any]? {
@@ -160,15 +183,24 @@ final class DeviceAttributeDeduplicator {
     /// Returns a stable string form of a value directly inside the attributes map for comparison, or nil when the
     /// value is null or invalid.
     static func canonicalize(_ value: Any?) -> String? {
-        return canonicalize(value, depth: 1)
+        return canonicalize(value, ancestors: [])
     }
 
-    private static func canonicalize(_ value: Any?, depth: Int) -> String? {
+    private static func canonicalize(_ value: Any?, ancestors: [ObjectIdentifier]) -> String? {
         guard let value = value, !(value is NSNull) else { return nil }
-        return canonicalValue(value, depth: depth)
+        return canonicalValue(value, ancestors: ancestors)
     }
 
-    private static func canonicalValue(_ value: Any, depth: Int) -> String? {
+    /// iOS only: returns the identity of a reference type value, such as an `NSMutableDictionary`, so a collection
+    /// that contains itself can be detected. Returns nil for Swift value types, which cannot contain themselves.
+    private static func referenceIdentity(_ value: Any) -> ObjectIdentifier? {
+        guard type(of: value) is AnyClass else { return nil }
+        return ObjectIdentifier(value as AnyObject)
+    }
+
+    /// `ancestors` holds the reference type collections that contain `value`, so a collection that contains
+    /// itself is invalid instead of recursing forever.
+    private static func canonicalValue(_ value: Any, ancestors: [ObjectIdentifier]) -> String? {
         if value is NSNull {
             return "null"
         }
@@ -188,14 +220,15 @@ final class DeviceAttributeDeduplicator {
             }
             return number.stringValue
         }
-        let isContainer = value is [AnyHashable: Any] || value is [Any]
-        if isContainer && depth > MAX_DEPTH {
-            return nil
+        var ancestors = ancestors
+        if let identity = referenceIdentity(value) {
+            guard !ancestors.contains(identity) else { return nil }
+            ancestors.append(identity)
         }
         if let map = value as? [AnyHashable: Any] {
             var entries: [(String, String)] = []
             for (rawKey, element) in map {
-                guard let key = rawKey as? String, let canonicalElement = canonicalValue(element, depth: depth + 1) else { return nil }
+                guard let key = rawKey as? String, let canonicalElement = canonicalValue(element, ancestors: ancestors) else { return nil }
                 entries.append((key, canonicalElement))
             }
             let sorted = entries.sorted { $0.0 < $1.0 }.map { "\(quote($0.0)):\($0.1)" }
@@ -205,7 +238,7 @@ final class DeviceAttributeDeduplicator {
             // Arrays are compared as sets, so element order and duplicates do not matter.
             var elements = Set<String>()
             for element in array {
-                guard let canonicalElement = canonicalValue(element, depth: depth + 1) else { return nil }
+                guard let canonicalElement = canonicalValue(element, ancestors: ancestors) else { return nil }
                 elements.insert(canonicalElement)
             }
             return "[" + elements.sorted().joined(separator: ",") + "]"

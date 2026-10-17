@@ -14,7 +14,8 @@ import Foundation
 
 /// Sends device attributes from `updateDeviceAttributesBypassConsent` to Edge without checking collect consent.
 /// The public API data is forwarded to the rules engine; a forward operational data rule responds with the
-/// attributes that may be sent. Rule responses are queued and sent to Edge one at a time, and each Edge result
+/// attributes that may be sent. The timezone, push token and push-to-start tokens are sent only when they change;
+/// all other values are always sent. Rule responses are queued and sent to Edge one at a time, and each Edge result
 /// releases the active request.
 final class DeviceAttributeSync {
     private static let LOG_SOURCE = "DeviceAttributeSync"
@@ -168,8 +169,8 @@ final class DeviceAttributeSync {
 
     /// Returns the values owned by other sources, in the same shape as the device attributes: the timezone set
     /// through the profile attributes API and the push token in the Messaging shared state.
-    /// iOS only: a Live Activity token list is an owner value when Messaging holds every token in it, so
-    /// `attributes` is needed to build those values.
+    /// iOS only: a Live Activity push-to-start token list is an owner value when Messaging holds every token in it,
+    /// so `attributes` is needed to build that value.
     private func ownerValues(_ attributes: [String: Any]) -> [String: Any] {
         typealias Keys = IdentityConstants.DeviceAttributes
         typealias Messaging = IdentityConstants.SharedState.Messaging
@@ -191,16 +192,14 @@ final class DeviceAttributeSync {
         }
         let liveActivity = messagingState[Messaging.LIVE_ACTIVITY] as? [String: Any]
         let input = attributes[Keys.TOKENS] as? [String: Any]
-        for (key, storedKey, idKey, tokenKey) in [(Keys.LIVE_ACTIVITY_START, Messaging.PUSH_TO_START_TOKENS, "attributeType", "value"),
-                                                  (Keys.LIVE_ACTIVITY_UPDATE, Messaging.UPDATE_TOKENS, "liveActivityID", "token")] {
-            guard let entries = input?[key] as? [[String: Any]],
-                  let stored = liveActivity?[storedKey] as? [String: [String: Any]] else { continue }
+        if let entries = input?[Keys.LIVE_ACTIVITY_START] as? [[String: Any]],
+           let stored = liveActivity?[Messaging.PUSH_TO_START_TOKENS] as? [String: [String: Any]] {
             let held = entries.isEmpty ? stored.isEmpty : entries.allSatisfy { entry in
-                guard let id = entry[idKey] as? String, let token = entry[tokenKey] as? String else { return false }
+                guard let id = entry["attributeType"] as? String, let token = entry["value"] as? String else { return false }
                 return stored[id]?["token"] as? String == token
             }
             if held {
-                tokens[key] = entries
+                tokens[Keys.LIVE_ACTIVITY_START] = entries
             }
         }
         if !tokens.isEmpty {
@@ -261,11 +260,11 @@ final class DeviceAttributeSync {
                   "\(Self.LOG_SOURCE) - Cleared device attribute requests and synced values after identity reset.")
     }
 
-    /// iOS only: removes the Live Activity tokens when Messaging clears its Live Activities.
+    /// iOS only: removes the stored Live Activity push-to-start tokens when Messaging clears its Live Activities.
     func handleClearLiveActivities(event: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
         guard event.data?[Keys.CLEAR_LIVE_ACTIVITIES] as? Bool == true else { return }
-        deduplicator.remove(paths: [[Keys.TOKENS, Keys.LIVE_ACTIVITY_START], [Keys.TOKENS, Keys.LIVE_ACTIVITY_UPDATE]])
+        deduplicator.remove(paths: [[Keys.TOKENS, Keys.LIVE_ACTIVITY_START]])
         publishProfileAttributes(event: event)
         Log.debug(label: IdentityConstants.LOG_TAG,
                   "\(Self.LOG_SOURCE) - Cleared Live Activity tokens after Messaging cleared Live Activities.")

@@ -129,8 +129,10 @@ import Foundation
     /// **independently of collect consent**.
     ///
     /// Accepts an open map. Only values returned by an allow-list Launch rule are sent to Edge.
-    /// Allowed values are de-duplicated against confirmed bypass values at every consent state.
-    /// The existing timezone store and Messaging's push/Live Activity shared state are compared only when
+    /// The timezone (`timezone`), push token (`tokens.pushNotification`) and Live Activity push-to-start tokens
+    /// (`tokens.liveActivityStart`) are sent only when they change, compared with the values Edge confirmed at every
+    /// consent state; all other values are always sent.
+    /// The existing timezone store and Messaging's push token and push-to-start tokens are compared only when
     /// collect consent is `"y"`, or the Consent extension is not registered
     /// (disable all comparisons with `edgeidentity.optimizeOperationalProfileDataSync: false`).
     /// A failed request does not mark values
