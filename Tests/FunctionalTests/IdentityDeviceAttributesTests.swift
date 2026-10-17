@@ -23,8 +23,9 @@ class IdentityDeviceAttributesTests: XCTestCase {
     // MockDataStore is flat and would incorrectly cross-suppress identical values).
     var mockDataStore: CollectionAwareMockDataStore!
 
-    private let deviceStore = IdentityConstants.Store.DEVICE_ATTRIBUTES
-    private let profileStore = IdentityConstants.Store.PROFILE_ATTRIBUTES
+    private let deviceStore = IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME
+    private let profileStore = IdentityConstants.ProfileAttributes.STORE_NAME
+    private let timeZoneKey = IdentityConstants.DeviceAttributes.TIME_ZONE
     private let pushKey = "pushNotification"
     private let appKey = IdentityConstants.DeviceAttributes.APP
 
@@ -33,13 +34,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         mockDataStore = CollectionAwareMockDataStore()
         ServiceProvider.shared.namedKeyValueService = mockDataStore
         mockRuntime = TestableExtensionRuntime()
-        identity = Identity(runtime: mockRuntime)
-        identity.onRegistered()
-        let bootEvent = Event(name: "boot", type: "test-type", source: "test-source", data: nil)
-        XCTAssertTrue(identity.readyForEvent(bootEvent))
-        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
-        // Deterministic start: both dedup stores empty (no reliance on device timezone / prior runs).
-        clearStores()
+        resetState()
     }
 
     override func tearDown() {
@@ -49,7 +44,21 @@ class IdentityDeviceAttributesTests: XCTestCase {
 
     private func clearStores() {
         mockDataStore.remove(collectionName: deviceStore, key: IdentityConstants.DeviceAttributes.SYNCED_VALUES)
-        mockDataStore.remove(collectionName: profileStore, key: TimeZoneAttributeHandler.key)
+        mockDataStore.remove(collectionName: profileStore, key: timeZoneKey)
+    }
+
+    /// Starts a new Identity, which reads the persisted device attributes store.
+    private func startIdentity() {
+        identity = Identity(runtime: mockRuntime)
+        identity.onRegistered()
+        XCTAssertTrue(identity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+    }
+
+    /// Deterministic start: both stores empty (no reliance on device timezone / prior runs) and a new Identity.
+    private func resetState() {
+        clearStores()
+        startIdentity()
     }
 
     // MARK: - Helpers
@@ -126,9 +135,25 @@ class IdentityDeviceAttributesTests: XCTestCase {
         return DeviceAttributeDeduplicator(storeName: deviceStore).readSynced()
     }
 
-    /// Confirmed device attribute leaf values keyed by path.
+    /// Confirmed device attribute leaf values keyed by path. A non-empty map is walked; any other value is a leaf.
     private func syncedDeviceValues() -> [[String]: Any] {
-        return DeviceAttributeDeduplicator.paths(in: storedDeviceAttributes())
+        var leaves: [[String]: Any] = [:]
+        func walk(_ map: [String: Any], _ path: [String]) {
+            for (key, value) in map {
+                if let child = value as? [String: Any], !child.isEmpty {
+                    walk(child, path + [key])
+                } else {
+                    leaves[path + [key]] = value
+                }
+            }
+        }
+        walk(storedDeviceAttributes(), [])
+        return leaves
+    }
+
+    /// True when every value in `attributes` matches the persisted device attributes store.
+    private func isSynced(_ attributes: [String: Any]) -> Bool {
+        return DeviceAttributeDeduplicator(storeName: deviceStore).filter(attributes, dedup: true, owners: nil).changed.isEmpty
     }
 
     private func syncResultEvents() -> [Event] {
@@ -335,12 +360,12 @@ class IdentityDeviceAttributesTests: XCTestCase {
 
     func testDeviceAttributes_dedupFalse_repeatedIdentical_alwaysDispatches() {
         let first = makeDeviceEvent(["timezone": "Europe/London"])
-        simulateConfig([IdentityConstants.ConfigKeys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], for: first)
+        simulateConfig([IdentityConstants.DeviceAttributes.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], for: first)
         mockRuntime.simulateComingEvents(first)
         consequence(operationalEvents().last?.data ?? [:])
 
         let second = makeDeviceEvent(["timezone": "Europe/London"])
-        simulateConfig([IdentityConstants.ConfigKeys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], for: second)
+        simulateConfig([IdentityConstants.DeviceAttributes.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], for: second)
         mockRuntime.simulateComingEvents(second)
         consequence(operationalEvents().last?.data ?? [:])
 
@@ -350,8 +375,8 @@ class IdentityDeviceAttributesTests: XCTestCase {
     // MARK: - Store independence between profile and device paths
 
     func testStoreNameConstants_areDistinct() {
-        XCTAssertNotEqual(IdentityConstants.Store.PROFILE_ATTRIBUTES,
-                          IdentityConstants.Store.DEVICE_ATTRIBUTES,
+        XCTAssertNotEqual(IdentityConstants.ProfileAttributes.STORE_NAME,
+                          IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME,
                           "Profile and device dedup stores must be distinct or a profile write would suppress the device dispatch")
     }
 
@@ -501,7 +526,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
 
     func testFailedOrDroppedRequestDoesNotCommitAndReleasesNextConsequence() {
         for status in ["failed", "dropped"] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             let first = consequence(["timezone": "Europe/London"], completeImmediately: false)!
             consequence(["timezone": "Europe/London"], completeImmediately: false)
@@ -522,10 +547,9 @@ class IdentityDeviceAttributesTests: XCTestCase {
         complete(first)
         XCTAssertEqual(2, bypassEvents().count)
         XCTAssertNotEqual(first.id, second.id)
-        let dedup = DeviceAttributeDeduplicator(storeName: deviceStore)
-        XCTAssertFalse(dedup.filter(["timezone": "Asia/Kolkata"], dedup: true).toSend.isEmpty)
+        XCTAssertFalse(isSynced(["timezone": "Asia/Kolkata"]))
         complete(second)
-        XCTAssertTrue(dedup.filter(["timezone": "Asia/Kolkata"], dedup: true).toSend.isEmpty)
+        XCTAssertTrue(isSynced(["timezone": "Asia/Kolkata"]))
     }
 
     func testContextIsNeverSentAsAnAttribute() {
@@ -565,8 +589,8 @@ class IdentityDeviceAttributesTests: XCTestCase {
     func testDedupPathsDoNotCollideWithLiteralDottedKeys() {
         let dedup = DeviceAttributeDeduplicator(storeName: deviceStore)
         dedup.commit(["a.b": 1, "a": ["b": true]])
-        XCTAssertTrue(dedup.filter(["a.b": 1, "a": ["b": true]], dedup: true).toSend.isEmpty)
-        XCTAssertFalse(dedup.filter(["a.b": true, "a": ["b": 1]], dedup: true).toSend.isEmpty)
+        XCTAssertTrue(dedup.filter(["a.b": 1, "a": ["b": true]], dedup: true, owners: nil).changed.isEmpty)
+        XCTAssertFalse(dedup.filter(["a.b": true, "a": ["b": 1]], dedup: true, owners: nil).changed.isEmpty)
     }
 
     private func deviceAttributeRulesEngine(attributes: [[String: Any]]) throws -> LaunchRulesEngine {
@@ -595,10 +619,10 @@ class IdentityDeviceAttributesTests: XCTestCase {
 
     func testSuccessfulBypassUpdatesTimezoneOwnerAndSkipsMatchingProfileRequest() throws {
         let edge = try XCTUnwrap(consequence(["timezone": "Europe/London"], completeImmediately: false))
-        XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: TimeZoneAttributeHandler.key))
+        XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: timeZoneKey))
         complete(edge)
         XCTAssertEqual("Europe/London",
-                       mockDataStore.get(collectionName: profileStore, key: TimeZoneAttributeHandler.key) as? String)
+                       mockDataStore.get(collectionName: profileStore, key: timeZoneKey) as? String)
         XCTAssertEqual(["timezone": "Europe/London"] as NSDictionary, lastProfileAttributesSharedState() as NSDictionary?)
         mockRuntime.simulateComingEvents(makeProfileEvent(timezone: "Europe/London"))
         XCTAssertTrue(edgeEvents().isEmpty)
@@ -623,7 +647,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertEqual(EventSource.responseContent, syncResult.source)
         XCTAssertEqual(result.id, syncResult.parentID)
         XCTAssertNil(syncResult.responseID)
-        XCTAssertEqual(["status": "success", "attributes": attributes] as NSDictionary, syncResult.data as NSDictionary?)
+        XCTAssertEqual(["status": "success", "reason": "", "attributes": attributes] as NSDictionary, syncResult.data as NSDictionary?)
         XCTAssertFalse(mockRuntime.dispatchedEvents.contains { $0.type == EventType.messaging })
         mockRuntime.simulateComingEvents(result)
         XCTAssertEqual(1, syncResultEvents().count)
@@ -633,7 +657,8 @@ class IdentityDeviceAttributesTests: XCTestCase {
         let cases: [(data: [String: Any], expected: [String: Any])] = [
             (["status": "failed", "reason": "network"], ["status": "failed", "reason": "network"]),
             (["status": "dropped", "reason": "consent"], ["status": "failed", "reason": "consent"]),
-            (["status": "failed"], ["status": "failed"])
+            (["status": "failed"], ["status": "failed", "reason": "unknown"]),
+            (["status": "failed", "reason": 500], ["status": "failed", "reason": "unknown"])
         ]
         for testCase in cases {
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
@@ -647,7 +672,9 @@ class IdentityDeviceAttributesTests: XCTestCase {
             XCTAssertEqual(EventType.edgeIdentity, syncResult.type)
             XCTAssertEqual(EventSource.responseContent, syncResult.source)
             XCTAssertEqual(result.id, syncResult.parentID)
-            XCTAssertEqual(testCase.expected as NSDictionary, syncResult.data as NSDictionary?)
+            var expected = testCase.expected
+            expected["attributes"] = ["timezone": "Europe/London"]
+            XCTAssertEqual(expected as NSDictionary, syncResult.data as NSDictionary?)
             XCTAssertTrue(syncedDeviceValues().isEmpty)
         }
     }
@@ -658,7 +685,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
                                                 completeImmediately: false))
             complete(Event(name: "unrelated", type: "other", source: "other", data: nil))
             complete(edge, status: status)
-            XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: TimeZoneAttributeHandler.key))
+            XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: timeZoneKey))
             XCTAssertFalse(syncResultEvents().contains { $0.data?["status"] as? String == "success" })
             XCTAssertTrue(syncedDeviceValues().isEmpty)
         }
@@ -692,9 +719,8 @@ class IdentityDeviceAttributesTests: XCTestCase {
             ["path": ["tokens", "pushNotification"], "enabled": true]
         ])
         let attributes: [String: Any] = ["tokens": ["pushNotification": ""]]
-        let dedup = DeviceAttributeDeduplicator(storeName: deviceStore)
-        let previous: [String: Any] = ["tokens": ["pushNotification": "previous"]]
-        dedup.commit(previous)
+        DeviceAttributeDeduplicator(storeName: deviceStore).commit(["tokens": ["pushNotification": "previous"]])
+        startIdentity()
 
         for status in ["failed", "success"] {
             mockRuntime.simulateComingEvents(makeDeviceEvent(attributes))
@@ -707,9 +733,9 @@ class IdentityDeviceAttributesTests: XCTestCase {
             let edge = try XCTUnwrap(bypassEvents().last)
             XCTAssertEqual("", (edge.data?["tokens"] as? [String: Any])?["pushNotification"] as? String)
             XCTAssertNotNil(edge.data?["app"])
-            XCTAssertFalse(dedup.filter(attributes, dedup: true).toSend.isEmpty)
+            XCTAssertFalse(isSynced(attributes))
             complete(edge, status: status)
-            XCTAssertEqual(status == "success", dedup.filter(attributes, dedup: true).toSend.isEmpty)
+            XCTAssertEqual(status == "success", isSynced(attributes))
         }
         XCTAssertEqual(2, bypassEvents().count)
         XCTAssertNil(consequence(attributes))
@@ -748,7 +774,7 @@ extension IdentityDeviceAttributesTests {
     func testMatchingResultWithInvalidStatusIsTreatedAsFailed() throws {
         let invalidResults: [[String: Any]?] = [nil, [:], ["status": "unknown"], ["status": 202]]
         for data in invalidResults {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             let first = try XCTUnwrap(consequence(["timezone": "Europe/London"], completeImmediately: false))
             consequence(["timezone": "Asia/Kolkata"], completeImmediately: false)
@@ -759,7 +785,8 @@ extension IdentityDeviceAttributesTests {
             XCTAssertEqual("Asia/Kolkata", bypassEvents().last?.data?["timezone"] as? String)
             XCTAssertTrue(syncedDeviceValues().isEmpty)
             XCTAssertEqual(1, syncResultEvents().count)
-            XCTAssertEqual(["status": "failed"] as NSDictionary, syncResultEvents().last?.data as NSDictionary?)
+            XCTAssertEqual(["status": "failed", "reason": "unknown", "attributes": ["timezone": "Europe/London"]] as NSDictionary,
+                           syncResultEvents().last?.data as NSDictionary?)
             complete(bypassEvents().last!)
         }
     }
@@ -772,14 +799,27 @@ extension IdentityDeviceAttributesTests {
                                                source: EventSource.responseContent,
                                                data: ["status": "failed", "requestEventId": first.id.uuidString]))
         XCTAssertEqual(2, bypassEvents().count)
-        XCTAssertEqual(["status": "failed"] as NSDictionary, syncResultEvents().last?.data as NSDictionary?)
+        XCTAssertEqual(["status": "failed", "reason": "unknown", "attributes": ["timezone": "Europe/London"]] as NSDictionary,
+                       syncResultEvents().last?.data as NSDictionary?)
 
         let second = try XCTUnwrap(bypassEvents().last)
         mockRuntime.simulateComingEvents(Event(name: "Device Attributes Response",
                                                type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
                                                source: EventSource.responseContent,
-                                               data: ["status": "success", "requestEventId": second.id.uuidString.lowercased()]))
+                                               data: ["status": "success", "requestEventId": second.id.uuidString]))
         XCTAssertEqual(["timezone": "Asia/Kolkata"] as NSDictionary, storedDeviceAttributes() as NSDictionary)
+    }
+
+    func testRequestEventIdIsMatchedAsAnExactString() throws {
+        let first = try XCTUnwrap(consequence(["timezone": "Europe/London"], completeImmediately: false))
+        mockRuntime.simulateComingEvents(Event(name: "Device Attributes Response",
+                                               type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
+                                               source: EventSource.responseContent,
+                                               data: ["status": "success", "requestEventId": first.id.uuidString.lowercased()]))
+        XCTAssertTrue(syncResultEvents().isEmpty)
+        XCTAssertTrue(syncedDeviceValues().isEmpty)
+        complete(first)
+        XCTAssertEqual(1, syncResultEvents().count)
     }
 
     func testNonMatchingResultDoesNotAdvanceQueue() throws {
@@ -819,10 +859,10 @@ extension IdentityDeviceAttributesTests {
 
     func testOwnerMatchesSuppressValuesOnlyWhenCollectConsentIsYes() throws {
         for consent in [nil, "n", "p", "unknown", "y"] as [String?] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateCollectConsent(consent)
-            mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Europe/London")
+            mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Europe/London")
             mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
                                             data: (["pushidentifier": "push", "liveActivity": [
                                                 "pushToStartTokens": ["A": ["token": "start"]],
@@ -847,7 +887,7 @@ extension IdentityDeviceAttributesTests {
 
     func testConfirmedBypassValuesSuppressDuplicatesAtEveryConsentState() throws {
         for consent in [nil, "n", "p", "unknown", "y"] as [String?] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateCollectConsent(consent)
             let attributes: [String: Any] = ["timezone": "Europe/London", "tokens": [
@@ -867,14 +907,14 @@ extension IdentityDeviceAttributesTests {
                                         data: (["pushidentifier": ""], .set))
         let attributes: [String: Any] = ["tokens": ["pushNotification": ""]]
         for consent in [nil, "n", "p"] as [String?] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateCollectConsent(consent)
             let request = try XCTUnwrap(consequence(attributes))
             XCTAssertEqual("", (request.data?["tokens"] as? [String: Any])?["pushNotification"] as? String)
             XCTAssertNil(consequence(attributes))
         }
-        clearStores()
+        resetState()
         simulateCollectConsent("y")
         XCTAssertNil(consequence(attributes))
         XCTAssertEqual(["tokens": ["pushNotification": ""]] as NSDictionary, storedDeviceAttributes() as NSDictionary)
@@ -882,7 +922,7 @@ extension IdentityDeviceAttributesTests {
 
     func testDisabledDedupSendsValuesMatchingBothConfirmedAndOwnerStores() throws {
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
-                                        data: ([IdentityConstants.ConfigKeys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], .set))
+                                        data: ([IdentityConstants.DeviceAttributes.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], .set))
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
                                         data: (["pushidentifier": "push", "liveActivity": [
                                             "pushToStartTokens": ["A": ["token": "start"]],
@@ -894,10 +934,10 @@ extension IdentityDeviceAttributesTests {
             "liveActivityUpdate": [["liveActivityID": "1", "token": "update"]]
         ]]
         for consent in ["n", "y"] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateCollectConsent(consent)
-            mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Europe/London")
+            mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Europe/London")
             for _ in 0..<2 {
                 let request = try XCTUnwrap(consequence(attributes))
                 var actual = request.data ?? [:]
@@ -919,7 +959,7 @@ extension IdentityDeviceAttributesTests {
             (["consents": ["collect": "y"]], .set)
         ]
         for state in states {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateRegisteredExtensions([IdentityConstants.SharedState.Consent.SHARED_OWNER_NAME])
             mockRuntime.simulateXDMSharedState(for: IdentityConstants.SharedState.Consent.SHARED_OWNER_NAME, data: state)
@@ -930,7 +970,7 @@ extension IdentityDeviceAttributesTests {
 
     func testQueuedConsequenceReadsConsentAtDequeueTime() throws {
         for (initial, latest) in [("y", "n"), ("n", "y")] {
-            clearStores()
+            resetState()
             mockRuntime.resetDispatchedEventAndCreatedSharedStates()
             simulateCollectConsent(initial)
             mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
@@ -962,7 +1002,7 @@ extension IdentityDeviceAttributesTests {
 
     func testChangedOwnerValuesAreSent() throws {
         simulateCollectConsent("y")
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Europe/London")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Europe/London")
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
                                         data: (["pushidentifier": "old"], .set))
         let request = try XCTUnwrap(consequence(["timezone": "Asia/Kolkata", "tokens": ["pushNotification": "new"]]))
@@ -974,7 +1014,7 @@ extension IdentityDeviceAttributesTests {
         simulateCollectConsent("y")
         let first = try XCTUnwrap(consequence(["custom": 1], completeImmediately: false))
         consequence(["timezone": "Europe/London", "tokens": ["pushNotification": "push"]], completeImmediately: false)
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Europe/London")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Europe/London")
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
                                         data: (["pushidentifier": "push"], .set))
         complete(first)
@@ -988,7 +1028,7 @@ extension IdentityDeviceAttributesTests {
         let first = try XCTUnwrap(consequence(["timezone": "Europe/London"], completeImmediately: false))
         consequence(["timezone": "Europe/London"], completeImmediately: false)
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Configuration.SHARED_OWNER_NAME,
-                                        data: ([IdentityConstants.ConfigKeys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], .set))
+                                        data: ([IdentityConstants.DeviceAttributes.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC: false], .set))
         complete(first)
         XCTAssertEqual(2, bypassEvents().count)
         XCTAssertEqual("Europe/London", bypassEvents().last?.data?["timezone"] as? String)
@@ -1087,19 +1127,60 @@ extension IdentityDeviceAttributesTests {
         XCTAssertNil(consequence(["tokens": ["pushNotification": "push"]]))
     }
 
-    // MARK: - Owner matches are copied into the device attributes store
+    // MARK: - Owner matches are copied into the device attributes store and published
 
-    func testOwnerMatchIsCopiedIntoStoreWithoutPublishing() throws {
+    /// Starts Identity on a runtime that records the event each standard shared state is published for.
+    private func startRecordingIdentity() -> SharedStateEventRecorder {
+        let recorder = SharedStateEventRecorder(mockRuntime)
+        identity = Identity(runtime: recorder)
+        identity.onRegistered()
+        XCTAssertTrue(identity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+        recorder.sharedStateEvents.removeAll()
+        return recorder
+    }
+
+    private func ruleResponse(_ data: [String: Any]) -> Event {
+        return Event(name: "Forward operational data",
+                     type: EventType.edgeIdentity,
+                     source: IdentityConstants.DeviceAttributes.RULE_RESPONSE_SOURCE,
+                     data: data)
+    }
+
+    func testOwnerMatchIsCommittedAndPublishedForTheRuleResponse() throws {
         simulateCollectConsent("y")
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Europe/London")
         mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
                                         data: (["pushidentifier": "push"], .set))
+        let recorder = startRecordingIdentity()
+        let response = ruleResponse(["tokens": ["pushNotification": "push"], "custom": "new"])
 
-        XCTAssertNil(consequence(["timezone": "Europe/London", "tokens": ["pushNotification": "push"]]))
+        mockRuntime.simulateComingEvents(response)
 
+        let edge = try XCTUnwrap(bypassEvents().last)
+        XCTAssertEqual(["custom"], attributeKeys(edge.data))
+        XCTAssertEqual(["tokens": ["pushNotification": "push"]] as NSDictionary, storedDeviceAttributes() as NSDictionary)
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual(["tokens": ["pushNotification": "push"]] as NSDictionary,
+                       lastProfileAttributesSharedState() as NSDictionary?)
+        XCTAssertEqual([response.id], recorder.sharedStateEvents.map { $0?.id })
+    }
+
+    func testOwnerMatchIsPublishedWhenEverythingIsDeduplicated() throws {
+        simulateCollectConsent("y")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Europe/London")
+        mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
+                                        data: (["pushidentifier": "push"], .set))
+        let recorder = startRecordingIdentity()
+        let response = ruleResponse(["timezone": "Europe/London", "tokens": ["pushNotification": "push"]])
+
+        mockRuntime.simulateComingEvents(response)
+
+        XCTAssertTrue(bypassEvents().isEmpty)
         let expected: [String: Any] = ["timezone": "Europe/London", "tokens": ["pushNotification": "push"]]
         XCTAssertEqual(expected as NSDictionary, storedDeviceAttributes() as NSDictionary)
-        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual(expected as NSDictionary, lastProfileAttributesSharedState() as NSDictionary?)
+        XCTAssertEqual([response.id], recorder.sharedStateEvents.map { $0?.id })
 
         // The copied values now dedup through the device attributes store, whatever the consent.
         simulateCollectConsent("n")
@@ -1107,10 +1188,23 @@ extension IdentityDeviceAttributesTests {
         XCTAssertTrue(bypassEvents().isEmpty)
     }
 
+    func testNoOwnerMatchDoesNotPublishBeforeEdgeResponse() throws {
+        simulateCollectConsent("y")
+        mockRuntime.simulateSharedState(for: IdentityConstants.SharedState.Messaging.SHARED_OWNER_NAME,
+                                        data: (["pushidentifier": "other"], .set))
+
+        let edge = try XCTUnwrap(consequence(["tokens": ["pushNotification": "push"]], completeImmediately: false))
+
+        XCTAssertTrue(storedDeviceAttributes().isEmpty)
+        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
+        complete(edge)
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+    }
+
     // MARK: - Shared state
 
     func testDeviceAttributesArePublishedInStandardSharedStateOnly() throws {
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Asia/Kolkata")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Asia/Kolkata")
         XCTAssertNotNil(consequence(["tokens": ["pushNotification": "push"], "custom": ["nested": true]]))
 
         XCTAssertEqual(["timezone": "Asia/Kolkata",
@@ -1123,24 +1217,28 @@ extension IdentityDeviceAttributesTests {
 
     func testBootupPublishesPersistedProfileAttributes() {
         DeviceAttributeDeduplicator(storeName: deviceStore).commit(["tokens": ["pushNotification": "push"]])
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Asia/Kolkata")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Asia/Kolkata")
         identity = Identity(runtime: mockRuntime)
         identity.onRegistered()
+
+        // The standard shared state is published once, at registration.
+        XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+        XCTAssertEqual(["timezone": "Asia/Kolkata", "tokens": ["pushNotification": "push"]] as NSDictionary,
+                       lastProfileAttributesSharedState() as NSDictionary?)
         mockRuntime.resetDispatchedEventAndCreatedSharedStates()
 
         XCTAssertTrue(identity.readyForEvent(Event(name: "boot", type: "test-type", source: "test-source", data: nil)))
 
-        XCTAssertEqual(["timezone": "Asia/Kolkata", "tokens": ["pushNotification": "push"]] as NSDictionary,
-                       lastProfileAttributesSharedState() as NSDictionary?)
+        XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
         let xdm = mockRuntime.createdXdmSharedStates.last ?? nil
         XCTAssertNotNil(xdm?[IdentityConstants.XDMKeys.IDENTITY_MAP])
         // As released: the XDM shared state holds only the consent-path timezone, never the device attributes.
         XCTAssertEqual(["timeZone": "Asia/Kolkata"] as NSDictionary,
-                       xdm?[IdentityConstants.ProfileAttributes.STORE_NAME] as? NSDictionary)
+                       xdm?[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] as? NSDictionary)
     }
 
     func testResetPublishesEmptyProfileAttributes() {
-        mockDataStore.set(collectionName: profileStore, key: TimeZoneAttributeHandler.key, value: "Asia/Kolkata")
+        mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Asia/Kolkata")
         XCTAssertNotNil(consequence(["custom": 1]))
         mockRuntime.resetDispatchedEventAndCreatedSharedStates()
 
@@ -1148,7 +1246,7 @@ extension IdentityDeviceAttributesTests {
                                                source: EventSource.requestReset, data: nil))
 
         XCTAssertEqual([:] as NSDictionary, lastProfileAttributesSharedState() as NSDictionary?)
-        XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: TimeZoneAttributeHandler.key))
+        XCTAssertNil(mockDataStore.get(collectionName: profileStore, key: timeZoneKey))
     }
 
     // MARK: - Clear Live Activities
@@ -1188,5 +1286,54 @@ extension IdentityDeviceAttributesTests {
 
         XCTAssertEqual(attributes as NSDictionary, storedDeviceAttributes() as NSDictionary)
         XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
+    }
+}
+
+/// Forwards to a `TestableExtensionRuntime` and records the event each standard shared state is created for.
+private final class SharedStateEventRecorder: ExtensionRuntime {
+    private let runtime: TestableExtensionRuntime
+    var sharedStateEvents: [Event?] = []
+
+    init(_ runtime: TestableExtensionRuntime) {
+        self.runtime = runtime
+    }
+
+    func unregisterExtension() { runtime.unregisterExtension() }
+    func registerListener(type: String, source: String, listener: @escaping EventListener) {
+        runtime.registerListener(type: type, source: source, listener: listener)
+    }
+    func startEvents() { runtime.startEvents() }
+    func stopEvents() { runtime.stopEvents() }
+    func dispatch(event: Event) { runtime.dispatch(event: event) }
+    func createSharedState(data: [String: Any], event: Event?) {
+        sharedStateEvents.append(event)
+        runtime.createSharedState(data: data, event: event)
+    }
+    func createPendingSharedState(event: Event?) -> SharedStateResolver {
+        return runtime.createPendingSharedState(event: event)
+    }
+    func getSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+        return runtime.getSharedState(extensionName: extensionName, event: event, barrier: barrier)
+    }
+    func getSharedState(extensionName: String, event: Event?, barrier: Bool, resolution: SharedStateResolution) -> SharedStateResult? {
+        return runtime.getSharedState(extensionName: extensionName, event: event, barrier: barrier, resolution: resolution)
+    }
+    func createXDMSharedState(data: [String: Any], event: Event?) {
+        runtime.createXDMSharedState(data: data, event: event)
+    }
+    func createPendingXDMSharedState(event: Event?) -> SharedStateResolver {
+        return runtime.createPendingXDMSharedState(event: event)
+    }
+    func getXDMSharedState(extensionName: String, event: Event?, barrier: Bool) -> SharedStateResult? {
+        return runtime.getXDMSharedState(extensionName: extensionName, event: event, barrier: barrier)
+    }
+    func getXDMSharedState(extensionName: String, event: Event?, barrier: Bool, resolution: SharedStateResolution) -> SharedStateResult? {
+        return runtime.getXDMSharedState(extensionName: extensionName, event: event, barrier: barrier, resolution: resolution)
+    }
+    func getHistoricalEvents(_ requests: [EventHistoryRequest], enforceOrder: Bool, handler: @escaping ([EventHistoryResult]) -> Void) {
+        runtime.getHistoricalEvents(requests, enforceOrder: enforceOrder, handler: handler)
+    }
+    func recordHistoricalEvent(_ event: Event, handler: ((Bool) -> Void)?) {
+        runtime.recordHistoricalEvent(event, handler: handler)
     }
 }

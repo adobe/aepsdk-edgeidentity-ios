@@ -144,7 +144,7 @@ import Foundation
     @objc(updateDeviceAttributesBypassConsent:)
     static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
         guard !attributes.isEmpty else {
-            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - updateDeviceAttributesBypassConsent: no attributes provided, ignoring.")
+            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Unable to update device attributes, attributes are null or empty.")
             return
         }
         let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,
