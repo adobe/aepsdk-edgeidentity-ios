@@ -1163,6 +1163,7 @@ extension IdentityDeviceAttributesTests {
         XCTAssertEqual(["tokens": ["pushNotification": "push"]] as NSDictionary,
                        lastProfileAttributesSharedState() as NSDictionary?)
         XCTAssertEqual([response.id], recorder.sharedStateEvents.map { $0?.id })
+        XCTAssertTrue(syncResultEvents().isEmpty, "A partially deduplicated request only gets the Edge result")
     }
 
     func testOwnerMatchIsPublishedWhenEverythingIsDeduplicated() throws {
@@ -1181,6 +1182,11 @@ extension IdentityDeviceAttributesTests {
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
         XCTAssertEqual(expected as NSDictionary, lastProfileAttributesSharedState() as NSDictionary?)
         XCTAssertEqual([response.id], recorder.sharedStateEvents.map { $0?.id })
+        let syncResult = try XCTUnwrap(syncResultEvents().last)
+        XCTAssertEqual(1, syncResultEvents().count)
+        XCTAssertEqual(response.id, syncResult.parentID)
+        XCTAssertEqual(["status": "success", "reason": "unchanged", "attributes": expected] as NSDictionary,
+                       syncResult.data as NSDictionary?)
 
         // The copied values now dedup through the device attributes store, whatever the consent.
         simulateCollectConsent("n")
@@ -1199,6 +1205,106 @@ extension IdentityDeviceAttributesTests {
         XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
         complete(edge)
         XCTAssertEqual(1, mockRuntime.createdSharedStates.count)
+    }
+
+    // MARK: - Result events for requests that are not sent to Edge
+
+    private func resetEvent() -> Event {
+        return Event(name: "Reset", type: EventType.genericIdentity, source: EventSource.requestReset, data: nil)
+    }
+
+    func testAllValuesSyncedDispatchesUnchangedResult() throws {
+        DeviceAttributeDeduplicator(storeName: deviceStore).commit(["timezone": "Europe/London", "custom": ["a": 1]])
+        startIdentity()
+        let response = ruleResponse(["timezone": "Europe/London", "custom": ["a": 1], "app": ["id": "rules-app"]])
+
+        mockRuntime.simulateComingEvents(response)
+
+        XCTAssertTrue(bypassEvents().isEmpty)
+        let syncResult = try XCTUnwrap(syncResultEvents().last)
+        XCTAssertEqual(1, syncResultEvents().count)
+        XCTAssertEqual(EventType.edgeIdentity, syncResult.type)
+        XCTAssertEqual(EventSource.responseContent, syncResult.source)
+        XCTAssertEqual(response.id, syncResult.parentID)
+        XCTAssertEqual(["status": "success", "reason": "unchanged",
+                        "attributes": ["timezone": "Europe/London", "custom": ["a": 1]]] as NSDictionary,
+                       syncResult.data as NSDictionary?)
+    }
+
+    func testPartialDedupSendsEdgeRequestWithoutUnchangedResult() throws {
+        DeviceAttributeDeduplicator(storeName: deviceStore).commit(["timezone": "Europe/London"])
+        startIdentity()
+
+        let edge = try XCTUnwrap(consequence(["timezone": "Europe/London", "custom": "new"], completeImmediately: false))
+
+        XCTAssertEqual(["custom"], attributeKeys(edge.data))
+        XCTAssertTrue(syncResultEvents().isEmpty)
+        complete(edge)
+        XCTAssertEqual(1, syncResultEvents().count)
+        XCTAssertEqual("success", syncResultEvents().last?.data?["status"] as? String)
+        XCTAssertEqual("", syncResultEvents().last?.data?["reason"] as? String)
+    }
+
+    func testResetDispatchesFailedResultsForActiveAndQueuedRequests() throws {
+        let active = try XCTUnwrap(consequence(["custom": 1], completeImmediately: false))
+        let first = ruleResponse(["custom": 2, "app": ["id": "rules-app"]])
+        let second = ruleResponse(["timezone": "Asia/Kolkata"])
+        mockRuntime.simulateComingEvents(first)
+        mockRuntime.simulateComingEvents(second)
+        XCTAssertEqual(1, bypassEvents().count)
+
+        mockRuntime.simulateComingEvents(resetEvent())
+
+        let results = syncResultEvents()
+        XCTAssertEqual(3, results.count)
+        XCTAssertEqual([active.id, first.id, second.id], results.map { $0.parentID })
+        let expectedAttributes: [[String: Any]] = [["custom": 1], ["custom": 2], ["timezone": "Asia/Kolkata"]]
+        for (result, attributes) in zip(results, expectedAttributes) {
+            XCTAssertEqual(["status": "failed", "reason": "identityReset", "attributes": attributes] as NSDictionary,
+                           result.data as NSDictionary?)
+        }
+        XCTAssertEqual(1, bypassEvents().count, "Dropped requests are never sent")
+
+        complete(active)
+        XCTAssertEqual(3, syncResultEvents().count, "A late Edge result for the dropped request is ignored")
+        XCTAssertTrue(syncedDeviceValues().isEmpty)
+    }
+
+    func testResetWithNothingPendingDispatchesNoResult() {
+        XCTAssertNotNil(consequence(["custom": 1]))
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+
+        mockRuntime.simulateComingEvents(resetEvent())
+
+        XCTAssertTrue(syncResultEvents().isEmpty)
+    }
+
+    func testMissingAppIdentifierDispatchesFailedResultAndContinuesQueue() throws {
+        DeviceAttributeDeduplicator(storeName: deviceStore).commit(["timezone": "Europe/London"])
+        var appIdentifiers: [String?] = ["com.adobe.test", nil, "com.adobe.test"]
+        let sync = DeviceAttributeSync(runtime: mockRuntime, appIdentifier: { appIdentifiers.removeFirst() })
+        sync.handleDeviceAttributeRuleResponse(event: ruleResponse(["custom": "active"]))
+        let active = try XCTUnwrap(bypassEvents().last)
+        let response = ruleResponse(["timezone": "Europe/London", "custom": "new", "app": ["id": "rules-app"]])
+        let next = ruleResponse(["custom": "next"])
+        sync.handleDeviceAttributeRuleResponse(event: response)
+        sync.handleDeviceAttributeRuleResponse(event: next)
+        mockRuntime.resetDispatchedEventAndCreatedSharedStates()
+
+        sync.handleDeviceAttributeResult(event: active.createChainedEvent(name: "Device Attributes Response",
+                                                                          type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
+                                                                          source: EventSource.responseContent,
+                                                                          data: ["status": "success"]))
+
+        let results = syncResultEvents()
+        XCTAssertEqual(2, results.count)
+        XCTAssertEqual(response.id, results.last?.parentID)
+        XCTAssertEqual(["status": "failed", "reason": "missingAppIdentifier", "attributes": ["custom": "new"]] as NSDictionary,
+                       results.last?.data as NSDictionary?)
+        let edge = try XCTUnwrap(bypassEvents().last)
+        XCTAssertEqual(1, bypassEvents().count)
+        XCTAssertEqual(next.id, edge.parentID)
+        XCTAssertEqual("com.adobe.test", (edge.data?["app"] as? [String: Any])?["id"] as? String)
     }
 
     // MARK: - Shared state
