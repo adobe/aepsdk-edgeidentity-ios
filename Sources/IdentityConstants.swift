@@ -124,6 +124,7 @@ enum IdentityConstants {
         static let DEVICE_ATTRIBUTES_TO_RULES_ENGINE = "Device attributes for rules engine"
         static let DEVICE_ATTRIBUTES_EDGE_REQUEST = "Edge bypass request"
         static let DEVICE_ATTRIBUTES_SYNC_RESULT = "Device Attributes Sync Result"
+        static let DEVICE_ATTRIBUTES_CONFIRMED = "Device attributes confirmed"
     }
 
     enum EventDataKeys {

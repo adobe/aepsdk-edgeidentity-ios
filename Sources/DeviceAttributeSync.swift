@@ -128,6 +128,7 @@ final class DeviceAttributeSync {
             }
             publishProfileAttributes(event: event)
             Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Device attributes synced (request '\(requestId)').")
+            dispatchTokensConfirmed(attributes: attributes, parent: event)
             dispatchSyncResult(status: Keys.STATUS_SUCCESS, reason: "", attributes: attributes, parent: event)
         } else {
             let reason = event.data?[Keys.REASON] as? String ?? Keys.UNKNOWN_REASON
@@ -147,6 +148,15 @@ final class DeviceAttributeSync {
                                                           type: EventType.edgeIdentity,
                                                           source: EventSource.responseContent,
                                                           data: data))
+    }
+
+    /// Tells Messaging which tokens Edge confirmed, chained to `parent`. Nothing is dispatched without tokens.
+    private func dispatchTokensConfirmed(attributes: [String: Any], parent: Event) {
+        guard let tokens = attributes[IdentityConstants.DeviceAttributes.TOKENS] as? [String: Any], !tokens.isEmpty else { return }
+        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_CONFIRMED,
+                                                          type: EventType.messaging,
+                                                          source: EventSource.responseContent,
+                                                          data: [IdentityConstants.DeviceAttributes.TOKENS: tokens]))
     }
 
     /// A response matches when it is chained to the active request or names it in `requestEventId`.
