@@ -48,6 +48,7 @@ enum IdentityConstants {
             static let PUSH_IDENTIFIER = "pushidentifier"
             static let LIVE_ACTIVITY = "liveActivity"
             static let PUSH_TO_START_TOKENS = "pushToStartTokens"
+            static let TOKEN = "token"
         }
     }
 
@@ -84,11 +85,6 @@ enum IdentityConstants {
         static let APP = "app"
         static let APP_ID = "id"
         static let APP_PLATFORM = "platform"
-        static let SYNCED_VALUES = "confirmedAttributes"
-        /// The only paths that are deduplicated and stored. They are profile values with a single current value.
-        /// Every other value, including Live Activity update tokens, which are per activity and not part of the
-        /// profile, is always sent to Edge and never stored.
-        static let DEDUPLICATED_PATHS: [[String]] = [[TIMEZONE], [TOKENS, PUSH_NOTIFICATION], [TOKENS, LIVE_ACTIVITY_START]]
 
         static let STATUS = "status"
         static let STATUS_SUCCESS = "success"
@@ -103,6 +99,8 @@ enum IdentityConstants {
 
         // iOS only: Live Activity tokens and the Messaging clear Live Activities event.
         static let LIVE_ACTIVITY_START = "liveActivityStart"
+        static let ATTRIBUTE_TYPE = "attributeType"
+        static let VALUE = "value"
         static let CLEAR_LIVE_ACTIVITIES = "isClearLiveActivitiesEvent"
 
         // iOS only: the APNs platform is derived from the Messaging `messaging.useSandbox` setting.

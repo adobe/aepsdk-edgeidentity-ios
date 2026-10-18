@@ -54,7 +54,7 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
-        deviceAttributeSync.publishProfileAttributes(event: nil)
+        deviceAttributeSync.publishStoredProfileAttributes()
     }
 
     public func onUnregistered() {
@@ -120,7 +120,7 @@ import Foundation
     /// type and append it to `profileAttributeHandlers` — this function needs no changes.
     private func handleProfileAttributes(event: Event) {
         guard let eventData = event.data, !eventData.isEmpty else {
-            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Event data is null or empty for '\(event.name)'; skipping update.")
+            Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
             return
         }
         var merged: [String: String] = [:]
@@ -130,7 +130,7 @@ import Foundation
             merged.merge(contribution) { _, new in new }
         }
         guard !merged.isEmpty else {
-            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - No profile attributes collected from event data; skipping update.")
+            Log.debug(label: friendlyName, "\(#function) - No attribute changes from any handler, skipping dispatch.")
             return
         }
         createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)

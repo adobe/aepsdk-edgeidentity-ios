@@ -21,14 +21,12 @@ final class DeviceAttributeSync {
     private static let LOG_SOURCE = "DeviceAttributeSync"
 
     private let runtime: ExtensionRuntime
-    private let appIdentifier: () -> String?
     private let deduplicator = DeviceAttributeDeduplicator(storeName: IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME)
     private var pendingRequests: [Event] = []
     private var activeRequest: Event?
 
-    init(runtime: ExtensionRuntime, appIdentifier: @escaping () -> String? = { Bundle.main.bundleIdentifier }) {
+    init(runtime: ExtensionRuntime) {
         self.runtime = runtime
-        self.appIdentifier = appIdentifier
     }
 
     /// Forwards public API data to the rules engine, which decides which attributes may be sent.
@@ -74,8 +72,9 @@ final class DeviceAttributeSync {
         attributes.removeValue(forKey: Keys.APP)
         let config = configuration()
         let dedup = config[Keys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC] as? Bool ?? true
-        let owners = dedup && isCollectConsentYes() ? ownerValues(attributes) : nil
-        let result = deduplicator.filter(attributes, dedup: dedup, owners: owners)
+        let result = dedup
+            ? deduplicator.filter(attributes, owners: isCollectConsentYes() ? ownerValues(attributes) : nil)
+            : DeviceAttributeDeduplicator.FilterResult(changed: attributes, ownerMatches: [:])
         if !result.ownerMatches.isEmpty {
             deduplicator.commit(result.ownerMatches)
             Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Marked device attributes held by their owner as synced.")
@@ -89,7 +88,7 @@ final class DeviceAttributeSync {
             return nil
         }
 
-        guard let appId = appIdentifier(), !appId.isEmpty else {
+        guard let appId = Bundle.main.bundleIdentifier, !appId.isEmpty else {
             Log.warning(label: IdentityConstants.LOG_TAG,
                         "\(Self.LOG_SOURCE) - Cannot send device attributes without an app identifier. " +
                             "Dropping rule event '\(ruleResponse.id.uuidString)'.")
@@ -195,8 +194,8 @@ final class DeviceAttributeSync {
         if let entries = input?[Keys.LIVE_ACTIVITY_START] as? [[String: Any]],
            let stored = liveActivity?[Messaging.PUSH_TO_START_TOKENS] as? [String: [String: Any]] {
             let held = entries.isEmpty ? stored.isEmpty : entries.allSatisfy { entry in
-                guard let id = entry["attributeType"] as? String, let token = entry["value"] as? String else { return false }
-                return stored[id]?["token"] as? String == token
+                guard let id = entry[Keys.ATTRIBUTE_TYPE] as? String, let token = entry[Keys.VALUE] as? String else { return false }
+                return stored[id]?[Messaging.TOKEN] as? String == token
             }
             if held {
                 tokens[Keys.LIVE_ACTIVITY_START] = entries
@@ -264,7 +263,7 @@ final class DeviceAttributeSync {
     func handleClearLiveActivities(event: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
         guard event.data?[Keys.CLEAR_LIVE_ACTIVITIES] as? Bool == true else { return }
-        deduplicator.remove(paths: [[Keys.TOKENS, Keys.LIVE_ACTIVITY_START]])
+        deduplicator.clearLiveActivityStart()
         publishProfileAttributes(event: event)
         Log.debug(label: IdentityConstants.LOG_TAG,
                   "\(Self.LOG_SOURCE) - Cleared Live Activity tokens after Messaging cleared Live Activities.")
@@ -272,11 +271,22 @@ final class DeviceAttributeSync {
 
     /// Publishes the synced device attributes merged with the consent-path timezone in the standard shared state.
     func publishProfileAttributes(event: Event?) {
+        runtime.createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: profileAttributes()], event: event)
+    }
+
+    /// Publishes the persisted profile attributes at registration. Nothing is published when nothing is stored.
+    func publishStoredProfileAttributes() {
+        let attributes = profileAttributes()
+        guard !attributes.isEmpty else { return }
+        runtime.createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: attributes], event: nil)
+    }
+
+    private func profileAttributes() -> [String: Any] {
         var attributes = deduplicator.readSynced()
         if let timezone = profileTimezone() {
             attributes[IdentityConstants.DeviceAttributes.TIMEZONE] = timezone
         }
-        runtime.createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: attributes], event: event)
+        return attributes
     }
 
     private func profileTimezone() -> String? {
