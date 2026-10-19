@@ -17,12 +17,12 @@ import Foundation
 class MockExtension: Extension {
     var name = "mockExtension"
     var friendlyName = "mockExtension"
-    static var extensionVersion = "0.0.1"
+    nonisolated(unsafe) static var extensionVersion = "0.0.1"
     var metadata: [String: String]?
 
-    static var registrationClosure: (() -> Void)?
-    static var unregistrationClosure: (() -> Void)?
-    static var eventReceivedClosure: ((Event) -> Void)?
+    nonisolated(unsafe) static var registrationClosure: (() -> Void)?
+    nonisolated(unsafe) static var unregistrationClosure: (() -> Void)?
+    nonisolated(unsafe) static var eventReceivedClosure: ((Event) -> Void)?
 
     let runtime: ExtensionRuntime
 

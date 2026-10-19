@@ -33,15 +33,6 @@
 		2EE7E6EA27FE5C3B00C4B12A /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6E927FE5C3B00C4B12A /* URLUtils.swift */; };
 		2EE7E6ED27FE9D8600C4B12A /* URLUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE7E6EB27FE9D2F00C4B12A /* URLUtilsTests.swift */; };
 		4C4B7D8C27A0CA2F00C0CE25 /* IdentityAdIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */; };
-		AA000002000000000000AA01 /* IdentityTimezoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AA01 /* IdentityTimezoneTests.swift */; };
-		AA000004000000000000AA01 /* IdentityTimezoneEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */; };
-		AA000006000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
-		AA000008000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
-		AA000010000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
-		AA000012000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
-		AA000014000000000000AA01 /* TimeZoneAttributeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */; };
-		AA000016000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
-		AA000018000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
 		4C4B7D9027A0CAC900C0CE25 /* Event+Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */; };
 		4C4B7D9127A1114600C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
 		4C4B7D9227A111A500C0CE25 /* IdentityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43BAB7125BBAFC700B08CC0 /* IdentityConstants.swift */; };
@@ -53,6 +44,15 @@
 		6C83D252831B862FDB67D2E8 /* Pods_TestApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5912AA86D48F7E66E10AC83 /* Pods_TestApp.framework */; };
 		6E80E481DE3A53282C35B828 /* Pods_FunctionalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C134E35F086FEE3EBB3C1E8 /* Pods_FunctionalTests.framework */; };
 		7B1D076BED1CBA5F1B3A2646 /* Pods_UnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D32C1448F1838E6E028C4D67 /* Pods_UnitTests.framework */; };
+		AA000002000000000000AA01 /* IdentityTimezoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AA01 /* IdentityTimezoneTests.swift */; };
+		AA000004000000000000AA01 /* IdentityTimezoneEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */; };
+		AA000006000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
+		AA000008000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
+		AA000010000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
+		AA000012000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
+		AA000014000000000000AA01 /* TimeZoneAttributeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */; };
+		AA000016000000000000AA01 /* ProfileAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000005000000000000AA01 /* ProfileAttributeHandler.swift */; };
+		AA000018000000000000AA01 /* TimeZoneAttributeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */; };
 		ADA08ECF8DE574D4021875E2 /* Pods_TestApptvOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DD402FC404C7E0DF4F16DC0 /* Pods_TestApptvOS.framework */; };
 		B4C3683F014E484CC244191C /* Pods_TestAppObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21DA6B9159175183322A361 /* Pods_TestAppObjC.framework */; };
 		B6F27EC02609146800C50A04 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F27EBF2609146800C50A04 /* AppDelegate.m */; };
@@ -146,11 +146,6 @@
 		3F04018E98F361A0DA81EAF3 /* Pods-TestAppObjC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestAppObjC.release.xcconfig"; path = "Target Support Files/Pods-TestAppObjC/Pods-TestAppObjC.release.xcconfig"; sourceTree = "<group>"; };
 		3F955AF4EC8D3303E0E75A85 /* Pods_AEPEdgeIdentity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AEPEdgeIdentity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4B7D8B27A0CA2F00C0CE25 /* IdentityAdIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityAdIDTests.swift; sourceTree = "<group>"; };
-		AA000001000000000000AA01 /* IdentityTimezoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneTests.swift; sourceTree = "<group>"; };
-		AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneEventTests.swift; sourceTree = "<group>"; };
-		AA000005000000000000AA01 /* ProfileAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAttributeHandler.swift; sourceTree = "<group>"; };
-		AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandler.swift; sourceTree = "<group>"; };
-		AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandlerTests.swift; sourceTree = "<group>"; };
 		4C4B7D8D27A0CAC900C0CE25 /* Event+Identity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Event+Identity.swift"; sourceTree = "<group>"; };
 		4C820A872836F19C00609575 /* AdIdUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdIdUtils.swift; sourceTree = "<group>"; };
 		4CAD0F78283C155E00490A1F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -158,6 +153,11 @@
 		4CC3D10627D2CFD70055ACC6 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 		7E694C5C8D2173BAD8F11953 /* Pods-TestApptvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestApptvOS.debug.xcconfig"; path = "Target Support Files/Pods-TestApptvOS/Pods-TestApptvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A5912AA86D48F7E66E10AC83 /* Pods_TestApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001000000000000AA01 /* IdentityTimezoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneTests.swift; sourceTree = "<group>"; };
+		AA000003000000000000AA01 /* IdentityTimezoneEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTimezoneEventTests.swift; sourceTree = "<group>"; };
+		AA000005000000000000AA01 /* ProfileAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAttributeHandler.swift; sourceTree = "<group>"; };
+		AA000007000000000000AA01 /* TimeZoneAttributeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandler.swift; sourceTree = "<group>"; };
+		AA000013000000000000AA01 /* TimeZoneAttributeHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeZoneAttributeHandlerTests.swift; sourceTree = "<group>"; };
 		AD3C06AABA5F980EB6685383 /* Pods-TestAppObjC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestAppObjC.debug.xcconfig"; path = "Target Support Files/Pods-TestAppObjC/Pods-TestAppObjC.debug.xcconfig"; sourceTree = "<group>"; };
 		B6F27EBC2609146800C50A04 /* TestAppObjC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestAppObjC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F27EBE2609146800C50A04 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1147,6 +1147,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1155,9 +1156,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvsimulator appletvos";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 13.0;
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1172,6 +1173,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1181,9 +1183,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvsimulator appletvos";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 13.0;
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1196,14 +1198,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.TestAppObjC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1216,14 +1220,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = SampleApps/TestAppObjC/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.TestAppObjC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1371,7 +1377,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1386,7 +1392,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1404,7 +1410,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1418,7 +1424,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1429,6 +1435,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = Tests/UnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1438,6 +1445,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1448,6 +1456,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = Tests/UnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1457,6 +1466,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1467,6 +1477,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = Tests/FunctionalTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1474,8 +1485,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.FunctionalTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1486,6 +1498,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				INFOPLIST_FILE = Tests/FunctionalTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1493,8 +1506,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.FunctionalTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1509,7 +1523,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1517,8 +1531,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1533,7 +1548,7 @@
 				DEVELOPMENT_TEAM = FKGEE875K4;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SampleApps/TestApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1542,8 +1557,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.adobe.mobile.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
@@ -1551,7 +1567,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
 		};
@@ -1559,7 +1577,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Release;
 		};
