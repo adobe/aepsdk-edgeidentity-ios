@@ -13,11 +13,11 @@
 import AEPServices
 import Foundation
 
-/// Keeps the confirmed values of the deduplicated paths (`DEDUPLICATED_PATHS`: the timezone, push token and
-/// push-to-start tokens) as a nested map and filters out values that do not need to be sent again. A value at a
+/// Stores the values Edge confirmed at the deduplicated paths (`DEDUPLICATED_PATHS`: the timezone, push token and
+/// push-to-start tokens) as a nested map, and filters out values that do not need to be sent again. A value at a
 /// deduplicated path is compared as a whole, even when it is a map, with the confirmed value at the same path and,
-/// when owner values are given (collect consent is "y"), with the owner value at that path. Arrays are compared as
-/// sets. Values at any other path are always sent and never stored.
+/// when `owners` is given, with the value its owner already holds. Arrays are compared as sets. Values at any other
+/// path are always sent and never stored.
 final class DeviceAttributeDeduplicator {
     private static let LOG_SOURCE = "DeviceAttributeDeduplicator"
     private let storeName: String
@@ -32,21 +32,21 @@ final class DeviceAttributeDeduplicator {
         }
     }
 
-    /// The result of `filter`: the values to send to Edge, and the values that are not sent because their owner
-    /// already holds them.
+    /// The result of `filter`: the values to send to Edge, and the owner-held values that are not sent.
     struct FilterResult {
         let changed: [String: Any]
         let ownerMatches: [String: Any]
     }
 
-    /// Splits `attributes` into the values that need to be sent to Edge and the values that match an owner value.
-    /// Only values at the deduplicated paths can be unchanged or match an owner; every other valid value is changed.
-    /// Owner matches are not committed here; the caller commits them.
+    /// Splits `attributes` into the values that need to be sent to Edge and the deduplicated values their owner
+    /// already holds. The owner is where the value is already set: the profile attributes API for the timezone and
+    /// Messaging for the push token and push-to-start tokens. Only values at the deduplicated paths can be unchanged
+    /// or owner-held; every other valid value is changed. Owner-held values are not stored here; the caller stores them.
     /// - Parameters:
     ///   - attributes: the attributes to filter
     ///   - dedup: whether to filter out unchanged values; when false, every valid value is returned as changed
-    ///   - owners: owner values to compare with, in the same shape as `attributes`; may be nil
-    /// - Returns: the changed values (empty when nothing changed) and the owner matches
+    ///   - owners: the values their owners hold, in the same shape as `attributes`; may be nil
+    /// - Returns: the changed values (empty when nothing changed) and the owner-held values
     func filter(_ attributes: [String: Any], dedup: Bool, owners: [String: Any]?) -> FilterResult {
         return Self.collect(attributes, synced: dedup ? synced : nil, owners: dedup ? owners : nil, path: [], ancestors: [])
     }
@@ -54,7 +54,7 @@ final class DeviceAttributeDeduplicator {
     /// Stores each value of `attributes` at a deduplicated path, replacing the whole confirmed value at that path and
     /// keeping the other confirmed values, then persists them. Values at any other path are not stored; when there
     /// are none at a deduplicated path, nothing is written.
-    /// - Parameter attributes: the attributes confirmed by Edge
+    /// - Parameter attributes: the attributes Edge confirmed, or the owner-held values
     func commit(_ attributes: [String: Any]) {
         let values = Self.deduplicatedValues(attributes)
         guard !values.isEmpty else { return }

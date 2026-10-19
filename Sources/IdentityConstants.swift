@@ -58,7 +58,7 @@ enum IdentityConstants {
 
         static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
 
-        // Standard shared state key holding the synced device attributes merged with the profile timezone.
+        // Standard shared state key holding the confirmed device attributes merged with the profile attributes timezone.
         static let SHARED_STATE_KEY = "profileAttributes"
 
         enum XDM {
@@ -70,7 +70,7 @@ enum IdentityConstants {
 
     }
 
-    /// Constants for the consent-independent device attribute sync (`updateDeviceAttributesBypassConsent` API).
+    /// Constants for sending device attributes regardless of collect consent (`updateDeviceAttributesBypassConsent` API).
     enum DeviceAttributes {
         static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
         static let BYPASS_TYPE = "com.adobe.eventType.edgeBypassConsent"

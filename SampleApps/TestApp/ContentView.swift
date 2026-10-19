@@ -74,7 +74,7 @@ struct GetIdentitiesView: View {
     @State var urlVariablesText: String = ""
     @State var timezoneInput: String = ""
     @State var lastTimezoneStatus: String = ""
-    // Exact input passed to updateDeviceAttributesBypassConsent (backend shape). Edit any value to send it again.
+    // Input passed to updateDeviceAttributesBypassConsent exactly as written. Edit any value to send it again.
     @State var deviceAttrJSON: String =
         #"{"timezone": "America/Los_Angeles", "tokens": {"pushNotification": "804EB6EDB22D-push-token-TEST", "# +
         #""liveActivityStart": [{"attributeType": "GameScoreLiveActivityAttributes", "value": "la-push-to-start-token-TEST"}], "# +
@@ -220,7 +220,7 @@ struct GetIdentitiesView: View {
 
                 Divider().padding(.vertical, 4)
 
-                // MARK: - Device Attributes (updateDeviceAttributesBypassConsent — consent-independent)
+                // MARK: - Device Attributes (updateDeviceAttributesBypassConsent, sent regardless of collect consent)
                 Text("Device Attributes — updateDeviceAttributesBypassConsent")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -235,7 +235,7 @@ struct GetIdentitiesView: View {
 
                 Button {
                     // The JSON text is only converted to a dictionary; it is passed to the API exactly as written.
-                    // Unchanged values are deduped by the SDK and won't be sent again.
+                    // The SDK does not send an unchanged timezone, push token or push-to-start tokens again.
                     guard let data = deviceAttrJSON.data(using: .utf8),
                           let attributes = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
                         lastDeviceAttrStatus = "Invalid JSON object, nothing sent"

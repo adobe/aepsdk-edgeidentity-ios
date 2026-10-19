@@ -252,8 +252,8 @@ import Foundation
                                eventDispatcher: dispatch(event:))
     }
 
-    /// Forwards the `updateDeviceAttributesBypassConsent` request. The edgeIdentity/requestContent pair is shared,
-    /// so only the API's own event is handled.
+    /// Forwards the `updateDeviceAttributesBypassConsent` request. Other events also use the edgeIdentity type and
+    /// requestContent source, so only the event from this API is handled.
     private func handleDeviceAttributes(event: Event) {
         guard event.name == IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES else {
             Log.trace(label: IdentityConstants.LOG_TAG, "Identity - Ignoring device attribute event with unexpected name '\(event.name)'.")

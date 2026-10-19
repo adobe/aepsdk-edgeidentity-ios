@@ -12,9 +12,8 @@ import AEPServices
 import Foundation
 
 /// A test double for `NamedCollectionProcessing` that — unlike the shared `MockDataStore` — partitions
-/// values by `collectionName`, mirroring the real `NamedCollectionDataStore` behavior. Required to test
-/// the separate profile-store / device-store dedup namespaces: with a flat mock, identical values in the
-/// two stores would incorrectly cross-suppress.
+/// values by `collectionName`, mirroring the real `NamedCollectionDataStore` behavior. Required to test that
+/// the profile attributes and device attributes stores stay separate.
 public class CollectionAwareMockDataStore: NamedCollectionProcessing {
     // Keyed by "collectionName\u{0}key" so collections never collide.
     private let queue = DispatchQueue(label: "com.adobe.collectionawaremockdatastore.syncqueue")
