@@ -14,13 +14,13 @@ import AEPServices
 import AEPTestUtils
 import XCTest
 
-/// Functional tests for the consent-independent device-attribute path (`updateDeviceAttributesBypassConsent`) handled
-/// by Identity: rule consequence -> FIFO -> Edge result -> confirmed-value dedup.
+/// Functional tests for sending device attributes regardless of collect consent (`updateDeviceAttributesBypassConsent`):
+/// rule response -> request queue -> device attributes response event -> deduplication against the confirmed values.
 class IdentityDeviceAttributesTests: XCTestCase {
     var identity: Identity!
     var mockRuntime: TestableExtensionRuntime!
-    // Collection-aware so the separate profile/device store namespaces are honored (the shared
-    // MockDataStore is flat and would incorrectly cross-suppress identical values).
+    // Keeps the profile attributes and device attributes stores separate; the shared MockDataStore ignores the
+    // collection name, so a value in one store would hide the same value in the other.
     var mockDataStore: CollectionAwareMockDataStore!
 
     private let deviceStore = IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME
@@ -124,7 +124,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         consequence(operational.data ?? [:])
     }
 
-    /// Operational-data events dispatched by the device path.
+    /// Events that forward the API data to the rules engine.
     private func operationalEvents() -> [Event] {
         return mockRuntime.dispatchedEvents.filter { $0.type == IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_TYPE }
     }
@@ -292,7 +292,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertTrue(bypassEvents().isEmpty, "app alone must never trigger an Edge dispatch")
     }
 
-    // MARK: - Key-based dedup (default true)
+    // MARK: - Deduplication by key (enabled by default)
 
     func testDeviceAttributes_sameKeySameValue_sentOnlyOnce() {
         sync(["timezone": "Europe/London"])
@@ -326,7 +326,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         sync(["tokens": [pushKey: "push-token-123"]])
         mockRuntime.resetDispatchedEventAndCreatedSharedStates()
 
-        // Both keys already synced with these values -> nothing sent.
+        // Both keys are already confirmed with these values, so nothing is sent.
         sync(["timezone": "Europe/London", "tokens": [pushKey: "push-token-123"]])
 
         XCTAssertTrue(bypassEvents().isEmpty)
@@ -356,12 +356,12 @@ class IdentityDeviceAttributesTests: XCTestCase {
     func testDeviceAttributes_persistsSyncedValuesToDeviceStore() {
         sync(["timezone": "Pacific/Auckland", "tokens": [pushKey: "push"], "customCount": 3])
 
-        // Only de-duplicated paths are stored.
+        // Only deduplicated paths are stored.
         XCTAssertEqual(["timezone": "Pacific/Auckland", "tokens": [pushKey: "push"]] as NSDictionary,
                        storedDeviceAttributes() as NSDictionary)
     }
 
-    // MARK: - Dedup config flag
+    // MARK: - Deduplication config flag
 
     func testDeviceAttributes_dedupFalse_repeatedIdentical_alwaysDispatches() {
         let first = makeDeviceEvent(["timezone": "Europe/London"])
@@ -377,7 +377,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertEqual(2, bypassEvents().count)
     }
 
-    // MARK: - Store independence between profile and device paths
+    // MARK: - Profile attributes and device attributes stores are independent
 
     func testStoreNameConstants_areDistinct() {
         XCTAssertNotEqual(IdentityConstants.ProfileAttributes.STORE_NAME,
@@ -435,7 +435,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertEqual(["token-1"], payload?[pushKey] as? [String])
     }
 
-    // MARK: - Backend payload shape (arrays / arrays of objects)
+    // MARK: - Nested tokens, arrays and arrays of objects
 
     private let backendTokens: [String: Any] = [
         "pushNotification": "804EB6EDB22D-EBE91B",
@@ -461,7 +461,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         sync(backendAttributes)
 
         XCTAssertEqual(2, bypassEvents().count)
-        // Live Activity update tokens are not de-duplicated, so they are sent every time.
+        // Live Activity update tokens are not deduplicated, so they are sent every time.
         XCTAssertEqual(["tokens"], attributeKeys(bypassEvents().last?.data))
         XCTAssertEqual(["liveActivityUpdate": backendTokens["liveActivityUpdate"] as Any] as NSDictionary,
                        bypassEvents().last?.data?["tokens"] as? NSDictionary)
@@ -596,7 +596,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         let dedup = DeviceAttributeDeduplicator(storeName: deviceStore)
         let attributes: [String: Any] = ["tokens.pushNotification": "dotted", "tokens": ["pushNotification": "push"]]
         dedup.commit(attributes)
-        // The literal dotted key is not a de-duplicated path, so only it is sent again.
+        // The literal dotted key is not a deduplicated path, so only it is sent again.
         XCTAssertEqual(["tokens.pushNotification": "dotted"] as NSDictionary,
                        dedup.filter(attributes, owners: nil).changed as NSDictionary)
     }
@@ -656,7 +656,7 @@ class IdentityDeviceAttributesTests: XCTestCase {
         XCTAssertEqual(result.id, syncResult.parentID)
         XCTAssertNil(syncResult.responseID)
         XCTAssertEqual(["status": "success", "reason": "", "attributes": attributes] as NSDictionary, syncResult.data as NSDictionary?)
-        // Messaging gets the confirmed tokens as sent, including an empty push token.
+        // Messaging gets the tokens Edge confirmed as sent, including an empty push token.
         XCTAssertEqual([["tokens": attributes["tokens"] ?? [:]]] as [NSDictionary],
                        mockRuntime.dispatchedEvents.filter { $0.type == EventType.messaging }.map { ($0.data ?? [:]) as NSDictionary })
         mockRuntime.simulateComingEvents(result)
@@ -887,12 +887,12 @@ extension IdentityDeviceAttributesTests {
             let request = try XCTUnwrap(consequence(attributes, completeImmediately: false))
             var actual = request.data ?? [:]
             actual.removeValue(forKey: appKey)
-            // Live Activity update tokens and custom values are never owner-matched.
+            // Live Activity update tokens and custom values are never owner-held.
             let expected: [String: Any] = consent == "y"
                 ? ["custom": "new", "tokens": ["liveActivityUpdate": [["liveActivityID": "1", "token": "update"]]]]
                 : attributes
             XCTAssertEqual(expected as NSDictionary, actual as NSDictionary)
-            // With consent "y" the owner matches are copied into the device attributes store right away.
+            // With consent "y" the owner-held values are stored as confirmed right away.
             XCTAssertEqual(consent == "y" ? 3 : 0, syncedDeviceValues().count)
             complete(request)
             XCTAssertEqual(3, syncedDeviceValues().count)
@@ -1021,7 +1021,8 @@ extension IdentityDeviceAttributesTests {
                                         data: (["pushidentifier": "push"], .set))
         complete(first)
         XCTAssertEqual(1, bypassEvents().count)
-        // The timezone and push token copied from their owners; the custom value is never stored.
+        // The timezone and push token are owner-held, so they are stored as confirmed; the custom value is never
+        // stored.
         XCTAssertEqual(2, syncedDeviceValues().count)
         XCTAssertNotNil(consequence(["custom": 2]))
     }
@@ -1129,7 +1130,7 @@ extension IdentityDeviceAttributesTests {
         XCTAssertNil(consequence(["tokens": ["pushNotification": "push"]]))
     }
 
-    // MARK: - Owner matches are copied into the device attributes store and published
+    // MARK: - Owner-held values are stored as confirmed and published
 
     /// Starts Identity on a runtime that records the event each standard shared state is published for.
     private func startRecordingIdentity() -> SharedStateEventRecorder {
@@ -1190,7 +1191,7 @@ extension IdentityDeviceAttributesTests {
         XCTAssertEqual(["status": "success", "reason": "unchanged", "attributes": expected] as NSDictionary,
                        syncResult.data as NSDictionary?)
 
-        // The copied values now dedup through the device attributes store, whatever the consent.
+        // The owner-held values are now confirmed, so they are deduplicated whatever the consent.
         simulateCollectConsent("n")
         XCTAssertNil(consequence(["tokens": ["pushNotification": "push"]]))
         XCTAssertTrue(bypassEvents().isEmpty)
@@ -1370,11 +1371,11 @@ extension IdentityDeviceAttributesTests {
         mockDataStore.set(collectionName: profileStore, key: timeZoneKey, value: "Asia/Kolkata")
         XCTAssertNotNil(consequence(["tokens": ["pushNotification": "push"], "custom": ["nested": true]]))
 
-        // Values outside the de-duplicated paths are not stored, so they are not published.
+        // Values outside the deduplicated paths are not stored, so they are not published.
         XCTAssertEqual(["timezone": "Asia/Kolkata",
                         "tokens": ["pushNotification": "push"]] as NSDictionary,
                        lastProfileAttributesSharedState() as NSDictionary?)
-        // The XDM shared state is unchanged by the device path.
+        // The XDM shared state is unchanged by the device attributes API.
         XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
     }
 
@@ -1395,7 +1396,7 @@ extension IdentityDeviceAttributesTests {
         XCTAssertTrue(mockRuntime.createdSharedStates.isEmpty)
         let xdm = mockRuntime.createdXdmSharedStates.last ?? nil
         XCTAssertNotNil(xdm?[IdentityConstants.XDMKeys.IDENTITY_MAP])
-        // As released: the XDM shared state holds only the consent-path timezone, never the device attributes.
+        // As released: the XDM shared state holds only the profile attributes timezone, never the device attributes.
         XCTAssertEqual(["timeZone": "Asia/Kolkata"] as NSDictionary,
                        xdm?[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] as? NSDictionary)
     }

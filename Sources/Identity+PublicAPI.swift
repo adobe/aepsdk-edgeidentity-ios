@@ -128,17 +128,16 @@ import Foundation
     /// Updates one or more device attributes that should be delivered to the Edge Network
     /// **independently of collect consent**.
     ///
-    /// Accepts an open map. Only values returned by an allow-list Launch rule are sent to Edge.
+    /// Accepts an open map. Only values that a Launch rule allows are sent to Edge.
     /// The timezone (`timezone`), push token (`tokens.pushNotification`) and Live Activity push-to-start tokens
-    /// (`tokens.liveActivityStart`) are sent only when they change, compared with the values Edge confirmed at every
-    /// consent state; all other values are always sent.
-    /// The existing timezone store and Messaging's push token and push-to-start tokens are compared only when
-    /// collect consent is `"y"`, or the Consent extension is not registered
+    /// (`tokens.liveActivityStart`) are sent only when they change from the last values Edge confirmed, whatever the
+    /// collect consent; all other values are always sent.
+    /// When collect consent is `"y"`, or the Consent extension is not registered, they are also not sent when they
+    /// match the timezone set through the profile attributes API or Messaging's push token and push-to-start tokens
     /// (disable all comparisons with `edgeidentity.optimizeOperationalProfileDataSync: false`).
-    /// A failed request does not mark values
-    /// as synced, so a later API call may send them again. Every dispatched update also
-    /// carries an SDK-generated `app { id, platform }` entry, using the bundle identifier and the latest
-    /// `messaging.useSandbox` setting at send time. Caller-provided `app` values do not override routing.
+    /// Values from a failed request are not stored as confirmed, so a later API call may send them again.
+    /// Every dispatched update also carries an SDK-generated `app { id, platform }` entry, using the bundle identifier
+    /// and the latest `messaging.useSandbox` setting at send time. Caller-provided `app` values do not override routing.
     ///
     /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
     ///   or arrays/dictionaries of those). Values are not validated by the SDK and are sent as provided.

@@ -25,19 +25,20 @@ final class DeviceAttributeDeduplicator {
         self.storeName = storeName
     }
 
-    /// The result of `filter`: the values to send to Edge, and the values that are not sent because their owner
-    /// already holds them.
+    /// The result of `filter`: the values to send to Edge, and the owner-held values that are not sent.
     struct FilterResult {
         let changed: [String: Any]
         let ownerMatches: [String: Any]
     }
 
-    /// Removes the deduplicated values that match the confirmed value or, when `owners` is given, the owner value.
-    /// Owner matches are returned separately and are not committed here; the caller commits them.
+    /// Removes the deduplicated values that match the confirmed value or, when `owners` is given, the value their owner
+    /// already holds. The owner is where the value is already set: the profile attributes API for the timezone and
+    /// Messaging for the push token and push-to-start tokens. Owner-held values are returned separately and are not
+    /// stored here; the caller stores them as confirmed.
     /// - Parameters:
     ///   - attributes: the attributes to filter
-    ///   - owners: owner values to compare with, in the same shape as `attributes`; may be nil
-    /// - Returns: the values to send (empty when nothing changed) and the owner matches
+    ///   - owners: the values their owners hold, in the same shape as `attributes`; may be nil
+    /// - Returns: the values to send (empty when nothing changed) and the owner-held values
     func filter(_ attributes: [String: Any], owners: [String: Any]?) -> FilterResult {
         var changed = attributes
         var ownerMatches: [String: Any] = [:]
@@ -71,7 +72,7 @@ final class DeviceAttributeDeduplicator {
     }
 
     /// Stores the deduplicated values in `attributes`, replacing the confirmed value of each. Other values are ignored.
-    /// - Parameter attributes: the attributes confirmed by Edge, or matched with their owner
+    /// - Parameter attributes: the attributes Edge confirmed, or the owner-held values
     func commit(_ attributes: [String: Any]) {
         if let timezone = attributes[Keys.TIMEZONE] as? String {
             write(Keys.TIMEZONE, timezone)
@@ -128,7 +129,7 @@ final class DeviceAttributeDeduplicator {
         return .changed
     }
 
-    /// Removes `key` from `changed` when its value is unchanged, and records the original value of an owner match.
+    /// Removes `key` from `changed` when its value is unchanged, and records the original value when it is owner-held.
     private static func apply(_ match: Match,
                               key: String,
                               from source: [String: Any],

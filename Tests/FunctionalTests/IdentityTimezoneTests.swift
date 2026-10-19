@@ -221,7 +221,7 @@ class IdentityTimezoneTests: XCTestCase, AnyCodableAsserts {
 
         mockRuntime.simulateComingEvents(makeTimezoneEvent("Europe/London"))
 
-        // Deduped: no Edge event and no shared state, as on Android.
+        // Deduplicated: no Edge event and no shared state, as on Android.
         XCTAssertTrue(edgeEvents().isEmpty)
         XCTAssertTrue(mockRuntime.createdXdmSharedStates.isEmpty)
     }

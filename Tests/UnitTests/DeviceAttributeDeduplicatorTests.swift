@@ -117,7 +117,7 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
                        reloaded().readSynced() as NSDictionary)
     }
 
-    // MARK: - Owner values
+    // MARK: - Owner-held values
 
     func testOwnerMatchesAreReturnedWithTheirOriginalValueAndNotCommitted() {
         let start = startTokens([("A", "a")])

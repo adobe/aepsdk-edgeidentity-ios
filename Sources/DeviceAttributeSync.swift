@@ -13,10 +13,10 @@ import AEPServices
 import Foundation
 
 /// Sends device attributes from `updateDeviceAttributesBypassConsent` to Edge without checking collect consent.
-/// The public API data is forwarded to the rules engine; a forward operational data rule responds with the
-/// attributes that may be sent. The timezone, push token and push-to-start tokens are sent only when they change;
-/// all other values are always sent. Rule responses are queued and sent to Edge one at a time, and each Edge result
-/// releases the active request.
+/// The public API data is forwarded to the rules engine; a Launch rule with a forward operational data consequence
+/// responds with the attributes that may be sent. The timezone, push token and push-to-start tokens are sent only
+/// when they change; all other values are always sent. Rule responses are queued and sent to Edge one at a time as
+/// device attributes request events; the next one is sent when the device attributes response event arrives.
 final class DeviceAttributeSync {
     private static let LOG_SOURCE = "DeviceAttributeSync"
 
@@ -44,7 +44,7 @@ final class DeviceAttributeSync {
                                                          data: data))
     }
 
-    /// Queues a rule consequence until the active Edge request has completed.
+    /// Queues a rule response until the active request gets its device attributes response event.
     func handleDeviceAttributeRuleResponse(event: Event) {
         guard let data = event.data, !data.isEmpty else {
             Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Rule response contains no device attributes.")
@@ -54,7 +54,7 @@ final class DeviceAttributeSync {
         processQueue()
     }
 
-    /// Sends queued requests until one is waiting for an Edge response or the queue is empty.
+    /// Sends queued requests until one is waiting for its device attributes response event or the queue is empty.
     private func processQueue() {
         while activeRequest == nil, !pendingRequests.isEmpty {
             guard let request = buildEdgeRequest(pendingRequests.removeFirst()) else { continue }
@@ -65,7 +65,8 @@ final class DeviceAttributeSync {
         }
     }
 
-    /// Returns the Edge request for the changed values in `ruleResponse`, or nil if there is nothing to send.
+    /// Returns the device attributes request event for the changed values in `ruleResponse`, or nil if there is
+    /// nothing to send.
     private func buildEdgeRequest(_ ruleResponse: Event) -> Event? {
         typealias Keys = IdentityConstants.DeviceAttributes
         var attributes = ruleResponse.data ?? [:]
@@ -106,7 +107,7 @@ final class DeviceAttributeSync {
                                                data: changed)
     }
 
-    /// Handles the Edge response for the active request, then sends the next queued request.
+    /// Handles the device attributes response event for the active request, then sends the next queued request.
     func handleDeviceAttributeResult(event: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
         guard let request = activeRequest, isResponseToActiveRequest(event) else {
@@ -140,7 +141,7 @@ final class DeviceAttributeSync {
         processQueue()
     }
 
-    /// Dispatches the sync result for a request, chained to `parent`. `attributes` must not contain `app`.
+    /// Dispatches the sync result for a request, with `parent` as its parent event. `attributes` must not contain `app`.
     private func dispatchSyncResult(status: String, reason: String, attributes: [String: Any], parent: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
         let data: [String: Any] = [Keys.STATUS: status, Keys.REASON: reason, Keys.ATTRIBUTES: attributes]
@@ -150,7 +151,8 @@ final class DeviceAttributeSync {
                                                           data: data))
     }
 
-    /// Tells Messaging which tokens Edge confirmed, chained to `parent`. Nothing is dispatched without tokens.
+    /// Tells Messaging which tokens Edge confirmed, with `parent` as the parent event. Nothing is dispatched without
+    /// tokens.
     private func dispatchTokensConfirmed(attributes: [String: Any], parent: Event) {
         guard let tokens = attributes[IdentityConstants.DeviceAttributes.TOKENS] as? [String: Any], !tokens.isEmpty else { return }
         runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_CONFIRMED,
@@ -159,17 +161,17 @@ final class DeviceAttributeSync {
                                                           data: [IdentityConstants.DeviceAttributes.TOKENS: tokens]))
     }
 
-    /// A response matches when it is chained to the active request or names it in `requestEventId`.
+    /// A response matches when its parent event is the active request or its `requestEventId` names it.
     private func isResponseToActiveRequest(_ event: Event) -> Bool {
         guard let request = activeRequest else { return false }
         return event.parentID == request.id ||
             event.data?[IdentityConstants.DeviceAttributes.REQUEST_EVENT_ID] as? String == request.id.uuidString
     }
 
-    /// Returns the values owned by other sources, in the same shape as the device attributes: the timezone set
-    /// through the profile attributes API and the push token in the Messaging shared state.
-    /// iOS only: a Live Activity push-to-start token list is an owner value when Messaging holds every token in it,
-    /// so `attributes` is needed to build that value.
+    /// Returns the values their owners already hold, in the same shape as the device attributes: the timezone set
+    /// through the profile attributes API and the push token in Messaging's shared state.
+    /// iOS only: the push-to-start token list is owner-held when Messaging holds every token in it, so `attributes`
+    /// is needed to build it.
     private func ownerValues(_ attributes: [String: Any]) -> [String: Any] {
         typealias Keys = IdentityConstants.DeviceAttributes
         typealias Messaging = IdentityConstants.SharedState.Messaging
@@ -234,8 +236,8 @@ final class DeviceAttributeSync {
         return collect?[Consent.VAL] as? String == Consent.YES
     }
 
-    /// Dispatches a failed result for the active request and each queued request, then clears them and all synced
-    /// values and republishes the profile attributes. The profile attribute store itself is cleared by
+    /// Dispatches a failed result for the active request and each queued request, then clears them and all confirmed
+    /// device attributes and republishes the profile attributes. The profile attribute store itself is cleared by
     /// `Identity.handleRequestReset`.
     func reset(event: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
@@ -259,7 +261,7 @@ final class DeviceAttributeSync {
                   "\(Self.LOG_SOURCE) - Cleared device attribute requests and synced values after identity reset.")
     }
 
-    /// iOS only: removes the stored Live Activity push-to-start tokens when Messaging clears its Live Activities.
+    /// iOS only: removes the confirmed Live Activity push-to-start tokens when Messaging clears its Live Activities.
     func handleClearLiveActivities(event: Event) {
         typealias Keys = IdentityConstants.DeviceAttributes
         guard event.data?[Keys.CLEAR_LIVE_ACTIVITIES] as? Bool == true else { return }
@@ -269,7 +271,8 @@ final class DeviceAttributeSync {
                   "\(Self.LOG_SOURCE) - Cleared Live Activity tokens after Messaging cleared Live Activities.")
     }
 
-    /// Publishes the synced device attributes merged with the consent-path timezone in the standard shared state.
+    /// Publishes the confirmed device attributes, merged with the timezone from the profile attribute store, in the
+    /// standard shared state.
     func publishProfileAttributes(event: Event?) {
         runtime.createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: profileAttributes()], event: event)
     }
