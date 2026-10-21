@@ -125,7 +125,7 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
-    /// Updates one or more device attributes that should be delivered to the Edge Network
+    /// Updates operational data that should be delivered to the Edge Network
     /// **independently of collect consent**.
     ///
     /// Accepts an open map. Only values that a Launch rule allows are sent to Edge.
@@ -142,13 +142,13 @@ import Foundation
     /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
     ///   or arrays/dictionaries of those). Values are not validated by the SDK and are sent as provided.
     ///   An empty map is a no-op.
-    @objc(updateDeviceAttributesBypassConsent:)
-    static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any]) {
+    @objc(updateOperationalData:)
+    static func updateOperationalData(_ attributes: [String: Any]) {
         guard !attributes.isEmpty else {
-            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Unable to update device attributes, attributes are null or empty.")
+            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Unable to update operational data, attributes are null or empty.")
             return
         }
-        let event = Event(name: IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES,
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA,
                           type: EventType.edgeIdentity,
                           source: EventSource.requestContent,
                           data: attributes)

@@ -12,16 +12,16 @@
 @testable import AEPServices
 import XCTest
 
-class DeviceAttributeDeduplicatorTests: XCTestCase {
+class OperationalDataDeduplicatorTests: XCTestCase {
     private var store: CollectionAwareMockDataStore!
-    private var deduplicator: DeviceAttributeDeduplicator!
-    private let storeName = IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME
+    private var deduplicator: OperationalDataDeduplicator!
+    private let storeName = IdentityConstants.DataStoreKeys.OPERATIONAL_DATA_DATASTORE_NAME
 
     override func setUp() {
         super.setUp()
         store = CollectionAwareMockDataStore()
         ServiceProvider.shared.namedKeyValueService = store
-        deduplicator = DeviceAttributeDeduplicator(storeName: storeName)
+        deduplicator = OperationalDataDeduplicator(storeName: storeName)
     }
 
     override func tearDown() {
@@ -29,15 +29,15 @@ class DeviceAttributeDeduplicatorTests: XCTestCase {
         super.tearDown()
     }
 
-    private func reloaded() -> DeviceAttributeDeduplicator {
-        return DeviceAttributeDeduplicator(storeName: storeName)
+    private func reloaded() -> OperationalDataDeduplicator {
+        return OperationalDataDeduplicator(storeName: storeName)
     }
 
     private func startTokens(_ entries: [(String, String)]) -> [[String: String]] {
         return entries.map { ["attributeType": $0.0, "value": $0.1] }
     }
 
-    private func filter(_ attributes: [String: Any], owners: [String: Any]? = nil) -> DeviceAttributeDeduplicator.FilterResult {
+    private func filter(_ attributes: [String: Any], owners: [String: Any]? = nil) -> OperationalDataDeduplicator.FilterResult {
         return deduplicator.filter(attributes, owners: owners)
     }
 

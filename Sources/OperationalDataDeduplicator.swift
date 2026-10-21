@@ -13,12 +13,12 @@
 import AEPServices
 import Foundation
 
-/// Stores the confirmed values of the deduplicated device attributes, the timezone (`timezone`), push token
+/// Stores the confirmed values of the deduplicated operational data, the timezone (`timezone`), push token
 /// (`tokens.pushNotification`) and Live Activity push-to-start tokens (`tokens.liveActivityStart`), and filters out
 /// those that do not need to be sent again. Push-to-start tokens are compared ignoring order. Values at any other path,
 /// and deduplicated values of an unexpected type, are always sent and never stored.
-final class DeviceAttributeDeduplicator {
-    private typealias Keys = IdentityConstants.DeviceAttributes
+final class OperationalDataDeduplicator {
+    private typealias Keys = IdentityConstants.OperationalData
     private let storeName: String
 
     init(storeName: String) {
@@ -89,7 +89,7 @@ final class DeviceAttributeDeduplicator {
         }
     }
 
-    /// Returns the confirmed values in the same nested shape as the device attributes.
+    /// Returns the confirmed values in the same nested shape as the operational data.
     func readSynced() -> [String: Any] {
         var synced: [String: Any] = [:]
         if let timezone = read(Keys.TIMEZONE) as? String {

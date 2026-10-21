@@ -12,16 +12,16 @@ import AEPCore
 import AEPServices
 import Foundation
 
-/// Sends device attributes from `updateDeviceAttributesBypassConsent` to Edge without checking collect consent.
+/// Sends operational data from `updateOperationalData` to Edge without checking collect consent.
 /// The public API data is forwarded to the rules engine; a Launch rule with a forward operational data consequence
 /// responds with the attributes that may be sent. The timezone, push token and push-to-start tokens are sent only
 /// when they change; all other values are always sent. Rule responses are queued and sent to Edge one at a time as
 /// device attributes request events; the next one is sent when the device attributes response event arrives.
-final class DeviceAttributeSync {
-    private static let LOG_SOURCE = "DeviceAttributeSync"
+final class OperationalDataSync {
+    private static let LOG_SOURCE = "OperationalDataSync"
 
     private let runtime: ExtensionRuntime
-    private let deduplicator = DeviceAttributeDeduplicator(storeName: IdentityConstants.DataStoreKeys.DEVICE_ATTRIBUTES_DATASTORE_NAME)
+    private let deduplicator = OperationalDataDeduplicator(storeName: IdentityConstants.DataStoreKeys.OPERATIONAL_DATA_DATASTORE_NAME)
     private var pendingRequests: [Event] = []
     private var activeRequest: Event?
 
@@ -30,24 +30,24 @@ final class DeviceAttributeSync {
     }
 
     /// Forwards public API data to the rules engine, which decides which attributes may be sent.
-    func handleDeviceAttributes(event: Event) {
+    func handleOperationalData(event: Event) {
         guard let data = event.data, !data.isEmpty else {
-            Log.warning(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Ignoring empty device attribute request.")
+            Log.warning(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Ignoring empty operational data request.")
             return
         }
         Log.debug(label: IdentityConstants.LOG_TAG,
-                  "\(Self.LOG_SOURCE) - Forwarding device attributes to the rules engine. " +
+                  "\(Self.LOG_SOURCE) - Forwarding operational data to the rules engine. " +
                     "Nothing is sent to Edge unless a forward operational data rule matches.")
-        runtime.dispatch(event: event.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_TO_RULES_ENGINE,
-                                                         type: IdentityConstants.DeviceAttributes.OPERATIONAL_DATA_TYPE,
+        runtime.dispatch(event: event.createChainedEvent(name: IdentityConstants.EventNames.OPERATIONAL_DATA_TO_RULES_ENGINE,
+                                                         type: IdentityConstants.OperationalData.OPERATIONAL_DATA_TYPE,
                                                          source: EventSource.requestContent,
                                                          data: data))
     }
 
     /// Queues a rule response until the active request gets its device attributes response event.
-    func handleDeviceAttributeRuleResponse(event: Event) {
+    func handleOperationalDataRuleResponse(event: Event) {
         guard let data = event.data, !data.isEmpty else {
-            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Rule response contains no device attributes.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Rule response contains no operational data.")
             return
         }
         pendingRequests.append(event)
@@ -60,7 +60,7 @@ final class DeviceAttributeSync {
             guard let request = buildEdgeRequest(pendingRequests.removeFirst()) else { continue }
             activeRequest = request
             Log.debug(label: IdentityConstants.LOG_TAG,
-                      "\(Self.LOG_SOURCE) - Sending device attributes to Edge (request '\(request.id.uuidString)').")
+                      "\(Self.LOG_SOURCE) - Sending operational data to Edge (request '\(request.id.uuidString)').")
             runtime.dispatch(event: request)
         }
     }
@@ -68,30 +68,30 @@ final class DeviceAttributeSync {
     /// Returns the device attributes request event for the changed values in `ruleResponse`, or nil if there is
     /// nothing to send.
     private func buildEdgeRequest(_ ruleResponse: Event) -> Event? {
-        typealias Keys = IdentityConstants.DeviceAttributes
+        typealias Keys = IdentityConstants.OperationalData
         var attributes = ruleResponse.data ?? [:]
         attributes.removeValue(forKey: Keys.APP)
         let config = configuration()
         let dedup = config[Keys.OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC] as? Bool ?? true
         let result = dedup
             ? deduplicator.filter(attributes, owners: isCollectConsentYes() ? ownerValues(attributes) : nil)
-            : DeviceAttributeDeduplicator.FilterResult(changed: attributes, ownerMatches: [:])
+            : OperationalDataDeduplicator.FilterResult(changed: attributes, ownerMatches: [:])
         if !result.ownerMatches.isEmpty {
             deduplicator.commit(result.ownerMatches)
-            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Marked device attributes held by their owner as synced.")
+            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Marked operational data held by its owner as synced.")
             publishProfileAttributes(event: ruleResponse)
         }
         var changed = result.changed
         guard !changed.isEmpty else {
             Log.debug(label: IdentityConstants.LOG_TAG,
-                      "\(Self.LOG_SOURCE) - Device attributes unchanged, not sending to Edge (rule event '\(ruleResponse.id.uuidString)').")
+                      "\(Self.LOG_SOURCE) - Operational data unchanged, not sending to Edge (rule event '\(ruleResponse.id.uuidString)').")
             dispatchSyncResult(status: Keys.STATUS_SUCCESS, reason: Keys.REASON_UNCHANGED, attributes: attributes, parent: ruleResponse)
             return nil
         }
 
         guard let appId = Bundle.main.bundleIdentifier, !appId.isEmpty else {
             Log.warning(label: IdentityConstants.LOG_TAG,
-                        "\(Self.LOG_SOURCE) - Cannot send device attributes without an app identifier. " +
+                        "\(Self.LOG_SOURCE) - Cannot send operational data without an app identifier. " +
                             "Dropping rule event '\(ruleResponse.id.uuidString)'.")
             dispatchSyncResult(status: Keys.STATUS_FAILED, reason: Keys.REASON_MISSING_APP_IDENTIFIER, attributes: changed, parent: ruleResponse)
             return nil
@@ -101,15 +101,15 @@ final class DeviceAttributeSync {
             Keys.APP_ID: appId,
             Keys.APP_PLATFORM: useSandbox ? Keys.PLATFORM_APNS_SANDBOX : Keys.PLATFORM_APNS
         ]
-        return ruleResponse.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_EDGE_REQUEST,
-                                               type: Keys.BYPASS_TYPE,
+        return ruleResponse.createChainedEvent(name: IdentityConstants.EventNames.EDGE_DEVICE_ATTRIBUTES_REQUEST,
+                                               type: Keys.EDGE_DEVICE_ATTRIBUTES_TYPE,
                                                source: EventSource.requestContent,
                                                data: changed)
     }
 
     /// Handles the device attributes response event for the active request, then sends the next queued request.
-    func handleDeviceAttributeResult(event: Event) {
-        typealias Keys = IdentityConstants.DeviceAttributes
+    func handleOperationalDataResult(event: Event) {
+        typealias Keys = IdentityConstants.OperationalData
         guard let request = activeRequest, isResponseToActiveRequest(event) else {
             Log.debug(label: IdentityConstants.LOG_TAG,
                       "\(Self.LOG_SOURCE) - Ignoring device attribute response '\(event.id.uuidString)', it does not match the active request.")
@@ -128,13 +128,13 @@ final class DeviceAttributeSync {
                     .set(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: Keys.TIME_ZONE, value: timezone)
             }
             publishProfileAttributes(event: event)
-            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Device attributes synced (request '\(requestId)').")
+            Log.debug(label: IdentityConstants.LOG_TAG, "\(Self.LOG_SOURCE) - Operational data synced (request '\(requestId)').")
             dispatchTokensConfirmed(attributes: attributes, parent: event)
             dispatchSyncResult(status: Keys.STATUS_SUCCESS, reason: "", attributes: attributes, parent: event)
         } else {
             let reason = event.data?[Keys.REASON] as? String ?? Keys.UNKNOWN_REASON
             Log.warning(label: IdentityConstants.LOG_TAG,
-                        "\(Self.LOG_SOURCE) - Device attribute sync failed (request '\(requestId)') with status '\(status ?? "missing")' " +
+                        "\(Self.LOG_SOURCE) - Operational data sync failed (request '\(requestId)') with status '\(status ?? "missing")' " +
                             "and reason '\(reason)'. Values remain unsynced.")
             dispatchSyncResult(status: Keys.STATUS_FAILED, reason: reason, attributes: attributes, parent: event)
         }
@@ -143,9 +143,9 @@ final class DeviceAttributeSync {
 
     /// Dispatches the sync result for a request, with `parent` as its parent event. `attributes` must not contain `app`.
     private func dispatchSyncResult(status: String, reason: String, attributes: [String: Any], parent: Event) {
-        typealias Keys = IdentityConstants.DeviceAttributes
+        typealias Keys = IdentityConstants.OperationalData
         let data: [String: Any] = [Keys.STATUS: status, Keys.REASON: reason, Keys.ATTRIBUTES: attributes]
-        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_SYNC_RESULT,
+        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.OPERATIONAL_DATA_SYNC_RESULT,
                                                           type: EventType.edgeIdentity,
                                                           source: EventSource.responseContent,
                                                           data: data))
@@ -154,26 +154,26 @@ final class DeviceAttributeSync {
     /// Tells Messaging which tokens Edge confirmed, with `parent` as the parent event. Nothing is dispatched without
     /// tokens.
     private func dispatchTokensConfirmed(attributes: [String: Any], parent: Event) {
-        guard let tokens = attributes[IdentityConstants.DeviceAttributes.TOKENS] as? [String: Any], !tokens.isEmpty else { return }
-        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.DEVICE_ATTRIBUTES_CONFIRMED,
+        guard let tokens = attributes[IdentityConstants.OperationalData.TOKENS] as? [String: Any], !tokens.isEmpty else { return }
+        runtime.dispatch(event: parent.createChainedEvent(name: IdentityConstants.EventNames.OPERATIONAL_DATA_CONFIRMED,
                                                           type: EventType.messaging,
                                                           source: EventSource.responseContent,
-                                                          data: [IdentityConstants.DeviceAttributes.TOKENS: tokens]))
+                                                          data: [IdentityConstants.OperationalData.TOKENS: tokens]))
     }
 
     /// A response matches when its parent event is the active request or its `requestEventId` names it.
     private func isResponseToActiveRequest(_ event: Event) -> Bool {
         guard let request = activeRequest else { return false }
         return event.parentID == request.id ||
-            event.data?[IdentityConstants.DeviceAttributes.REQUEST_EVENT_ID] as? String == request.id.uuidString
+            event.data?[IdentityConstants.OperationalData.REQUEST_EVENT_ID] as? String == request.id.uuidString
     }
 
-    /// Returns the values their owners already hold, in the same shape as the device attributes: the timezone set
+    /// Returns the values their owners already hold, in the same shape as the operational data: the timezone set
     /// through the profile attributes API and the push token in Messaging's shared state.
     /// iOS only: the push-to-start token list is owner-held when Messaging holds every token in it, so `attributes`
     /// is needed to build it.
     private func ownerValues(_ attributes: [String: Any]) -> [String: Any] {
-        typealias Keys = IdentityConstants.DeviceAttributes
+        typealias Keys = IdentityConstants.OperationalData
         typealias Messaging = IdentityConstants.SharedState.Messaging
         var owners: [String: Any] = [:]
         if let timezone = profileTimezone() {
@@ -237,10 +237,10 @@ final class DeviceAttributeSync {
     }
 
     /// Dispatches a failed result for the active request and each queued request, then clears them and all confirmed
-    /// device attributes and republishes the profile attributes. The profile attribute store itself is cleared by
+    /// operational data and republishes the profile attributes. The profile attribute store itself is cleared by
     /// `Identity.handleRequestReset`.
     func reset(event: Event) {
-        typealias Keys = IdentityConstants.DeviceAttributes
+        typealias Keys = IdentityConstants.OperationalData
         if let request = activeRequest {
             dispatchSyncResult(status: Keys.STATUS_FAILED,
                                reason: Keys.REASON_IDENTITY_RESET,
@@ -258,12 +258,12 @@ final class DeviceAttributeSync {
         deduplicator.clear()
         publishProfileAttributes(event: event)
         Log.debug(label: IdentityConstants.LOG_TAG,
-                  "\(Self.LOG_SOURCE) - Cleared device attribute requests and synced values after identity reset.")
+                  "\(Self.LOG_SOURCE) - Cleared operational data requests and synced values after identity reset.")
     }
 
     /// iOS only: removes the confirmed Live Activity push-to-start tokens when Messaging clears its Live Activities.
     func handleClearLiveActivities(event: Event) {
-        typealias Keys = IdentityConstants.DeviceAttributes
+        typealias Keys = IdentityConstants.OperationalData
         guard event.data?[Keys.CLEAR_LIVE_ACTIVITIES] as? Bool == true else { return }
         deduplicator.clearLiveActivityStart()
         publishProfileAttributes(event: event)
@@ -271,7 +271,7 @@ final class DeviceAttributeSync {
                   "\(Self.LOG_SOURCE) - Cleared Live Activity tokens after Messaging cleared Live Activities.")
     }
 
-    /// Publishes the confirmed device attributes, merged with the timezone from the profile attribute store, in the
+    /// Publishes the confirmed operational data, merged with the timezone from the profile attribute store, in the
     /// standard shared state.
     func publishProfileAttributes(event: Event?) {
         runtime.createSharedState(data: [IdentityConstants.ProfileAttributes.SHARED_STATE_KEY: profileAttributes()], event: event)
@@ -287,7 +287,7 @@ final class DeviceAttributeSync {
     private func profileAttributes() -> [String: Any] {
         var attributes = deduplicator.readSynced()
         if let timezone = profileTimezone() {
-            attributes[IdentityConstants.DeviceAttributes.TIMEZONE] = timezone
+            attributes[IdentityConstants.OperationalData.TIMEZONE] = timezone
         }
         return attributes
     }
@@ -295,7 +295,7 @@ final class DeviceAttributeSync {
     private func profileTimezone() -> String? {
         return ServiceProvider.shared.namedKeyValueService
             .get(collectionName: IdentityConstants.ProfileAttributes.STORE_NAME,
-                 key: IdentityConstants.DeviceAttributes.TIME_ZONE) as? String
+                 key: IdentityConstants.OperationalData.TIME_ZONE) as? String
     }
 
     private func configuration() -> [String: Any] {

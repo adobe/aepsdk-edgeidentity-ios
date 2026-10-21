@@ -29,12 +29,12 @@ import Foundation
     // an additional attribute — the collector in handleProfileAttributes is attribute-agnostic.
     private let profileAttributeHandlers: [ProfileAttributeHandler] = [TimeZoneAttributeHandler()]
 
-    private let deviceAttributeSync: DeviceAttributeSync
+    private let operationalDataSync: OperationalDataSync
 
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         state = IdentityState(identityProperties: IdentityProperties())
-        deviceAttributeSync = DeviceAttributeSync(runtime: runtime)
+        operationalDataSync = OperationalDataSync(runtime: runtime)
         super.init()
     }
 
@@ -42,19 +42,19 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
-        registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent, listener: handleDeviceAttributes)
+        registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent, listener: handleOperationalData)
         registerListener(type: EventType.edgeIdentity,
-                         source: IdentityConstants.DeviceAttributes.RULE_RESPONSE_SOURCE,
-                         listener: deviceAttributeSync.handleDeviceAttributeRuleResponse)
-        registerListener(type: IdentityConstants.DeviceAttributes.BYPASS_TYPE,
+                         source: IdentityConstants.OperationalData.RULE_RESPONSE_SOURCE,
+                         listener: operationalDataSync.handleOperationalDataRuleResponse)
+        registerListener(type: IdentityConstants.OperationalData.EDGE_DEVICE_ATTRIBUTES_TYPE,
                          source: EventSource.responseContent,
-                         listener: deviceAttributeSync.handleDeviceAttributeResult)
-        registerListener(type: EventType.messaging, source: EventSource.requestContent, listener: deviceAttributeSync.handleClearLiveActivities)
+                         listener: operationalDataSync.handleOperationalDataResult)
+        registerListener(type: EventType.messaging, source: EventSource.requestContent, listener: operationalDataSync.handleClearLiveActivities)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
-        deviceAttributeSync.publishStoredProfileAttributes()
+        operationalDataSync.publishStoredProfileAttributes()
     }
 
     public func onUnregistered() {
@@ -134,7 +134,7 @@ import Foundation
             return
         }
         createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)
-        deviceAttributeSync.publishProfileAttributes(event: event)
+        operationalDataSync.publishProfileAttributes(event: event)
         dispatchProfileAttributesEdgeEvent(xdmData: merged)
     }
 
@@ -245,21 +245,21 @@ import Foundation
             ServiceProvider.shared.namedKeyValueService.remove(
                 collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: handler.attributeKey)
         }
-        deviceAttributeSync.reset(event: event)
+        operationalDataSync.reset(event: event)
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,
                                eventDispatcher: dispatch(event:))
     }
 
-    /// Forwards the `updateDeviceAttributesBypassConsent` request. Other events also use the edgeIdentity type and
+    /// Forwards the `updateOperationalData` request. Other events also use the edgeIdentity type and
     /// requestContent source, so only the event from this API is handled.
-    private func handleDeviceAttributes(event: Event) {
-        guard event.name == IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES else {
-            Log.trace(label: IdentityConstants.LOG_TAG, "Identity - Ignoring device attribute event with unexpected name '\(event.name)'.")
+    private func handleOperationalData(event: Event) {
+        guard event.name == IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA else {
+            Log.trace(label: IdentityConstants.LOG_TAG, "Identity - Ignoring operational data event with unexpected name '\(event.name)'.")
             return
         }
-        deviceAttributeSync.handleDeviceAttributes(event: event)
+        operationalDataSync.handleOperationalData(event: event)
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.

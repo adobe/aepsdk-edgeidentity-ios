@@ -16,7 +16,7 @@ Refer to the [Getting Started Guide](getting-started.md)
 | [removeIdentity](#removeIdentity)                     |
 | [resetIdentities](#resetIdentities)                   |
 | [setAdvertisingIdentifier](#setAdvertisingIdentifier) |
-| [updateDeviceAttributesBypassConsent](#updateDeviceAttributesBypassConsent) |
+| [updateOperationalData](#updateOperationalData)       |
 | [updateIdentities](#updateIdentities)                 |
 
 ------
@@ -437,9 +437,9 @@ func setAdvertisingIdentifierUsingTrackingManager() {
 ```
 ------
 
-### updateDeviceAttributesBypassConsent
+### updateOperationalData
 
-Sends device attributes to the Edge Network **independently of collect consent**. Use it for operational data, such as the device timezone and push tokens, that must reach the profile even when the user has not consented to data collection.
+Sends operational data, such as the device timezone and push tokens, to the Edge Network **independently of collect consent**. Use it for data that must reach the profile even when the user has not consented to data collection.
 
 The attributes are forwarded to the rules engine, and only the values returned by a Launch rule with a forward operational data consequence are sent to the Edge Network. The SDK adds an `app` entry with the bundle identifier and the APNs platform (`apns`, or `apnsSandbox` when `messaging.useSandbox` is `true`). Requests are sent one at a time.
 
@@ -453,12 +453,12 @@ Each request ends with an event of type `com.adobe.eventType.edgeIdentity` and s
 
 ##### Syntax
 ```swift
-static func updateDeviceAttributesBypassConsent(_ attributes: [String: Any])
+static func updateOperationalData(_ attributes: [String: Any])
 ```
 
 ##### Example
 ```swift
-Identity.updateDeviceAttributesBypassConsent([
+Identity.updateOperationalData([
     "timezone": "America/Los_Angeles",
     "tokens": [
         "pushNotification": "<push token>",
@@ -471,12 +471,12 @@ Identity.updateDeviceAttributesBypassConsent([
 
 ##### Syntax
 ```objectivec
-+ (void) updateDeviceAttributesBypassConsent:(NSDictionary<NSString *, id> * _Nonnull)attributes;
++ (void) updateOperationalData:(NSDictionary<NSString *, id> * _Nonnull)attributes;
 ```
 
 ##### Example
 ```objectivec
-[AEPMobileEdgeIdentity updateDeviceAttributesBypassConsent:@{
+[AEPMobileEdgeIdentity updateOperationalData:@{
     @"timezone": @"America/Los_Angeles",
     @"tokens": @{@"pushNotification": @"<push token>"}
 }];

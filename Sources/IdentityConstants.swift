@@ -59,7 +59,7 @@ enum IdentityConstants {
 
         static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
 
-        // Standard shared state key holding the confirmed device attributes merged with the profile attributes timezone.
+        // Standard shared state key holding the confirmed operational data merged with the profile attributes timezone.
         static let SHARED_STATE_KEY = "profileAttributes"
 
         enum XDM {
@@ -71,10 +71,10 @@ enum IdentityConstants {
 
     }
 
-    /// Constants for sending device attributes regardless of collect consent (`updateDeviceAttributesBypassConsent` API).
-    enum DeviceAttributes {
+    /// Constants for sending operational data regardless of collect consent (`updateOperationalData` API).
+    enum OperationalData {
         static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
-        static let BYPASS_TYPE = "com.adobe.eventType.edgeBypassConsent"
+        static let EDGE_DEVICE_ATTRIBUTES_TYPE = "com.adobe.eventType.edgeDeviceAttributes"
         static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
         static let OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC = "edgeidentity.optimizeOperationalProfileDataSync"
 
@@ -120,11 +120,11 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
         static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
-        static let UPDATE_DEVICE_ATTRIBUTES = "Update Device Attributes"
-        static let DEVICE_ATTRIBUTES_TO_RULES_ENGINE = "Device attributes for rules engine"
-        static let DEVICE_ATTRIBUTES_EDGE_REQUEST = "Edge bypass request"
-        static let DEVICE_ATTRIBUTES_SYNC_RESULT = "Device Attributes Sync Result"
-        static let DEVICE_ATTRIBUTES_CONFIRMED = "Device attributes confirmed"
+        static let UPDATE_OPERATIONAL_DATA = "Update Operational Data"
+        static let OPERATIONAL_DATA_TO_RULES_ENGINE = "Operational data for rules engine"
+        static let EDGE_DEVICE_ATTRIBUTES_REQUEST = "Edge device attributes request"
+        static let OPERATIONAL_DATA_SYNC_RESULT = "Operational Data Sync Result"
+        static let OPERATIONAL_DATA_CONFIRMED = "Operational data confirmed"
     }
 
     enum EventDataKeys {
@@ -135,7 +135,7 @@ enum IdentityConstants {
 
     enum DataStoreKeys {
         static let IDENTITY_PROPERTIES = "identity.properties"
-        static let DEVICE_ATTRIBUTES_DATASTORE_NAME = "com.adobe.mobilecore.deviceAttributes"
+        static let OPERATIONAL_DATA_DATASTORE_NAME = "com.adobe.mobilecore.operationalData"
     }
 
     enum Namespaces {

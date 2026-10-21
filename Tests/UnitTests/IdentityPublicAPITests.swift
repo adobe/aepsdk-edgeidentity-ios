@@ -317,15 +317,15 @@ class IdentityAPITests: XCTestCase {
         Identity.removeIdentity(item: IdentityItem(id: ""), withNamespace: "")
     }
 
-    // MARK: - updateDeviceAttributesBypassConsent
+    // MARK: - updateOperationalData
 
-    /// Tests that updateDeviceAttributesBypassConsent dispatches the open map as-is, including arbitrary keys.
-    func testUpdateDeviceAttributes_dispatchesMapAsIs() {
+    /// Tests that updateOperationalData dispatches the open map as-is, including arbitrary keys.
+    func testUpdateOperationalData_dispatchesMapAsIs() {
         // setup
-        let expectation = XCTestExpectation(description: "updateDeviceAttributesBypassConsent should dispatch an event")
+        let expectation = XCTestExpectation(description: "updateOperationalData should dispatch an event")
         expectation.assertForOverFulfill = true
         EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { event in
-            XCTAssertEqual(IdentityConstants.EventNames.UPDATE_DEVICE_ATTRIBUTES, event.name)
+            XCTAssertEqual(IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA, event.name)
             XCTAssertEqual("America/Los_Angeles", event.data?["timezone"] as? String)
             XCTAssertEqual("push-token-123", event.data?["pushNotification"] as? String)
             XCTAssertEqual("", (event.data?["tokens"] as? [String: Any])?["pushNotification"] as? String)
@@ -335,7 +335,7 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.updateDeviceAttributesBypassConsent(["timezone": "America/Los_Angeles",
+        Identity.updateOperationalData(["timezone": "America/Los_Angeles",
                                                       "pushNotification": "push-token-123",
                                                       "tokens": ["pushNotification": ""],
                                                       "customCount": 5])
@@ -344,8 +344,8 @@ class IdentityAPITests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    /// Tests that updateDeviceAttributesBypassConsent with an empty map does not dispatch an event.
-    func testUpdateDeviceAttributes_emptyMap_doesNotDispatch() {
+    /// Tests that updateOperationalData with an empty map does not dispatch an event.
+    func testUpdateOperationalData_emptyMap_doesNotDispatch() {
         // setup
         let expectation = XCTestExpectation(description: "Empty attributes must not dispatch")
         expectation.isInverted = true
@@ -354,7 +354,7 @@ class IdentityAPITests: XCTestCase {
         }
 
         // test
-        Identity.updateDeviceAttributesBypassConsent([:])
+        Identity.updateOperationalData([:])
         wait(for: [expectation], timeout: 0.1)
     }
 }
