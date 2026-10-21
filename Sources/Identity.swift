@@ -42,7 +42,9 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
-        registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent, listener: handleOperationalData)
+        registerListener(type: EventType.edgeIdentity,
+                         source: IdentityConstants.OperationalData.REQUEST_SOURCE,
+                         listener: operationalDataSync.handleOperationalData)
         registerListener(type: EventType.edgeIdentity,
                          source: IdentityConstants.OperationalData.RULE_RESPONSE_SOURCE,
                          listener: operationalDataSync.handleOperationalDataRuleResponse)
@@ -250,16 +252,6 @@ import Foundation
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,
                                eventDispatcher: dispatch(event:))
-    }
-
-    /// Forwards the `updateOperationalData` request. Other events also use the edgeIdentity type and
-    /// requestContent source, so only the event from this API is handled.
-    private func handleOperationalData(event: Event) {
-        guard event.name == IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA else {
-            Log.trace(label: IdentityConstants.LOG_TAG, "Identity - Ignoring operational data event with unexpected name '\(event.name)'.")
-            return
-        }
-        operationalDataSync.handleOperationalData(event: event)
     }
 
     /// Handler for `EventType.hub` `EventSource.sharedState` events.

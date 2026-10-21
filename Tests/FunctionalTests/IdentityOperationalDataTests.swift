@@ -66,7 +66,7 @@ class IdentityOperationalDataTests: XCTestCase {
     private func makeOperationalDataEvent(_ data: [String: Any]) -> Event {
         return Event(name: IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA,
                      type: EventType.edgeIdentity,
-                     source: EventSource.requestContent,
+                     source: IdentityConstants.OperationalData.REQUEST_SOURCE,
                      data: data)
     }
 
@@ -401,18 +401,36 @@ class IdentityOperationalDataTests: XCTestCase {
         XCTAssertEqual(1, edgeEvents().count)
     }
 
-    // MARK: - Only the API's own request is forwarded
+    // MARK: - The request is matched by event type and source, not by event name
 
-    func testOtherEventOnSameTypeAndSource_isNotForwarded() {
-        let otherEvent = Event(name: "Some Other Request",
-                               type: EventType.edgeIdentity,
-                               source: EventSource.requestContent,
-                               data: ["timezone": "Asia/Kolkata", "secret": "value"])
+    func testOnRegistered_registersOperationalDataListenerOnRequestOperationalDataSource() {
+        XCTAssertNotNil(mockRuntime.getListener(type: EventType.edgeIdentity,
+                                               source: "com.adobe.eventSource.requestOperationalData"))
+    }
 
-        mockRuntime.simulateComingEvents(otherEvent)
+    func testRequestContentEvent_doesNotReachOperationalDataSync() {
+        mockRuntime.simulateComingEvents(Event(name: IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA,
+                                               type: EventType.edgeIdentity,
+                                               source: EventSource.requestContent,
+                                               data: ["timezone": "UTC"]))
 
-        XCTAssertTrue(operationalEvents().isEmpty)
-        XCTAssertTrue(syncedOperationalDataValues().isEmpty, "Ignored events must not be recorded as synced")
+        XCTAssertTrue(mockRuntime.dispatchedEvents.isEmpty)
+        XCTAssertTrue(syncedOperationalDataValues().isEmpty)
+    }
+
+    func testRequestOperationalDataEventWithOtherName_isSentToRulesEngine() {
+        let event = Event(name: "Other Name",
+                          type: EventType.edgeIdentity,
+                          source: IdentityConstants.OperationalData.REQUEST_SOURCE,
+                          data: ["timezone": "UTC"])
+
+        mockRuntime.simulateComingEvents(event)
+
+        XCTAssertEqual(1, mockRuntime.dispatchedEvents.count)
+        let rulesEvent = mockRuntime.dispatchedEvents[0]
+        XCTAssertEqual(IdentityConstants.OperationalData.OPERATIONAL_DATA_TYPE, rulesEvent.type)
+        XCTAssertEqual(event.id, rulesEvent.parentID)
+        XCTAssertEqual("UTC", rulesEvent.data?["timezone"] as? String)
     }
 
     // MARK: - Reset

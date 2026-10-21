@@ -324,8 +324,10 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "updateOperationalData should dispatch an event")
         expectation.assertForOverFulfill = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { event in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: IdentityConstants.OperationalData.REQUEST_SOURCE) { event in
             XCTAssertEqual(IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA, event.name)
+            XCTAssertEqual(EventType.edgeIdentity, event.type)
+            XCTAssertEqual("com.adobe.eventSource.requestOperationalData", event.source)
             XCTAssertEqual("America/Los_Angeles", event.data?["timezone"] as? String)
             XCTAssertEqual("push-token-123", event.data?["pushNotification"] as? String)
             XCTAssertEqual("", (event.data?["tokens"] as? [String: Any])?["pushNotification"] as? String)
@@ -349,7 +351,7 @@ class IdentityAPITests: XCTestCase {
         // setup
         let expectation = XCTestExpectation(description: "Empty attributes must not dispatch")
         expectation.isInverted = true
-        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: EventSource.requestContent) { _ in
+        EventHub.shared.getExtensionContainer(MockExtension.self)?.registerListener(type: EventType.edgeIdentity, source: IdentityConstants.OperationalData.REQUEST_SOURCE) { _ in
             expectation.fulfill()
         }
 

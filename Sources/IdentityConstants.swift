@@ -73,6 +73,7 @@ enum IdentityConstants {
 
     /// Constants for sending operational data regardless of collect consent (`updateOperationalData` API).
     enum OperationalData {
+        static let REQUEST_SOURCE = "com.adobe.eventSource.requestOperationalData"
         static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
         static let EDGE_DEVICE_ATTRIBUTES_TYPE = "com.adobe.eventType.edgeDeviceAttributes"
         static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"

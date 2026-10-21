@@ -150,7 +150,7 @@ import Foundation
         }
         let event = Event(name: IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA,
                           type: EventType.edgeIdentity,
-                          source: EventSource.requestContent,
+                          source: IdentityConstants.OperationalData.REQUEST_SOURCE,
                           data: attributes)
         MobileCore.dispatch(event: event)
     }
