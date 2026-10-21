@@ -39,6 +39,7 @@ jobs:
     uses: adobe/aepsdk-commons/.github/workflows/ios-release.yml@gha-ios-5.3.5
     with:
       tag: ${{ github.event.inputs.tag }}
+      xcode-version: '16.4'
       create-github-release: ${{ github.event.inputs.create-github-release == 'true' && 'AEPEdgeIdentity' || '' }}
       pod-publish-extensions: ${{ github.event.inputs.pod-publish-extensions == 'true' && 'AEPEdgeIdentity' || '' }}
       version-validation-paths: AEPEdgeIdentity.podspec, AEPEdgeIdentity.xcodeproj/project.pbxproj, Sources/IdentityConstants.swift

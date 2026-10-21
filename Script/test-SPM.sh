@@ -71,6 +71,10 @@ xcodebuild build -scheme TestProject -destination 'generic/platform=iOS'
 echo '############# Build for x86_64 iOS simulator ###############'
 xcodebuild build -scheme TestProject -destination 'generic/platform=iOS Simulator' ARCHS=x86_64
 
+# Ensure tvOS SDK is available before generic tvOS builds (release CI downloads iOS only).
+echo '############# Download tvOS platform if needed ###############'
+xcodebuild -downloadPlatform tvOS
+
 # Archive for generic tvOS device
 echo '############# Archive for generic tvOS device ###############'
 xcodebuild archive -scheme TestProject -destination 'generic/platform=tvOS'
