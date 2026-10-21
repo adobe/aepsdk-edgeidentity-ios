@@ -29,9 +29,12 @@ import Foundation
     // an additional attribute — the collector in handleProfileAttributes is attribute-agnostic.
     private let profileAttributeHandlers: [ProfileAttributeHandler] = [TimeZoneAttributeHandler()]
 
+    private let operationalDataSync: OperationalDataSync
+
     public required init?(runtime: ExtensionRuntime) {
         self.runtime = runtime
         state = IdentityState(identityProperties: IdentityProperties())
+        operationalDataSync = OperationalDataSync(runtime: runtime)
         super.init()
     }
 
@@ -39,10 +42,21 @@ import Foundation
         registerListener(type: EventType.edgeIdentity, source: EventSource.requestIdentity, listener: handleIdentityRequest)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestContent, listener: handleRequestContent)
         registerListener(type: EventType.genericProfileAttributes, source: EventSource.requestContent, listener: handleProfileAttributes)
+        registerListener(type: EventType.edgeIdentity,
+                         source: IdentityConstants.OperationalData.REQUEST_SOURCE,
+                         listener: operationalDataSync.handleOperationalData)
+        registerListener(type: EventType.edgeIdentity,
+                         source: IdentityConstants.OperationalData.RULE_RESPONSE_SOURCE,
+                         listener: operationalDataSync.handleOperationalDataRuleResponse)
+        registerListener(type: IdentityConstants.OperationalData.EDGE_DEVICE_ATTRIBUTES_TYPE,
+                         source: EventSource.responseContent,
+                         listener: operationalDataSync.handleOperationalDataResult)
+        registerListener(type: EventType.messaging, source: EventSource.requestContent, listener: operationalDataSync.handleClearLiveActivities)
         registerListener(type: EventType.edgeIdentity, source: EventSource.updateIdentity, listener: handleUpdateIdentity)
         registerListener(type: EventType.edgeIdentity, source: EventSource.removeIdentity, listener: handleRemoveIdentity)
         registerListener(type: EventType.genericIdentity, source: EventSource.requestReset, listener: handleRequestReset)
         registerListener(type: EventType.hub, source: EventSource.sharedState, listener: handleHubSharedState)
+        operationalDataSync.publishStoredProfileAttributes()
     }
 
     public func onUnregistered() {
@@ -86,7 +100,7 @@ import Foundation
         var data = baseData
         let merged = collectStoredAttributes()
         if !merged.isEmpty {
-            data[IdentityConstants.ProfileAttributes.STORE_NAME] = merged
+            data[IdentityConstants.XDMKeys.PROFILE_ATTRIBUTES] = merged
         }
         return data
     }
@@ -109,11 +123,8 @@ import Foundation
     private func handleProfileAttributes(event: Event) {
         guard let eventData = event.data, !eventData.isEmpty else {
             Log.debug(label: friendlyName, "\(#function) - Event data empty, skipping.")
-            let resolver = createPendingXDMSharedState(event: event)
-            resolver(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
             return
         }
-        let resolver = createPendingXDMSharedState(event: event)
         var merged: [String: String] = [:]
         for handler in profileAttributeHandlers {
             guard eventData.keys.contains(handler.attributeKey) else { continue }
@@ -122,17 +133,11 @@ import Foundation
         }
         guard !merged.isEmpty else {
             Log.debug(label: friendlyName, "\(#function) - No attribute changes from any handler, skipping dispatch.")
-            resolver(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
             return
         }
-        publishProfileAttributesSharedState(merged, event: event, resolveSharedState: resolver)
-    }
-
-    // MARK: - Shared state + Edge dispatch
-
-    private func publishProfileAttributesSharedState(_ xdm: [String: String], event: Event, resolveSharedState: ([String: Any]) -> Void) {
-        resolveSharedState(enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()))
-        dispatchProfileAttributesEdgeEvent(xdmData: xdm)
+        createXDMSharedState(data: enrichWithProfileAttributes(baseData: state.identityProperties.toXdmData()), event: event)
+        operationalDataSync.publishProfileAttributes(event: event)
+        dispatchProfileAttributesEdgeEvent(xdmData: merged)
     }
 
     // MARK: - Edge event dispatch
@@ -242,6 +247,7 @@ import Foundation
             ServiceProvider.shared.namedKeyValueService.remove(
                 collectionName: IdentityConstants.ProfileAttributes.STORE_NAME, key: handler.attributeKey)
         }
+        operationalDataSync.reset(event: event)
         let resolver = createPendingXDMSharedState(event: event)
         state.resetIdentifiers(event: event,
                                resolveXDMSharedState: resolver,
@@ -270,4 +276,3 @@ import Foundation
         }
     }
 }
-

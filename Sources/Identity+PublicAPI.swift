@@ -125,6 +125,36 @@ import Foundation
         MobileCore.dispatch(event: event)
     }
 
+    /// Updates operational data that should be delivered to the Edge Network
+    /// **independently of collect consent**.
+    ///
+    /// Accepts an open map. Only values that a Launch rule allows are sent to Edge.
+    /// The timezone (`timezone`), push token (`tokens.pushNotification`) and Live Activity push-to-start tokens
+    /// (`tokens.liveActivityStart`) are sent only when they change from the last values Edge confirmed, whatever the
+    /// collect consent; all other values are always sent.
+    /// When collect consent is `"y"`, or the Consent extension is not registered, they are also not sent when they
+    /// match the timezone set through the profile attributes API or Messaging's push token and push-to-start tokens
+    /// (disable all comparisons with `edgeidentity.optimizeOperationalProfileDataSync: false`).
+    /// Values from a failed request are not stored as confirmed, so a later API call may send them again.
+    /// Every dispatched update also carries an SDK-generated `app { id, platform }` entry, using the bundle identifier
+    /// and the latest `messaging.useSandbox` setting at send time. Caller-provided `app` values do not override routing.
+    ///
+    /// - Parameter attributes: Map of attribute key to a JSON-compatible value (`String`, `NSNumber`/`Bool`,
+    ///   or arrays/dictionaries of those). Values are not validated by the SDK and are sent as provided.
+    ///   An empty map is a no-op.
+    @objc(updateOperationalData:)
+    static func updateOperationalData(_ attributes: [String: Any]) {
+        guard !attributes.isEmpty else {
+            Log.warning(label: IdentityConstants.LOG_TAG, "Identity - Unable to update operational data, attributes are null or empty.")
+            return
+        }
+        let event = Event(name: IdentityConstants.EventNames.UPDATE_OPERATIONAL_DATA,
+                          type: EventType.edgeIdentity,
+                          source: IdentityConstants.OperationalData.REQUEST_SOURCE,
+                          data: attributes)
+        MobileCore.dispatch(event: event)
+    }
+
     /// Removes the identity from the stored client-side `IdentityMap`. The Identity extension will stop sending this identifier.
     /// This does not clear the identifier from the User Profile Graph.
     /// - Parameters:
