@@ -16,6 +16,7 @@ Refer to the [Getting Started Guide](getting-started.md)
 | [removeIdentity](#removeIdentity)                     |
 | [resetIdentities](#resetIdentities)                   |
 | [setAdvertisingIdentifier](#setAdvertisingIdentifier) |
+| [updateOperationalData](#updateOperationalData)       |
 | [updateIdentities](#updateIdentities)                 |
 
 ------
@@ -434,6 +435,53 @@ func setAdvertisingIdentifierUsingTrackingManager() {
     }];
 }
 ```
+------
+
+### updateOperationalData
+
+Sends operational data, such as the device timezone and push tokens, to the Edge Network **independently of collect consent**. Use it for data that must reach the profile even when the user has not consented to data collection.
+
+The attributes are forwarded to the rules engine, and only the values returned by a Launch rule with a forward operational data consequence are sent to the Edge Network. The SDK adds an `app` entry with the bundle identifier and the APNs platform (`apns`, or `apnsSandbox` when `messaging.useSandbox` is `true`). Requests are sent one at a time.
+
+The timezone (`timezone`), push token (`tokens.pushNotification`) and Live Activity push-to-start tokens (`tokens.liveActivityStart`) are sent only when they change; all other values are sent on every call. A value is unchanged when it matches the value the Edge Network last confirmed or, when collect consent is `y` (or the Consent extension is not registered), the value already held by its owner: the timezone set through the profile attributes API, or the push token and push-to-start tokens in Messaging's shared state. Set `edgeidentity.optimizeOperationalProfileDataSync` to `false` in the configuration to send every value on every call. Confirmed values are cleared by `resetIdentities`.
+
+Values are not validated by the SDK and are sent as provided. An empty map is ignored.
+
+Each request ends with an event of type `com.adobe.eventType.edgeIdentity` and source `com.adobe.eventSource.responseContent` with the `status` (`success` or `failed`), `reason` and `attributes` of the request.
+
+#### Swift
+
+##### Syntax
+```swift
+static func updateOperationalData(_ attributes: [String: Any])
+```
+
+##### Example
+```swift
+Identity.updateOperationalData([
+    "timezone": "America/Los_Angeles",
+    "tokens": [
+        "pushNotification": "<push token>",
+        "liveActivityStart": [["attributeType": "GameScoreLiveActivityAttributes", "value": "<push-to-start token>"]]
+    ]
+])
+```
+
+#### Objective-C
+
+##### Syntax
+```objectivec
++ (void) updateOperationalData:(NSDictionary<NSString *, id> * _Nonnull)attributes;
+```
+
+##### Example
+```objectivec
+[AEPMobileEdgeIdentity updateOperationalData:@{
+    @"timezone": @"America/Los_Angeles",
+    @"tokens": @{@"pushNotification": @"<push token>"}
+}];
+```
+
 ------
 
 ### updateIdentities
