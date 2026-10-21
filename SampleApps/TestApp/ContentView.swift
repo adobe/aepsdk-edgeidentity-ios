@@ -74,6 +74,12 @@ struct GetIdentitiesView: View {
     @State var urlVariablesText: String = ""
     @State var timezoneInput: String = ""
     @State var lastTimezoneStatus: String = ""
+    // Input passed to updateOperationalData exactly as written. Edit any value to send it again.
+    @State var operationalDataJSON: String =
+        #"{"timezone": "America/Los_Angeles", "tokens": {"pushNotification": "804EB6EDB22D-push-token-TEST", "# +
+        #""liveActivityStart": [{"attributeType": "GameScoreLiveActivityAttributes", "value": "la-push-to-start-token-TEST"}], "# +
+        #""liveActivityUpdate": [{"liveActivityID": "Test2", "token": "la-update-token-TEST"}]}}"#
+    @State var lastOperationalDataStatus: String = ""
 
     private let presetZones = ["America/Los_Angeles", "America/New_York", "Europe/London", "Asia/Kolkata", "Pacific/Auckland"]
     // Matches IdentityTimezoneTests.testTimezoneSync_spam5x_onlyOneEdgeEvent — self-contained dedup check.
@@ -207,6 +213,43 @@ struct GetIdentitiesView: View {
 
                 if !lastTimezoneStatus.isEmpty {
                     Text(lastTimezoneStatus)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 2)
+                }
+
+                Divider().padding(.vertical, 4)
+
+                // MARK: - Operational Data (updateOperationalData, sent regardless of collect consent)
+                Text("Operational Data — updateOperationalData")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                TextField("Operational data JSON (backend shape)", text: $operationalDataJSON)
+                    #if os(iOS)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    #endif
+                    .padding(.horizontal)
+
+                Button {
+                    // The JSON text is only converted to a dictionary; it is passed to the API exactly as written.
+                    // The SDK does not send an unchanged timezone, push token or push-to-start tokens again.
+                    guard let data = operationalDataJSON.data(using: .utf8),
+                          let attributes = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+                        lastOperationalDataStatus = "Invalid JSON object, nothing sent"
+                        return
+                    }
+                    AEPEdgeIdentity.Identity.updateOperationalData(attributes)
+                    lastOperationalDataStatus = "Called updateOperationalData with keys: \(attributes.keys.sorted())"
+                } label: {
+                    Text("Send updateOperationalData")
+                }
+                .padding(.top, 4)
+
+                if !lastOperationalDataStatus.isEmpty {
+                    Text(lastOperationalDataStatus)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.top, 2)

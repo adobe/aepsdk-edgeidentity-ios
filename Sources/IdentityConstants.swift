@@ -42,6 +42,14 @@ enum IdentityConstants {
         enum Consent {
             static let SHARED_OWNER_NAME = "com.adobe.edge.consent"
         }
+
+        enum Messaging {
+            static let SHARED_OWNER_NAME = "com.adobe.messaging"
+            static let PUSH_IDENTIFIER = "pushidentifier"
+            static let LIVE_ACTIVITY = "liveActivity"
+            static let PUSH_TO_START_TOKENS = "pushToStartTokens"
+            static let TOKEN = "token"
+        }
     }
 
     enum ProfileAttributes {
@@ -51,6 +59,9 @@ enum IdentityConstants {
 
         static let STORE_NAME = "com.adobe.mobilecore.profileAttributes"
 
+        // Standard shared state key holding the confirmed operational data merged with the profile attributes timezone.
+        static let SHARED_STATE_KEY = "profileAttributes"
+
         enum XDM {
             static let XDM_KEY = "xdm"
             static let DATA_KEY = "data"
@@ -58,6 +69,45 @@ enum IdentityConstants {
             static let PROFILE_UPDATE_EVENT_TYPE = "profile.updateAttributes"
         }
 
+    }
+
+    /// Constants for sending operational data regardless of collect consent (`updateOperationalData` API).
+    enum OperationalData {
+        static let REQUEST_SOURCE = "com.adobe.eventSource.requestOperationalData"
+        static let RULE_RESPONSE_SOURCE = "com.adobe.eventSource.responseOperationalData"
+        static let EDGE_DEVICE_ATTRIBUTES_TYPE = "com.adobe.eventType.edgeDeviceAttributes"
+        static let OPERATIONAL_DATA_TYPE = "com.adobe.eventType.generic.operationalData"
+        static let OPTIMIZE_OPERATIONAL_PROFILE_DATA_SYNC = "edgeidentity.optimizeOperationalProfileDataSync"
+
+        static let TIME_ZONE = "timeZone"
+        static let TIMEZONE = "timezone"
+        static let TOKENS = "tokens"
+        static let PUSH_NOTIFICATION = "pushNotification"
+        static let APP = "app"
+        static let APP_ID = "id"
+        static let APP_PLATFORM = "platform"
+
+        static let STATUS = "status"
+        static let STATUS_SUCCESS = "success"
+        static let STATUS_FAILED = "failed"
+        static let REASON = "reason"
+        static let REQUEST_EVENT_ID = "requestEventId"
+        static let ATTRIBUTES = "attributes"
+        static let UNKNOWN_REASON = "unknown"
+        static let REASON_UNCHANGED = "unchanged"
+        static let REASON_IDENTITY_RESET = "identityReset"
+        static let REASON_MISSING_APP_IDENTIFIER = "missingAppIdentifier"
+
+        // iOS only: Live Activity tokens and the Messaging clear Live Activities event.
+        static let LIVE_ACTIVITY_START = "liveActivityStart"
+        static let ATTRIBUTE_TYPE = "attributeType"
+        static let VALUE = "value"
+        static let CLEAR_LIVE_ACTIVITIES = "isClearLiveActivitiesEvent"
+
+        // iOS only: the APNs platform is derived from the Messaging `messaging.useSandbox` setting.
+        static let MESSAGING_USE_SANDBOX = "messaging.useSandbox"
+        static let PLATFORM_APNS = "apns"
+        static let PLATFORM_APNS_SANDBOX = "apnsSandbox"
     }
 
     enum EventNames {
@@ -71,6 +121,11 @@ enum IdentityConstants {
         static let IDENTITY_RESPONSE_CONTENT_ONE_TIME = "Edge Identity Response Content One Time"
         static let RESET_IDENTITIES_COMPLETE = "Edge Identity Reset Identities Complete"
         static let UPDATE_PROFILE_ATTRIBUTES = "Update Profile Attributes"
+        static let UPDATE_OPERATIONAL_DATA = "Update Operational Data"
+        static let OPERATIONAL_DATA_TO_RULES_ENGINE = "Operational data for rules engine"
+        static let EDGE_DEVICE_ATTRIBUTES_REQUEST = "Edge device attributes request"
+        static let OPERATIONAL_DATA_SYNC_RESULT = "Operational Data Sync Result"
+        static let OPERATIONAL_DATA_CONFIRMED = "Operational data confirmed"
     }
 
     enum EventDataKeys {
@@ -81,6 +136,7 @@ enum IdentityConstants {
 
     enum DataStoreKeys {
         static let IDENTITY_PROPERTIES = "identity.properties"
+        static let OPERATIONAL_DATA_DATASTORE_NAME = "com.adobe.mobilecore.operationalData"
     }
 
     enum Namespaces {
@@ -97,6 +153,7 @@ enum IdentityConstants {
 
     enum XDMKeys {
         static let IDENTITY_MAP = "identityMap"
+        static let PROFILE_ATTRIBUTES = "com.adobe.mobilecore.profileAttributes"
 
         enum Consent {
             static let CONSENTS = "consents"
