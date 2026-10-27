@@ -105,11 +105,11 @@ struct GetIdentitiesView: View {
                 self.ecidIdentityText = ""
 
                 AEPEdgeIdentity.Identity.getExperienceCloudId { ecid, _ in
-                    self.ecidEdgeIdentityText = ecid ?? "no ECID value found"
+                    DispatchQueue.main.async { self.ecidEdgeIdentityText = ecid ?? "no ECID value found" }
                 }
 
                 AEPIdentity.Identity.getExperienceCloudId { ecid, _ in
-                    self.ecidIdentityText = ecid ?? ""
+                    DispatchQueue.main.async { self.ecidIdentityText = ecid ?? "" }
                 }
             } label: {
                 Text("Get ECID")
@@ -119,7 +119,7 @@ struct GetIdentitiesView: View {
                 self.urlVariablesText = ""
 
                 AEPEdgeIdentity.Identity.getUrlVariables { urlVariablesString, _ in
-                    self.urlVariablesText = urlVariablesString ?? "URLVariables not generated"
+                    DispatchQueue.main.async { self.urlVariablesText = urlVariablesString ?? "URLVariables not generated" }
                 }
             } label: {
                 Text("Get URLVariables")
@@ -139,17 +139,20 @@ struct GetIdentitiesView: View {
                 Button {
                     self.identityMapText = ""
                     AEPEdgeIdentity.Identity.getIdentities { identityMap, _ in
+                        // Build the display string on the callback queue; only the String crosses to main.
+                        let text: String
                         if let identityMap = identityMap {
                             let encoder = JSONEncoder()
                             encoder.outputFormatting = .prettyPrinted
-                            guard let data = try? encoder.encode(identityMap) else {
-                                self.identityMapText = "failed to encode IdentityMap"
-                                return
+                            if let data = try? encoder.encode(identityMap) {
+                                text = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
+                            } else {
+                                text = "failed to encode IdentityMap"
                             }
-                            self.identityMapText = String(data: data, encoding: .utf8) ?? "failed to encode JSON to string"
                         } else {
-                            self.identityMapText = "IdentityMap was nil"
+                            text = "IdentityMap was nil"
                         }
+                        DispatchQueue.main.async { self.identityMapText = text }
                     }
                 } label: {
                     Text("Get Identities")

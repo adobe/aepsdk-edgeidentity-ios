@@ -21,7 +21,7 @@ import Foundation
     /// - Parameter completion: invoked once the Experience Cloud ID is available, or
     ///                         an `AEPError` if an unexpected error occurs or the request timed out.
     @objc(getExperienceCloudId:)
-    static func getExperienceCloudId(completion: @escaping (String?, Error?) -> Void) {
+    @preconcurrency static func getExperienceCloudId(completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_ECID,
                           type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
@@ -58,7 +58,7 @@ import Foundation
     ///     - MCORGID: Experience Cloud Org ID
     /// - Parameter completion: invoked with a value containing the identifiers in query parameter format or an AEPError if an unexpected error occurs or the request times out.
     @objc(getUrlVariables:)
-    static func getUrlVariables(completion: @escaping (String?, Error?) -> Void) {
+    @preconcurrency static func getUrlVariables(completion: @escaping @Sendable (String?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITY_URL_VARIABLES,
                           type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
@@ -84,7 +84,7 @@ import Foundation
     /// - Parameter completion: invoked once the identifiers are available, or
     ///                         an `AEPError` if an unexpected error occurs or the request timed out.
     @objc(getIdentities:)
-    static func getIdentities(completion: @escaping (IdentityMap?, Error?) -> Void) {
+    @preconcurrency static func getIdentities(completion: @escaping @Sendable (IdentityMap?, Error?) -> Void) {
         let event = Event(name: IdentityConstants.EventNames.REQUEST_IDENTITIES,
                           type: EventType.edgeIdentity,
                           source: EventSource.requestIdentity,
